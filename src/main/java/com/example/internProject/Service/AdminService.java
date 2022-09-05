@@ -6,8 +6,9 @@ import com.example.internProject.Repository.LabRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
-
+import java.util.Random;
 @Service
 public class AdminService
 {
@@ -35,5 +36,18 @@ public class AdminService
         }
 
 
+    }
+
+    public String deleteLab(String labName){
+        Lab labToBeDeleted = labRepo.findByLabName(labName);
+        if (Objects.isNull(labToBeDeleted)){
+            return "There isn't a lab named "+labName+" found in the database to be deleted";
+        }
+        else {
+            labRepo.delete(labToBeDeleted);
+
+            return "Lab named "+labName+" is successfully deleted from the database";
+
+        }
     }
 }
