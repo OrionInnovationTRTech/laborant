@@ -59,4 +59,39 @@ public class LabService
 
     }
 
+    public String getALlLabsStatus(){
+        List<Lab> allLabs = adminService.getAllLabs();
+        if (allLabs.size() == 0){
+            return "There aren't any labs in the database";
+        }
+        else{
+            String response = "";
+            String outputString = "";
+            for (Lab currentLab: allLabs
+                 )
+            {
+                outputString+= currentLab.getLabName() +   "    "+ "Host: "+ currentLab.getHost()  +  "      " ;
+                try {
+                    response =
+                    connectAndExecuteCommand(currentLab.getUserName(),
+                            currentLab.getPassword(), currentLab.getHost(), currentLab.getPort(),
+                            "sudo wae-status");
+                    outputString+=response;
+                    outputString+="\n  \n";
+                }
+                catch(Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+            }
+            System.out.println(outputString);
+            return outputString;
+
+        }
+
+
+
+    }
+
 }
