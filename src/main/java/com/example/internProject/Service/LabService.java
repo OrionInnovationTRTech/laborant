@@ -76,6 +76,47 @@ public class LabService
                     connectAndExecuteCommand(currentLab.getUserName(),
                             currentLab.getPassword(), currentLab.getHost(), currentLab.getPort(),
                             "sudo wae-status");
+                    Scanner scanner = new Scanner(response);
+                    String currentLine = null;
+                    List<List<String>> outputArray = new ArrayList<>();
+                    while (scanner.hasNextLine())
+                    {
+                        List<String> words = new ArrayList<>();
+                        currentLine = scanner.nextLine();
+                        StringTokenizer tokenizer = new StringTokenizer(currentLine);
+                        while (tokenizer.hasMoreElements())
+                            words.add(tokenizer.nextToken());
+                        outputArray.add(words);
+
+                        System.out.println(currentLine);
+                    }
+                    System.out.println(outputArray);
+                    if (outputArray.get(1).get(9).equals("FAI")){
+                        outputString += "SIGNAL 3";
+                    }
+                    else {
+                        boolean stopFound = false;
+                        boolean failFound = false;
+                        for (String value : outputArray.get(1)) {
+                            System.out.println(value);
+                            if (value.equals("STO")) {
+                                stopFound = true;
+                            }
+                            if (value.equals("FAI")) {
+                                failFound = true;
+                            }
+                        }
+                        if (failFound){
+                            outputString +="SIGNAL 2";
+                        }
+                        else if (!failFound && stopFound) {
+                            outputString+="SIGNAL 1";
+                        }
+                        else {
+                            outputString+="SIGNAL 0";
+                        }
+                    }
+                    outputString+=  " \n";
                     outputString+=response;
                     outputString+="\n  \n";
                 }
