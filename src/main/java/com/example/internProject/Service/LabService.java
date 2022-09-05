@@ -173,4 +173,28 @@ public class LabService
         }
     }
 
+    public String runCommandOnSelectedLab(String labName,String commandToBeExecuted){
+
+        Lab labToExecute = adminService.findLabByName(labName);
+        if (Objects.isNull(labToExecute)){
+            return "There isn't a lab found in the database named "+ labName;
+        }
+        else
+        {
+            String outputString = "";
+            try {
+                outputString+=
+                connectAndExecuteCommand(labToExecute.getUserName(), labToExecute.getPassword(),
+                        labToExecute.getHost(), labToExecute.getPort(), commandToBeExecuted);
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+            return outputString;
+
+        }
+
+    }
+
 }
