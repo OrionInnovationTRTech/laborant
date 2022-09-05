@@ -38,6 +38,12 @@ public class AdminService
 
     }
 
+    public List<Lab> getAllLabs(){
+        List<Lab> allLabs = labRepo.findAll();
+        return allLabs;
+
+    }
+
     public String deleteLab(String labName){
         Lab labToBeDeleted = labRepo.findByLabName(labName);
         if (Objects.isNull(labToBeDeleted)){
@@ -49,5 +55,9 @@ public class AdminService
             return "Lab named "+labName+" is successfully deleted from the database";
 
         }
+    }
+
+    public Lab findLabByName(String labName){
+        return labRepo.findByLabName(labName);
     }
 }
