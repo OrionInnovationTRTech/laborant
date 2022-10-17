@@ -3,16 +3,16 @@ package com.example.internProject.Model;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "Labs")
+@Table(name = "lab")
 public class Lab
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name ="lab_name")
+    @Column(name ="name")
     private String labName;
-    @Column(name ="user_name")
+    @Column(name ="username")
     private String userName;
     @Column(name ="password")
     private String password;
