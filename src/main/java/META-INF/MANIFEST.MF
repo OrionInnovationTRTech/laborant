@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: com.example.internProject.InternProjectApplication
+Main-Class: com.oi.laborant.internproject.InternProjectApplication
 
