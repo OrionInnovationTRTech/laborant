@@ -1,4 +1,4 @@
-package com.example.internProject;
+package com.oi.laborant.internproject;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

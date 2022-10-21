@@ -8,10 +8,10 @@
 		<version>2.7.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
-	<artifactId>internProject</artifactId>
+	<groupId>com.oi.laborant</groupId>
+	<artifactId>internproject</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>internProject</name>
+	<name>internproject</name>
 	<description>Project for Orion Innovation Internship</description>
 	<properties>
 		<java.version>17</java.version>
