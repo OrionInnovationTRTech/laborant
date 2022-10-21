@@ -8,8 +8,8 @@
 		<version>2.7.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.oi.laborant</groupId>
-	<artifactId>internproject</artifactId>
+	<groupId>com.example</groupId>
+	<artifactId>internProject</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>internProject</name>
 	<description>Project for Orion Innovation Internship</description>
