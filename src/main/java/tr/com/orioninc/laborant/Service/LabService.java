@@ -1,7 +1,6 @@
-package com.example.internProject.Service;
+package tr.com.orioninc.laborant.Service;
 
-import com.example.internProject.Model.Lab;
-import com.example.internProject.Repository.LabRepository;
+import tr.com.orioninc.laborant.Model.Lab;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;

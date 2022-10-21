@@ -1,16 +1,15 @@
-package com.example.internProject.Controller;
+package tr.com.orioninc.laborant.Controller;
 
 
-import com.example.internProject.Model.CommandDTO;
-import com.example.internProject.Model.Lab;
-import com.example.internProject.Service.AdminService;
-import com.example.internProject.Service.LabService;
+import tr.com.orioninc.laborant.Model.CommandDTO;
+import tr.com.orioninc.laborant.Model.Lab;
+import tr.com.orioninc.laborant.Service.AdminService;
+import tr.com.orioninc.laborant.Service.LabService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;

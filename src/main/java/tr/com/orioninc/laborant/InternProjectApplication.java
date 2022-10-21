@@ -1,4 +1,4 @@
-package com.example.internProject;
+package tr.com.orioninc.laborant;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

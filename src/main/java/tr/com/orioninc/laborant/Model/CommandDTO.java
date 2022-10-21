@@ -1,4 +1,4 @@
-package com.example.internProject.Model;
+package tr.com.orioninc.laborant.Model;
 
 public class CommandDTO {
 

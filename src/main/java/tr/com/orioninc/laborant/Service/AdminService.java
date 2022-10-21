@@ -1,14 +1,14 @@
 
-package com.example.internProject.Service;
+package tr.com.orioninc.laborant.Service;
 
-import com.example.internProject.Model.Lab;
-import com.example.internProject.Repository.LabRepository;
+import tr.com.orioninc.laborant.Model.Lab;
+import tr.com.orioninc.laborant.Repository.LabRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
+
 @Service
 public class AdminService
 {
