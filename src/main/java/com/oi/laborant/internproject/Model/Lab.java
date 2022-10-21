@@ -1,4 +1,4 @@
-package com.example.internProject.Model;
+package com.oi.laborant.internproject.Model;
 
 import javax.persistence.*;
 

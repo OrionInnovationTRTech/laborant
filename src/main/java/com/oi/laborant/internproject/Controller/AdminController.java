@@ -1,8 +1,8 @@
-package com.example.internProject.Controller;
+package com.oi.laborant.internproject.Controller;
 
-import com.example.internProject.Model.Lab;
-import com.example.internProject.Service.AdminService;
-import com.example.internProject.Service.LabService;
+import com.oi.laborant.internproject.Model.Lab;
+import com.oi.laborant.internproject.Service.AdminService;
+import com.oi.laborant.internproject.Service.LabService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

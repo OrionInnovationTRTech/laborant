@@ -1,6 +1,6 @@
-package com.example.internProject.Repository;
+package com.oi.laborant.internproject.Repository;
 
-import com.example.internProject.Model.Lab;
+import com.oi.laborant.internproject.Model.Lab;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
