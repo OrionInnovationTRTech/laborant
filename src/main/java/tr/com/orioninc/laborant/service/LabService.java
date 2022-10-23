@@ -1,6 +1,6 @@
-package tr.com.orioninc.laborant.Service;
+package tr.com.orioninc.laborant.service;
 
-import tr.com.orioninc.laborant.Model.Lab;
+import tr.com.orioninc.laborant.model.Lab;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;

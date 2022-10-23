@@ -1,8 +1,8 @@
 
-package tr.com.orioninc.laborant.Service;
+package tr.com.orioninc.laborant.service;
 
-import tr.com.orioninc.laborant.Model.Lab;
-import tr.com.orioninc.laborant.Repository.LabRepository;
+import tr.com.orioninc.laborant.model.Lab;
+import tr.com.orioninc.laborant.repository.LabRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

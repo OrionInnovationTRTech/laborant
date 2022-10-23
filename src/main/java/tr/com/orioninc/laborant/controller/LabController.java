@@ -1,10 +1,10 @@
-package tr.com.orioninc.laborant.Controller;
+package tr.com.orioninc.laborant.controller;
 
 
-import tr.com.orioninc.laborant.Model.CommandDTO;
-import tr.com.orioninc.laborant.Model.Lab;
-import tr.com.orioninc.laborant.Service.AdminService;
-import tr.com.orioninc.laborant.Service.LabService;
+import tr.com.orioninc.laborant.model.CommandDTO;
+import tr.com.orioninc.laborant.model.Lab;
+import tr.com.orioninc.laborant.service.AdminService;
+import tr.com.orioninc.laborant.service.LabService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
