@@ -1,6 +1,6 @@
-package tr.com.orioninc.laborant.Repository;
+package tr.com.orioninc.laborant.repository;
 
-import tr.com.orioninc.laborant.Model.Lab;
+import tr.com.orioninc.laborant.model.Lab;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

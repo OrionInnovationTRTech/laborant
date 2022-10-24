@@ -1,10 +1,11 @@
-package tr.com.orioninc.laborant.Controller;
+package tr.com.orioninc.laborant.controller;
 
 
-import tr.com.orioninc.laborant.Model.CommandDTO;
-import tr.com.orioninc.laborant.Model.Lab;
-import tr.com.orioninc.laborant.Service.AdminService;
-import tr.com.orioninc.laborant.Service.LabService;
+import lombok.extern.log4j.Log4j2;
+import tr.com.orioninc.laborant.model.CommandDTO;
+import tr.com.orioninc.laborant.model.Lab;
+import tr.com.orioninc.laborant.service.AdminService;
+import tr.com.orioninc.laborant.service.LabService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
-
+@Log4j2
 @Controller
 public class LabController
 {
@@ -71,7 +72,7 @@ public class LabController
                                  @ModelAttribute("currentCommand") CommandDTO currentCommand)
     {
         if (currentCommand.getCommand() == "") {
-            System.out.println("EMPTY COMMAND");
+            log.info("EMPTY COMMAND");
             Lab labFromDB = adminService.findLabByName(labName);
             Lab currentLab = new Lab();
             currentLab.setLabName(labName);
@@ -92,7 +93,7 @@ public class LabController
             model.addAttribute("currentLab", currentLab);
             try {
                 String commandResponse = labService.runCommandOnSelectedLab(labName, currentCommand.command);
-                System.out.println("INSIDE CONTROLLER" + commandResponse);
+                log.info("INSIDE CONTROLLER" + commandResponse);
                 List<List<String>> outputArray = new ArrayList<>();
                 Scanner scanner = new Scanner(commandResponse);
                 String currentLine = null;

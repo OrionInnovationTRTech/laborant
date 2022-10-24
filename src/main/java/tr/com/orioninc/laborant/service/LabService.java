@@ -1,6 +1,7 @@
-package tr.com.orioninc.laborant.Service;
+package tr.com.orioninc.laborant.service;
 
-import tr.com.orioninc.laborant.Model.Lab;
+import lombok.extern.log4j.Log4j2;
+import tr.com.orioninc.laborant.model.Lab;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
@@ -11,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.*;
 
 @Service
+@Log4j2
 public class LabService
 {
     @Autowired
@@ -87,9 +89,9 @@ public class LabService
                             words.add(tokenizer.nextToken());
                         outputArray.add(words);
 
-                        System.out.println(currentLine);
+                        log.info(currentLine);
                     }
-                    System.out.println(outputArray);
+                    log.info(outputArray);
                     if (outputArray.get(1).get(9).equals("FAI")){
                         outputString += "SIGNAL 3";
                     }
@@ -97,7 +99,7 @@ public class LabService
                         boolean stopFound = false;
                         boolean failFound = false;
                         for (String value : outputArray.get(1)) {
-                            System.out.println(value);
+                            log.info(value);
                             if (value.equals("STO")) {
                                 stopFound = true;
                             }
@@ -125,7 +127,7 @@ public class LabService
                 }
 
             }
-            System.out.println(outputString);
+            log.info(outputString);
             return outputString;
 
         }
