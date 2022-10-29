@@ -3,10 +3,11 @@ package tr.com.orioninc.laborant.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import tr.com.orioninc.laborant.model.Lab;
 import tr.com.orioninc.laborant.repository.LabRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
@@ -17,8 +18,17 @@ import java.util.Objects;
 public class AdminService
 {
     private LabRepository labRepo;
+    public Object addNew (Lab lab)
+    {
+        if (labRepo.findByLabName(lab.getLabName()) != null)
+            return "Lab already exists";
+        else {
+            labRepo.save(lab);
+            return lab;
+        }
+    }
 
-    public  String addNewLab(String labName, String userName, String password, String host, Integer port)
+    public String addNewLab(String labName, String userName, String password, String host, Integer port)
     {
         Lab searchLab = labRepo.findByLabName(labName);
         if (Objects.isNull(searchLab))
@@ -42,8 +52,7 @@ public class AdminService
     }
 
     public List<Lab> getAllLabs(){
-        List<Lab> allLabs = labRepo.findAll();
-        return allLabs;
+        return labRepo.findAll();
 
     }
 
@@ -62,5 +71,20 @@ public class AdminService
 
     public Lab findLabByName(String labName){
         return labRepo.findByLabName(labName);
+    }
+
+    public String updateLab(@PathVariable String labName, @RequestBody Lab lab){
+        Lab labToBeUpdated = labRepo.findByLabName(labName);
+        if (Objects.isNull(labToBeUpdated)){
+            return "There isn't a lab named "+labName+" found in the database to be updated";
+        }
+        else {
+            labToBeUpdated.setUserName(lab.getUserName());
+            labToBeUpdated.setHost(lab.getHost());
+            labToBeUpdated.setPort(lab.getPort());
+            labToBeUpdated.setPassword(lab.getPassword());
+            labRepo.save(labToBeUpdated);
+            return "Lab named "+labName+" is successfully updated in the database";
+        }
     }
 }

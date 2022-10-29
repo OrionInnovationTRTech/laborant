@@ -1,21 +1,20 @@
 package tr.com.orioninc.laborant.controller;
 
 
-import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import tr.com.orioninc.laborant.model.CommandDTO;
 import tr.com.orioninc.laborant.model.Lab;
 import tr.com.orioninc.laborant.service.AdminService;
 import tr.com.orioninc.laborant.service.LabService;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.StringTokenizer;
+import java.util.*;
 
 @Log4j2
 @Controller
@@ -32,7 +31,7 @@ public class LabController
         String response = labService.getALlLabsStatus();
         List<List<String>> outputArray = new ArrayList<>();
         Scanner scanner = new Scanner(response);
-        String currentLine = null;
+        String currentLine;
         while (scanner.hasNextLine())
         {
             List<String> words = new ArrayList<>();
@@ -72,7 +71,7 @@ public class LabController
     public String runCommand(Model model, @PathVariable String labName,
                                  @ModelAttribute("currentCommand") CommandDTO currentCommand)
     {
-        if (currentCommand.getCommand() == "") {
+        if (Objects.equals(currentCommand.getCommand(), "")) {
             log.info("EMPTY COMMAND");
             Lab labFromDB = adminService.findLabByName(labName);
             Lab currentLab = new Lab();
@@ -97,14 +96,14 @@ public class LabController
                 log.info("INSIDE CONTROLLER" + commandResponse);
                 List<List<String>> outputArray = new ArrayList<>();
                 Scanner scanner = new Scanner(commandResponse);
-                String currentLine = null;
+                String currentLine;
 
                 while (scanner.hasNextLine())
                 {
                     List<String> words = new ArrayList<>();
                     currentLine = scanner.nextLine();
 
-                    if (currentLine.substring(0,1) == " "){
+                    if (currentLine.charAt(0) == ' '){
                         words.add(" ");
                     }
                     StringTokenizer tokenizer = new StringTokenizer(currentLine);

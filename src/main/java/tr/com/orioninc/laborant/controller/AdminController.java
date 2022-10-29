@@ -23,6 +23,14 @@ public class AdminController {
     LabService labService;
 
 
+    @GetMapping( value = {"/addNewLab"} )
+    public String addNewLab(Model model)
+    {
+        Lab newLab = new Lab();
+        model.addAttribute("newLab", newLab);
+
+        return "add_Lab_Form";
+    }
     @PostMapping(value = {"/addNewLab"})
     public String submitNewLab(Model model, @ModelAttribute("newLab") Lab lab, RedirectAttributes redirAttrs) {
         try {
