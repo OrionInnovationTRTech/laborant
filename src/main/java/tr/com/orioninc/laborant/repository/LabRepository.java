@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LabRepository extends JpaRepository<Lab,Integer> {
- public Lab findByLabName(String labName);
- public Lab findByUserNameAndHost(String userName, String host);
+ Lab findByLabName(String labName);
+ Lab findByUserNameAndHost(String userName, String host);
 }

@@ -1,24 +1,26 @@
 package tr.com.orioninc.laborant.model;
 
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "lab")
-public class Lab
-{
+public class Lab {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name ="name")
+    @Column(name = "name")
     private String labName;
-    @Column(name ="username")
+    @Column(name = "username")
     private String userName;
-    @Column(name ="password")
+    @Column(name = "password")
     private String password;
-    @Column(name ="host")
+    @Column(name = "host")
     private String host;
-    @Column(name ="port")
+    @Column(name = "port")
     private Integer port;
 
     public Lab() {

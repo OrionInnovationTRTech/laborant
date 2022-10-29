@@ -1,6 +1,8 @@
 
 package tr.com.orioninc.laborant.service;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import tr.com.orioninc.laborant.model.Lab;
 import tr.com.orioninc.laborant.repository.LabRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +12,10 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@Log4j2
+@AllArgsConstructor
 public class AdminService
 {
-    @Autowired
     private LabRepository labRepo;
 
     public  String addNewLab(String labName, String userName, String password, String host, Integer port)
@@ -22,7 +25,7 @@ public class AdminService
         {
             Lab searchHostUserPair = labRepo.findByUserNameAndHost(userName, host) ;
             if (Objects.isNull(searchHostUserPair)){
-                Lab labToBeAdded = new Lab(labName,userName,password,host,port);
+                Lab labToBeAdded = new Lab(labName, userName, password, host, port);
                 labToBeAdded = labRepo.save(labToBeAdded);
                 return "Successfully added the new lab named "+  labToBeAdded.getLabName() + " to the database";
             }

@@ -1,5 +1,6 @@
 package tr.com.orioninc.laborant.service;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import tr.com.orioninc.laborant.model.Lab;
 import com.jcraft.jsch.ChannelExec;
