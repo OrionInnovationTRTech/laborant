@@ -1,26 +1,31 @@
 package tr.com.orioninc.laborant.service;
 
-import lombok.extern.log4j.Log4j2;
-import tr.com.orioninc.laborant.model.Lab;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tr.com.orioninc.laborant.model.Lab;
 
 import java.io.ByteArrayOutputStream;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
+
+
 
 @Service
 @Log4j2
-public class LabService
-{
+public class LabService {
     @Autowired
     AdminService adminService;
-    
+
 
     public static String connectAndExecuteCommand(String username, String password,
-                                           String host, int port, String command) throws Exception {
+                                                  String host, int port, String command) throws Exception {
 
         Session session = null;
         ChannelExec channel = null;
@@ -31,7 +36,7 @@ public class LabService
             session.setPassword(password);
             session.setConfig("StrictHostKeyChecking", "no");
             session.connect();
-            if(session.isConnected()){
+            if (session.isConnected()) {
                 log.info("[connectAndExecuteCommand] Session connected");
             }
 
@@ -46,13 +51,11 @@ public class LabService
             }
 
             responseString = new String(responseStream.toByteArray());
-        }
-        catch(Exception e)
-        {
-            log.error("[connectAndExecuteCommand] Error occured while connecting to lab: {}" , e.getMessage());
+        } catch (Exception e) {
+            log.error("[connectAndExecuteCommand] Error occured while connecting to lab: {}", e.getStackTrace()); //To be checked
             e.printStackTrace();
-        }
-        finally {
+
+        } finally {
             if (session != null) {
                 session.disconnect();
                 log.info("[connectAndExecuteCommand] Session disconnected");
@@ -66,27 +69,25 @@ public class LabService
         return responseString; // it was inside finally block
     }
 
-    public String getALlLabsStatus(){
+    public String getAllLabsStatus() {
         List<Lab> allLabs = adminService.getAllLabs();
-        if (allLabs.size() == 0){
+        if (allLabs.size() == 0) {
             log.warn("[getALlLabsStatus] There is no lab in the database.");
             return "There aren't any labs in the database";
-        }
-        else{
+        } else {
             String response = "";
             StringBuilder outputString = new StringBuilder();
-            for (Lab currentLab: allLabs) {
+            for (Lab currentLab : allLabs) {
                 outputString.append(currentLab.toString()); //toString instead of appending all parameters one by one.
                 try {
                     response =
-                    connectAndExecuteCommand(currentLab.getUserName(),
-                            currentLab.getPassword(), currentLab.getHost(), currentLab.getPort(),
-                            "sudo wae-status");
+                            connectAndExecuteCommand(currentLab.getUserName(),
+                                    currentLab.getPassword(), currentLab.getHost(), currentLab.getPort(),
+                                    "sudo wae-status");
                     Scanner scanner = new Scanner(response);
                     String currentLine = null;
                     List<List<String>> outputArray = new ArrayList<>();
-                    while (scanner.hasNextLine())
-                    {
+                    while (scanner.hasNextLine()) {
                         List<String> words = new ArrayList<>();
                         currentLine = scanner.nextLine();
                         StringTokenizer tokenizer = new StringTokenizer(currentLine);
@@ -97,10 +98,9 @@ public class LabService
                         log.info(currentLine); // I don't know what this info prints. Will look at it while connected to a real lab
                     }
                     log.info(outputArray); // I don't know what this info prints. ****
-                    if (outputArray.get(1).get(9).equals("FAI")){
+                    if (outputArray.get(1).get(9).equals("FAI")) {
                         outputString.append("SIGNAL 3");
-                    }
-                    else {
+                    } else {
                         boolean stopFound = false;
                         boolean failFound = false;
                         for (String value : outputArray.get(1)) {
@@ -112,23 +112,19 @@ public class LabService
                                 failFound = true;
                             }
                         }
-                        if (failFound){
+                        if (failFound) {
                             outputString.append("SIGNAL 2");
-                        }
-                        else if (!failFound && stopFound) {
+                        } else if (!failFound && stopFound) {
                             outputString.append("SIGNAL 1");
-                        }
-                        else {
+                        } else {
                             outputString.append("SIGNAL 0");
                         }
                     }
                     outputString.append(" \n");
                     outputString.append(response);
                     outputString.append("\n  \n");
-                }
-                catch(Exception e)
-                {
-                    log.error("[getALlLabsStatus] error while getting lab status",e);
+                } catch (Exception e) {
+                    log.error("[getALlLabsStatus] error while getting lab status", e);
                     e.printStackTrace();
                 }
 
@@ -139,19 +135,16 @@ public class LabService
         }
 
 
-
     }
 
-    public List<String> getAllLabVersions(){
+    public List<String> getAllLabVersions() {
         List<String> labVersions = new ArrayList<>();
         List<Lab> allLabs = adminService.getAllLabs();
-        if (allLabs.size() == 0)
-        {
+        if (allLabs.size() == 0) {
             log.warn("[getAllLabVersions] There is no lab in the database.");
             labVersions.add("There aren't any labs in the database");
             return labVersions;
-        }
-        else {
+        } else {
             String outputString = "";
             for (Lab currentLab : allLabs) {
                 outputString = "";
@@ -182,24 +175,20 @@ public class LabService
         }
     }
 
-    public String runCommandOnSelectedLab(String labName,String commandToBeExecuted){
+    public String runCommandOnSelectedLab(String labName, String commandToBeExecuted) {
 
         Lab labToExecute = adminService.findLabByName(labName);
-        if (Objects.isNull(labToExecute)){
+        if (Objects.isNull(labToExecute)) {
             log.warn("[runCommandOnSelectedLab] There is no lab with the given name.");
-            return "There is no lab found in the database named "+ labName;
-        }
-        else
-        {
+            return "There is no lab found in the database named " + labName;
+        } else {
             String outputString = "";
             try {
-                outputString+=
-                connectAndExecuteCommand(labToExecute.getUserName(), labToExecute.getPassword(),
-                        labToExecute.getHost(), labToExecute.getPort(), commandToBeExecuted);
-            }
-            catch(Exception e)
-            {
-                log.error("[runCommandOnSelectedLab] error while running command on lab: {}",labName, e);
+                outputString +=
+                        connectAndExecuteCommand(labToExecute.getUserName(), labToExecute.getPassword(),
+                                labToExecute.getHost(), labToExecute.getPort(), commandToBeExecuted);
+            } catch (Exception e) {
+                log.error("[runCommandOnSelectedLab] error while running command on lab: {}", labName, e);
                 e.printStackTrace();
             }
             log.info("[runCommandOnSelectedLab] {}", outputString);
