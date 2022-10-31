@@ -11,10 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.StringTokenizer;
+import java.util.*;
 
 @Log4j2
 @Controller
@@ -41,6 +38,7 @@ public class LabController
                 words.add(tokenizer.nextToken());
             outputArray.add(words);
         }
+        log.info("[getAllLabs] Success - outputArray: {}", outputArray);
         model.addAttribute("success",outputArray);
         return "response_Message";
     }
@@ -54,12 +52,15 @@ public class LabController
             currentLab.setUserName(userName);
             currentLab.setHost(host);
             currentLab.setPort(port);
+            log.info("[runCommandPage] currentLab: {}", currentLab);
             model.addAttribute("currentLab", currentLab);
             CommandDTO currentCommand = new CommandDTO();
+            log.info("[runCommandPage] currentCommand: {}", currentCommand);
             model.addAttribute("currentCommand", currentCommand);
             return "run_Command";
         }
         catch (Exception e){
+            log.error("[runCommandPage] Error while running command: " + e.getMessage());
             String errorMessage = e.getMessage();
             model.addAttribute("errorMessage", errorMessage);
 
@@ -71,15 +72,16 @@ public class LabController
     public String runCommand(Model model, @PathVariable String labName,
                                  @ModelAttribute("currentCommand") CommandDTO currentCommand)
     {
-        log.info("[runCommand] Running command on lab named" + labName);
-        if (currentCommand.getCommand() == "") {
-            log.warn("[EMPTY COMMAND]");
+        log.info("[runCommand] Running command on lab named {}", labName);
+        if (Objects.equals(currentCommand.getCommand(), "")) {
             Lab labFromDB = adminService.findLabByName(labName);
             Lab currentLab = new Lab();
             currentLab.setLabName(labName);
             currentLab.setUserName(labFromDB.getUserName());
             currentLab.setHost(labFromDB.getHost());
             currentLab.setPort(labFromDB.getPort());
+            log.info("[runCommand] currentLab: {}", currentLab);
+            log.warn("[runCommand] Command is empty");
             model.addAttribute("currentLab", currentLab);
             model.addAttribute("errorMessage", "Please enter a command");
             return "run_Command";
@@ -91,10 +93,11 @@ public class LabController
             currentLab.setUserName(labFromDB.getUserName());
             currentLab.setHost(labFromDB.getHost());
             currentLab.setPort(labFromDB.getPort());
+            log.info("[runCommand] currentLab: {}", currentLab);
             model.addAttribute("currentLab", currentLab);
             try {
                 String commandResponse = labService.runCommandOnSelectedLab(labName, currentCommand.command);
-                log.info("[INSIDE CONTROLLER]" + commandResponse);
+                log.info("[runCommand] commandResponse: {}", commandResponse);
                 List<List<String>> outputArray = new ArrayList<>();
                 Scanner scanner = new Scanner(commandResponse);
                 String currentLine = null;
@@ -113,10 +116,13 @@ public class LabController
                     outputArray.add(words);
                 }
 
+                log.info("[runCommand] Success {}", outputArray);
                 model.addAttribute("success", outputArray);
+                log.info("[runCommand] Response message: {}", commandResponse);
                 model.addAttribute("responseMessage", commandResponse);
                 return "run_Command";
             } catch (Exception e) {
+                log.error("[runCommand] Error while running command on lab named {}", labName);
                 String errorMessage = e.getMessage();
                 model.addAttribute("errorMessage", errorMessage);
 

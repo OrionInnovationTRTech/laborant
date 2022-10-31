@@ -12,9 +12,8 @@ public class InternProjectApplication {
 
 	public static void main(String[] args) throws Exception
 	{
-		log.info(" [MAIN] Starting application");
+		log.info("[main] Starting application");
 		SpringApplication.run(InternProjectApplication.class, args);
-
 
 	}
 

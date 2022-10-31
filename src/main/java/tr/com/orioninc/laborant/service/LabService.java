@@ -31,6 +31,9 @@ public class LabService
             session.setPassword(password);
             session.setConfig("StrictHostKeyChecking", "no");
             session.connect();
+            if(session.isConnected()){
+                log.info("[connectAndExecuteCommand] Session connected");
+            }
 
             channel = (ChannelExec) session.openChannel("exec");
             channel.setCommand(command);
@@ -46,30 +49,34 @@ public class LabService
         }
         catch(Exception e)
         {
+            log.error("[connectAndExecuteCommand] Error occured while connecting to lab: {}" , e.getMessage());
             e.printStackTrace();
         }
         finally {
             if (session != null) {
                 session.disconnect();
+                log.info("[connectAndExecuteCommand] Session disconnected");
             }
             if (channel != null) {
+                log.info("[connectAndExecuteCommand] Channel disconnected");
                 channel.disconnect();
             }
-            return responseString;
         }
-
+        log.info("[connectAndExecuteCommand] Response string: {}", responseString);
+        return responseString; // it was inside finally block
     }
 
     public String getALlLabsStatus(){
         List<Lab> allLabs = adminService.getAllLabs();
         if (allLabs.size() == 0){
+            log.warn("[getALlLabsStatus] There is no lab in the database.");
             return "There aren't any labs in the database";
         }
         else{
             String response = "";
             StringBuilder outputString = new StringBuilder();
             for (Lab currentLab: allLabs) {
-                outputString.append("Lab: ").append(currentLab.getLabName()).append("  ").append("Host: ").append(currentLab.getHost()).append("----");
+                outputString.append(currentLab.toString()); //toString instead of appending all parameters one by one.
                 try {
                     response =
                     connectAndExecuteCommand(currentLab.getUserName(),
@@ -87,9 +94,9 @@ public class LabService
                             words.add(tokenizer.nextToken());
                         outputArray.add(words);
 
-                        log.info(currentLine); // I dont know what this info prints.
+                        log.info(currentLine); // I don't know what this info prints. Will look at it while connected to a real lab
                     }
-                    log.info(outputArray); // I dont know what this info prints.
+                    log.info(outputArray); // I don't know what this info prints. ****
                     if (outputArray.get(1).get(9).equals("FAI")){
                         outputString.append("SIGNAL 3");
                     }
@@ -121,11 +128,12 @@ public class LabService
                 }
                 catch(Exception e)
                 {
+                    log.error("[getALlLabsStatus] error while getting lab status",e);
                     e.printStackTrace();
                 }
 
             }
-            log.info("[LABSERVICE] " + outputString);
+            log.info("[getAllLabsStatus] {}", outputString);
             return outputString.toString();
 
         }
@@ -139,13 +147,13 @@ public class LabService
         List<Lab> allLabs = adminService.getAllLabs();
         if (allLabs.size() == 0)
         {
+            log.warn("[getAllLabVersions] There is no lab in the database.");
             labVersions.add("There aren't any labs in the database");
             return labVersions;
         }
         else {
             String outputString = "";
-            for (Lab currentLab : allLabs
-            ) {
+            for (Lab currentLab : allLabs) {
                 outputString = "";
                 outputString += currentLab.getLabName() + " \n";
                 try {
@@ -161,6 +169,7 @@ public class LabService
                     String currentVersion = tokens.get(15);
                     labVersions.add(currentVersion);
                 } catch (Exception e) {
+                    log.error("[getAllLabVersions] error while getting lab version on lab: {}", currentLab.getLabName(), e);
                     e.printStackTrace();
                     labVersions.add("UNABLE TO CONNECT");
 
@@ -168,6 +177,7 @@ public class LabService
                 }
 
             }
+            log.info("[LabService] {}", labVersions);
             return labVersions;
         }
     }
@@ -176,7 +186,8 @@ public class LabService
 
         Lab labToExecute = adminService.findLabByName(labName);
         if (Objects.isNull(labToExecute)){
-            return "There isn't a lab found in the database named "+ labName;
+            log.warn("[runCommandOnSelectedLab] There is no lab with the given name.");
+            return "There is no lab found in the database named "+ labName;
         }
         else
         {
@@ -188,8 +199,10 @@ public class LabService
             }
             catch(Exception e)
             {
+                log.error("[runCommandOnSelectedLab] error while running command on lab: {}",labName, e);
                 e.printStackTrace();
             }
+            log.info("[runCommandOnSelectedLab] {}", outputString);
             return outputString;
 
         }
