@@ -38,7 +38,6 @@ public class LabController
                 words.add(tokenizer.nextToken());
             outputArray.add(words);
         }
-        log.info("[getAllLabs] Success - outputArray: {}", outputArray);
         model.addAttribute("success",outputArray);
         return "response_Message";
     }
@@ -72,7 +71,7 @@ public class LabController
     public String runCommand(Model model, @PathVariable String labName,
                                  @ModelAttribute("currentCommand") CommandDTO currentCommand)
     {
-        log.info("[runCommand] Running command on lab named {}", labName);
+        log.info("[runCommand][LabController] Running command on lab named {}", labName);
         if (Objects.equals(currentCommand.getCommand(), "")) {
             Lab labFromDB = adminService.findLabByName(labName);
             Lab currentLab = new Lab();
@@ -80,8 +79,8 @@ public class LabController
             currentLab.setUserName(labFromDB.getUserName());
             currentLab.setHost(labFromDB.getHost());
             currentLab.setPort(labFromDB.getPort());
-            log.info("[runCommand] currentLab: {}", currentLab);
-            log.warn("[runCommand] Command is empty");
+            log.info("[runCommand][LabController] currentLab: {}", currentLab);
+            log.warn("[runCommand][LabController] Command is empty");
             model.addAttribute("currentLab", currentLab);
             model.addAttribute("errorMessage", "Please enter a command");
             return "run_Command";
@@ -93,11 +92,11 @@ public class LabController
             currentLab.setUserName(labFromDB.getUserName());
             currentLab.setHost(labFromDB.getHost());
             currentLab.setPort(labFromDB.getPort());
-            log.info("[runCommand] currentLab: {}", currentLab);
+            log.info("[runCommand][LabController] currentLab: {}", currentLab);
             model.addAttribute("currentLab", currentLab);
             try {
                 String commandResponse = labService.runCommandOnSelectedLab(labName, currentCommand.command);
-                log.info("[runCommand] commandResponse: {}", commandResponse);
+                log.info("[runCommand][LabController] commandResponse: {}", commandResponse);
                 List<List<String>> outputArray = new ArrayList<>();
                 Scanner scanner = new Scanner(commandResponse);
                 String currentLine = null;
@@ -116,13 +115,13 @@ public class LabController
                     outputArray.add(words);
                 }
 
-                log.info("[runCommand] Success {}", outputArray);
+                log.info("[runCommand][LabController] Success {}", outputArray);
                 model.addAttribute("success", outputArray);
-                log.info("[runCommand] Response message: {}", commandResponse);
+                log.info("[runCommand][LabController] Response message: {}", commandResponse);
                 model.addAttribute("responseMessage", commandResponse);
                 return "run_Command";
             } catch (Exception e) {
-                log.error("[runCommand] Error while running command on lab named {}", labName);
+                log.error("[runCommand][LabController] Error while running command on lab named {}", labName);
                 String errorMessage = e.getMessage();
                 model.addAttribute("errorMessage", errorMessage);
 

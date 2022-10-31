@@ -1,5 +1,6 @@
 package tr.com.orioninc.laborant.controller;
 
+import lombok.extern.log4j.Log4j2;
 import tr.com.orioninc.laborant.model.Lab;
 import tr.com.orioninc.laborant.service.AdminService;
 import tr.com.orioninc.laborant.service.LabService;
@@ -13,6 +14,7 @@ import java.util.List;
 
 
 @Controller
+@Log4j2
 public class AdminController {
 
     @Autowired
@@ -39,12 +41,14 @@ public class AdminController {
                    lab.getPassword(),lab.getHost(),lab.getPort());
 
            model.addAttribute("success",newLabResult);
+           log.info("[submitNewLab][AdminController] Success - New Lab Added {}", newLabResult);
            model.addAttribute("responseMessage", newLabResult);
            return   "add_Lab_Form";
        }
        catch (Exception e){
            String errorMessage = e.getMessage();
            redirAttrs.addFlashAttribute("error", errorMessage);
+              log.error("[submitNewLab][AdminController] Error while adding new lab {}", errorMessage);
            model.addAttribute("errorMessage", "Please fill" +
                    " all the fields to add a lab to the database");
 
@@ -56,7 +60,9 @@ public class AdminController {
     public String getAllLabs(Model model){
         List<Lab> allLabs = adminService.getAllLabs();
         model.addAttribute("labs",allLabs);
+        log.info("[getAllLabs][Admin Controller] All Labs: {}", allLabs);
         List<String> labVersions = labService.getAllLabVersions();
+        log.info("[getAllLabs][Admin Controller] All Lab Versions: {}", labVersions);
         model.addAttribute("labVersions",labVersions);
         return "all_Labs";
 
