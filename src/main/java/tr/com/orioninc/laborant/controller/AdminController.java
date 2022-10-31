@@ -1,31 +1,32 @@
 package tr.com.orioninc.laborant.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import tr.com.orioninc.laborant.model.Lab;
 import tr.com.orioninc.laborant.service.AdminService;
 import tr.com.orioninc.laborant.service.LabService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
 
 @Controller
 @Log4j2
+@AllArgsConstructor
 public class AdminController {
 
-    @Autowired
     AdminService adminService;
 
-    @Autowired
     LabService labService;
 
-    @GetMapping( value = {"/addNewLab"} )
-    public String addNewLab(Model model)
-    {
+    @GetMapping(value = {"/addNewLab"})
+    public String addNewLab(Model model) {
         Lab newLab = new Lab();
         model.addAttribute("newLab", newLab);
 
@@ -33,45 +34,43 @@ public class AdminController {
     }
 
 
-    @PostMapping( value = {"/addNewLab"} )
-    public String submitNewLab(Model model,@ModelAttribute("newLab") Lab lab,RedirectAttributes redirAttrs)
-    {
-       try{
-           String newLabResult = adminService.addNewLab(lab.getLabName(),lab.getUserName(),
-                   lab.getPassword(),lab.getHost(),lab.getPort());
+    @PostMapping(value = {"/addNewLab"})
+    public String submitNewLab(Model model, @ModelAttribute("newLab") Lab lab, RedirectAttributes redirAttrs) {
+        try {
+            String newLabResult = adminService.addNewLab(lab.getLabName(), lab.getUserName(),
+                    lab.getPassword(), lab.getHost(), lab.getPort());
 
-           model.addAttribute("success",newLabResult);
-           log.info("[submitNewLab][AdminController] Success - New Lab Added {}", newLabResult);
-           model.addAttribute("responseMessage", newLabResult);
-           return   "add_Lab_Form";
-       }
-       catch (Exception e){
-           String errorMessage = e.getMessage();
-           redirAttrs.addFlashAttribute("error", errorMessage);
-              log.error("[submitNewLab][AdminController] Error while adding new lab {}", errorMessage);
-           model.addAttribute("errorMessage", "Please fill" +
-                   " all the fields to add a lab to the database");
+            model.addAttribute("success", newLabResult);
+            log.info("[submitNewLab][AdminController] Success - New Lab Added {}", newLabResult);
+            model.addAttribute("responseMessage", newLabResult);
+            return "add_Lab_Form";
+        } catch (Exception e) {
+            String errorMessage = e.getMessage();
+            redirAttrs.addFlashAttribute("error", errorMessage);
+            log.error("[submitNewLab][AdminController] Error while adding new lab {}", errorMessage);
+            model.addAttribute("errorMessage", "Please fill" +
+                    " all the fields to add a lab to the database");
 
-           return "add_Lab_Form";
-       }
+            return "add_Lab_Form";
+        }
     }
 
-    @GetMapping( value = {"/allLabs"})
-    public String getAllLabs(Model model){
+    @GetMapping(value = {"/allLabs"})
+    public String getAllLabs(Model model) {
         List<Lab> allLabs = adminService.getAllLabs();
-        model.addAttribute("labs",allLabs);
+        model.addAttribute("labs", allLabs);
         log.info("[getAllLabs][Admin Controller] All Labs: {}", allLabs);
         List<String> labVersions = labService.getAllLabVersions();
         log.info("[getAllLabs][Admin Controller] All Lab Versions: {}", labVersions);
-        model.addAttribute("labVersions",labVersions);
+        model.addAttribute("labVersions", labVersions);
         return "all_Labs";
 
     }
 
-    @GetMapping( value = {"/deleteLab/{labName}"})
-    public String deleteLab(Model model,@PathVariable String labName){
+    @GetMapping(value = {"/deleteLab/{labName}"})
+    public String deleteLab(Model model, @PathVariable String labName) {
         String response = adminService.deleteLab(labName);
-        model.addAttribute("message",response);
+        model.addAttribute("message", response);
         return "redirect:/allLabs";
     }
 

@@ -8,6 +8,7 @@ public class CommandDTO {
     public CommandDTO() {
         this.command = null;
     }
+
     public CommandDTO(String command) {
         this.command = command;
     }
