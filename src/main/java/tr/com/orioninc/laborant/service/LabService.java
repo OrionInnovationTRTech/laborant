@@ -67,11 +67,9 @@ public class LabService
         }
         else{
             String response = "";
-            String outputString = "";
-            for (Lab currentLab: allLabs
-                 )
-            {
-                outputString+= currentLab.getLabName() +   "    "+ "Host: "+ currentLab.getHost()  +  "      " ;
+            StringBuilder outputString = new StringBuilder();
+            for (Lab currentLab: allLabs) {
+                outputString.append("Lab: ").append(currentLab.getLabName()).append("  ").append("Host: ").append(currentLab.getHost()).append("----");
                 try {
                     response =
                     connectAndExecuteCommand(currentLab.getUserName(),
@@ -89,11 +87,11 @@ public class LabService
                             words.add(tokenizer.nextToken());
                         outputArray.add(words);
 
-                        log.info(currentLine);
+                        log.info(currentLine); // I dont know what this info prints.
                     }
-                    log.info(outputArray);
+                    log.info(outputArray); // I dont know what this info prints.
                     if (outputArray.get(1).get(9).equals("FAI")){
-                        outputString += "SIGNAL 3";
+                        outputString.append("SIGNAL 3");
                     }
                     else {
                         boolean stopFound = false;
@@ -108,18 +106,18 @@ public class LabService
                             }
                         }
                         if (failFound){
-                            outputString +="SIGNAL 2";
+                            outputString.append("SIGNAL 2");
                         }
                         else if (!failFound && stopFound) {
-                            outputString+="SIGNAL 1";
+                            outputString.append("SIGNAL 1");
                         }
                         else {
-                            outputString+="SIGNAL 0";
+                            outputString.append("SIGNAL 0");
                         }
                     }
-                    outputString+=  " \n";
-                    outputString+=response;
-                    outputString+="\n  \n";
+                    outputString.append(" \n");
+                    outputString.append(response);
+                    outputString.append("\n  \n");
                 }
                 catch(Exception e)
                 {
@@ -127,8 +125,8 @@ public class LabService
                 }
 
             }
-            log.info(outputString);
-            return outputString;
+            log.info("[LABSERVICE] " + outputString);
+            return outputString.toString();
 
         }
 

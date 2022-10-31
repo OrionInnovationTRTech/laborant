@@ -1,6 +1,7 @@
 
 package tr.com.orioninc.laborant.service;
 
+import lombok.extern.log4j.Log4j2;
 import tr.com.orioninc.laborant.model.Lab;
 import tr.com.orioninc.laborant.repository.LabRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@Log4j2
 public class AdminService
 {
     @Autowired
@@ -24,14 +26,18 @@ public class AdminService
             if (Objects.isNull(searchHostUserPair)){
                 Lab labToBeAdded = new Lab(labName,userName,password,host,port);
                 labToBeAdded = labRepo.save(labToBeAdded);
+                log.info("[addNewLab] Successfully added new lab with name: " + labToBeAdded.getLabName());
                 return "Successfully added the new lab named "+  labToBeAdded.getLabName() + " to the database";
             }
             else{
+                log.warn("[addNewLab] The lab named " + labName + " already exists in the database");
                 return "There is already a pair in the database with username: "+userName + " and host: " + host ;
             }
         }
         else
         {
+
+            log.warn("[addNewLab] There is already a lab named " + labName + "  in the database. Try again");
             return "There is already a lab named " + labName + " in the database. Try again";
         }
 
@@ -40,11 +46,12 @@ public class AdminService
 
     public List<Lab> getAllLabs(){
         List<Lab> allLabs = labRepo.findAll();
+        log.info("[getAllLabs] - Getting all labs from the database... " + allLabs);
         return allLabs;
-
     }
 
     public String deleteLab(String labName){
+        log.info("[deleteLab] lab deleted: " + labName);
         Lab labToBeDeleted = labRepo.findByLabName(labName);
         if (Objects.isNull(labToBeDeleted)){
             return "There isn't a lab named "+labName+" found in the database to be deleted";
@@ -58,6 +65,7 @@ public class AdminService
     }
 
     public Lab findLabByName(String labName){
+        log.info("[findLabByName] Lab found: "+labName);
         return labRepo.findByLabName(labName);
     }
 }

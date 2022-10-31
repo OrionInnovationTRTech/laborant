@@ -71,8 +71,9 @@ public class LabController
     public String runCommand(Model model, @PathVariable String labName,
                                  @ModelAttribute("currentCommand") CommandDTO currentCommand)
     {
+        log.info("[runCommand] Running command on lab named" + labName);
         if (currentCommand.getCommand() == "") {
-            log.info("EMPTY COMMAND");
+            log.warn("[EMPTY COMMAND]");
             Lab labFromDB = adminService.findLabByName(labName);
             Lab currentLab = new Lab();
             currentLab.setLabName(labName);
@@ -93,7 +94,7 @@ public class LabController
             model.addAttribute("currentLab", currentLab);
             try {
                 String commandResponse = labService.runCommandOnSelectedLab(labName, currentCommand.command);
-                log.info("INSIDE CONTROLLER" + commandResponse);
+                log.info("[INSIDE CONTROLLER]" + commandResponse);
                 List<List<String>> outputArray = new ArrayList<>();
                 Scanner scanner = new Scanner(commandResponse);
                 String currentLine = null;
