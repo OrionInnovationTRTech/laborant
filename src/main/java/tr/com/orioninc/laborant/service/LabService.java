@@ -11,14 +11,12 @@ import java.io.ByteArrayOutputStream;
 import java.util.*;
 
 @Service
-public class LabService
-{
+public class LabService {
     @Autowired
     AdminService adminService;
-    
 
     public static String connectAndExecuteCommand(String username, String password,
-                                           String host, int port, String command) throws Exception {
+            String host, int port, String command) throws Exception {
 
         Session session = null;
         ChannelExec channel = null;
@@ -41,12 +39,9 @@ public class LabService
             }
 
             responseString = new String(responseStream.toByteArray());
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             if (session != null) {
                 session.disconnect();
             }
@@ -58,28 +53,23 @@ public class LabService
 
     }
 
-    public String getALlLabsStatus(){
+    public String getALlLabsStatus() {
         List<Lab> allLabs = adminService.getAllLabs();
-        if (allLabs.size() == 0){
+        if (allLabs.size() == 0) {
             return "There aren't any labs in the database";
-        }
-        else{
+        } else {
             String response = "";
             String outputString = "";
-            for (Lab currentLab: allLabs
-                 )
-            {
-                outputString+= currentLab.getLabName() +   "    "+ "Host: "+ currentLab.getHost()  +  "      " ;
+            for (Lab currentLab : allLabs) {
+                outputString += currentLab.getLabName() + "    " + "Host: " + currentLab.getHost() + "      ";
                 try {
-                    response =
-                    connectAndExecuteCommand(currentLab.getUserName(),
+                    response = connectAndExecuteCommand(currentLab.getUserName(),
                             currentLab.getPassword(), currentLab.getHost(), currentLab.getPort(),
                             "sudo wae-status");
                     Scanner scanner = new Scanner(response);
                     String currentLine = null;
                     List<List<String>> outputArray = new ArrayList<>();
-                    while (scanner.hasNextLine())
-                    {
+                    while (scanner.hasNextLine()) {
                         List<String> words = new ArrayList<>();
                         currentLine = scanner.nextLine();
                         StringTokenizer tokenizer = new StringTokenizer(currentLine);
@@ -90,10 +80,9 @@ public class LabService
                         System.out.println(currentLine);
                     }
                     System.out.println(outputArray);
-                    if (outputArray.get(1).get(9).equals("FAI")){
+                    if (outputArray.get(1).get(9).equals("FAI")) {
                         outputString += "SIGNAL 3";
-                    }
-                    else {
+                    } else {
                         boolean stopFound = false;
                         boolean failFound = false;
                         for (String value : outputArray.get(1)) {
@@ -105,22 +94,18 @@ public class LabService
                                 failFound = true;
                             }
                         }
-                        if (failFound){
-                            outputString +="SIGNAL 2";
-                        }
-                        else if (!failFound && stopFound) {
-                            outputString+="SIGNAL 1";
-                        }
-                        else {
-                            outputString+="SIGNAL 0";
+                        if (failFound) {
+                            outputString += "SIGNAL 2";
+                        } else if (!failFound && stopFound) {
+                            outputString += "SIGNAL 1";
+                        } else {
+                            outputString += "SIGNAL 0";
                         }
                     }
-                    outputString+=  " \n";
-                    outputString+=response;
-                    outputString+="\n  \n";
-                }
-                catch(Exception e)
-                {
+                    outputString += " \n";
+                    outputString += response;
+                    outputString += "\n  \n";
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -130,29 +115,23 @@ public class LabService
 
         }
 
-
-
     }
 
-    public List<String> getAllLabVersions(){
+    public List<String> getAllLabVersions() {
         List<String> labVersions = new ArrayList<>();
         List<Lab> allLabs = adminService.getAllLabs();
-        if (allLabs.size() == 0)
-        {
+        if (allLabs.size() == 0) {
             labVersions.add("There aren't any labs in the database");
             return labVersions;
-        }
-        else {
+        } else {
             String outputString = "";
-            for (Lab currentLab : allLabs
-            ) {
+            for (Lab currentLab : allLabs) {
                 outputString = "";
                 outputString += currentLab.getLabName() + " \n";
                 try {
-                    outputString +=
-                            connectAndExecuteCommand(currentLab.getUserName(),
-                                    currentLab.getPassword(), currentLab.getHost(), currentLab.getPort(),
-                                    "sudo wae-status");
+                    outputString += connectAndExecuteCommand(currentLab.getUserName(),
+                            currentLab.getPassword(), currentLab.getHost(), currentLab.getPort(),
+                            "sudo wae-status");
                     outputString += "\n  \n";
                     List<String> tokens = new ArrayList<>();
                     StringTokenizer tokenizer = new StringTokenizer(outputString);
@@ -164,7 +143,6 @@ public class LabService
                     e.printStackTrace();
                     labVersions.add("UNABLE TO CONNECT");
 
-
                 }
 
             }
@@ -172,22 +150,17 @@ public class LabService
         }
     }
 
-    public String runCommandOnSelectedLab(String labName,String commandToBeExecuted){
+    public String runCommandOnSelectedLab(String labName, String commandToBeExecuted) {
 
         Lab labToExecute = adminService.findLabByName(labName);
-        if (Objects.isNull(labToExecute)){
-            return "There isn't a lab found in the database named "+ labName;
-        }
-        else
-        {
+        if (Objects.isNull(labToExecute)) {
+            return "There isn't a lab found in the database named " + labName;
+        } else {
             String outputString = "";
             try {
-                outputString+=
-                connectAndExecuteCommand(labToExecute.getUserName(), labToExecute.getPassword(),
+                outputString += connectAndExecuteCommand(labToExecute.getUserName(), labToExecute.getPassword(),
                         labToExecute.getHost(), labToExecute.getPort(), commandToBeExecuted);
-            }
-            catch(Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return outputString;
