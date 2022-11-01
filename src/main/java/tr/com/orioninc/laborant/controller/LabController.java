@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -17,6 +19,7 @@ import java.util.StringTokenizer;
 
 
 @Controller
+@Log4j2
 public class LabController
 {
     @Autowired
@@ -27,7 +30,7 @@ public class LabController
 
     @GetMapping(value = {"/lab/getAllLabsStatus"})
     public String getAllLabs(Model model){
-        String response = labService.getALlLabsStatus();
+        String response = labService.getAllLabsStatus();
         List<List<String>> outputArray = new ArrayList<>();
         Scanner scanner = new Scanner(response);
         String currentLine = null;
@@ -41,6 +44,7 @@ public class LabController
             outputArray.add(words);
         }
         model.addAttribute("success",outputArray);
+        scanner.close();
         return "response_Message";
     }
 
@@ -122,29 +126,5 @@ public class LabController
             }
         }
     }
-    
-}
-
-/*
-@RestController
-public class LabController
-{
-    @Autowired
-    LabService labService;
-
-    @GetMapping("/lab/getAllLabsStatus")
-    public String getAllLabs(){
-        return labService.getALlLabsStatus();
-    }
-
-    @GetMapping("/lab/runCommand")
-    public String getAllLabs(@RequestParam String labName, @RequestParam String command)
-    {
-        return labService.runCommandOnSelectedLab(labName,command);
-    }
-
-
-
 
 }
- */
