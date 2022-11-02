@@ -1,6 +1,7 @@
 package tr.com.orioninc.laborant.controller;
 
 
+import lombok.AllArgsConstructor;
 import tr.com.orioninc.laborant.model.CommandDTO;
 import tr.com.orioninc.laborant.model.Lab;
 import tr.com.orioninc.laborant.service.AdminService;
@@ -30,6 +31,7 @@ public class LabController
 
     @GetMapping(value = {"/lab/getAllLabsStatus"})
     public String getAllLabs(Model model){
+        log.debug("[getAllLabs] @GetMapping /getAllLabsStatus method is called");
         String response = labService.getAllLabsStatus();
         List<List<String>> outputArray = new ArrayList<>();
         Scanner scanner = new Scanner(response);
@@ -44,6 +46,7 @@ public class LabController
             outputArray.add(words);
         }
         model.addAttribute("success",outputArray);
+        log.debug("[getAllLabs] @GetMapping /getAllLabsStatus success.");
         scanner.close();
         return "response_Message";
     }
@@ -51,6 +54,7 @@ public class LabController
     @GetMapping(value = {"/lab/runCommand/{labName}/{userName}/{host}/{port}"})
     public String runCommandPage(Model model,@PathVariable String labName,@PathVariable String userName,@PathVariable String host,@PathVariable Integer port)
     {
+        log.debug("[runCommandPage] @GetMapping /runCommand method is called");
         try {
             Lab currentLab = new Lab();
             currentLab.setLabName(labName);
@@ -64,6 +68,7 @@ public class LabController
         }
         catch (Exception e){
             String errorMessage = e.getMessage();
+            log.error("[runCommandPage] @GetMapping exception: {}" + e.getMessage());
             model.addAttribute("errorMessage", errorMessage);
 
             return "run_Command";
@@ -74,8 +79,9 @@ public class LabController
     public String runCommand(Model model, @PathVariable String labName,
                                  @ModelAttribute("currentCommand") CommandDTO currentCommand)
     {
+        log.debug("[runCommand] @PostMapping /runCommand method is called");
         if (currentCommand.getCommand() == "") {
-            System.out.println("EMPTY COMMAND");
+            log.info("[runCommand] Empty command.");
             Lab labFromDB = adminService.findLabByName(labName);
             Lab currentLab = new Lab();
             currentLab.setLabName(labName);
@@ -96,7 +102,7 @@ public class LabController
             model.addAttribute("currentLab", currentLab);
             try {
                 String commandResponse = labService.runCommandOnSelectedLab(labName, currentCommand.command);
-                System.out.println("INSIDE CONTROLLER" + commandResponse);
+                log.info("[runCommand] Inside controller: {}", commandResponse);
                 List<List<String>> outputArray = new ArrayList<>();
                 Scanner scanner = new Scanner(commandResponse);
                 String currentLine = null;
@@ -115,11 +121,13 @@ public class LabController
                     outputArray.add(words);
                 }
 
+                log.info("[runCommand] Output array: {}", outputArray);
                 model.addAttribute("success", outputArray);
                 model.addAttribute("responseMessage", commandResponse);
                 return "run_Command";
             } catch (Exception e) {
                 String errorMessage = e.getMessage();
+                log.error("[runCommand] @PostMapping exception: {}" + e.getMessage());
                 model.addAttribute("errorMessage", errorMessage);
 
                 return "run_Command";
