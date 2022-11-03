@@ -2,7 +2,7 @@ package tr.com.orioninc.laborant.model;
 
 public class CommandDTO {
 
-    public String command;
+    private String command;
 
     public CommandDTO() {
         this.command = null;

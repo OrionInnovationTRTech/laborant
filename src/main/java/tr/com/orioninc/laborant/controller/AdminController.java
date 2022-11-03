@@ -20,8 +20,8 @@ import java.util.List;
 @AllArgsConstructor
 public class AdminController {
 
-    AdminService adminService;
-    LabService labService;
+    private AdminService adminService;
+    private LabService labService;
 
     @GetMapping(value = { "/addNewLab" })
     public String addNewLab(Model model) {

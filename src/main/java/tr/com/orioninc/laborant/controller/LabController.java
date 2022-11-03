@@ -14,6 +14,7 @@ import tr.com.orioninc.laborant.service.AdminService;
 import tr.com.orioninc.laborant.service.LabService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -23,8 +24,8 @@ import java.util.StringTokenizer;
 @AllArgsConstructor
 public class LabController {
 
-    LabService labService;
-    AdminService adminService;
+    private LabService labService;
+    private AdminService adminService;
 
     @GetMapping(value = { "/lab/getAllLabsStatus" })
     public String getAllLabs(Model model) {
@@ -36,9 +37,12 @@ public class LabController {
         while (scanner.hasNextLine()) {
             List<String> words = new ArrayList<>();
             currentLine = scanner.nextLine();
-            StringTokenizer tokenizer = new StringTokenizer(currentLine);
-            while (tokenizer.hasMoreElements())
-                words.add(tokenizer.nextToken());
+            // StringTokenizer tokenizer = new StringTokenizer(currentLine);
+            // while (tokenizer.hasMoreElements())
+            //     words.add(tokenizer.nextToken());
+            // TODO: Not tested, old impl above.
+            String[] outputStringTokenized = currentLine.split(" ");
+            Arrays.asList(outputStringTokenized).forEach(words::add);
             outputArray.add(words);
         }
         model.addAttribute("success", outputArray);
@@ -74,7 +78,7 @@ public class LabController {
     public String runCommand(Model model, @PathVariable String labName,
             @ModelAttribute("currentCommand") CommandDTO currentCommand) {
         log.debug("[runCommand] @PostMapping /runCommand method is called");
-        if (currentCommand.getCommand() == "") {
+        if (currentCommand.getCommand().isEmpty()) {
             log.info("[runCommand] Empty command.");
             Lab labFromDB = adminService.findLabByName(labName);
             Lab currentLab = new Lab();
@@ -85,46 +89,48 @@ public class LabController {
             model.addAttribute("currentLab", currentLab);
             model.addAttribute("errorMessage", "Please enter a command");
             return "run_Command";
-        } else {
-            Lab labFromDB = adminService.findLabByName(labName);
-            Lab currentLab = new Lab();
-            currentLab.setLabName(labName);
-            currentLab.setUserName(labFromDB.getUserName());
-            currentLab.setHost(labFromDB.getHost());
-            currentLab.setPort(labFromDB.getPort());
-            model.addAttribute("currentLab", currentLab);
-            try {
-                String commandResponse = labService.runCommandOnSelectedLab(labName, currentCommand.command);
-                log.info("[runCommand] Inside controller: {}", commandResponse);
-                List<List<String>> outputArray = new ArrayList<>();
-                Scanner scanner = new Scanner(commandResponse);
-                String currentLine = null;
-
-                while (scanner.hasNextLine()) {
-                    List<String> words = new ArrayList<>();
-                    currentLine = scanner.nextLine();
-
-                    if (currentLine.substring(0, 1) == " ") {
-                        words.add(" ");
-                    }
-                    StringTokenizer tokenizer = new StringTokenizer(currentLine);
-                    while (tokenizer.hasMoreElements())
-                        words.add(tokenizer.nextToken());
-                    outputArray.add(words);
-                }
-
-                log.info("[runCommand] Output array: {}", outputArray);
-                model.addAttribute("success", outputArray);
-                model.addAttribute("responseMessage", commandResponse);
-                return "run_Command";
-            } catch (Exception e) {
-                String errorMessage = e.getMessage();
-                log.error("[runCommand] @PostMapping exception: {}", e.getMessage(), e);
-                model.addAttribute("errorMessage", errorMessage);
-
-                return "run_Command";
-            }
         }
+        Lab labFromDB = adminService.findLabByName(labName);
+        Lab currentLab = new Lab();
+        currentLab.setLabName(labName);
+        currentLab.setUserName(labFromDB.getUserName());
+        currentLab.setHost(labFromDB.getHost());
+        currentLab.setPort(labFromDB.getPort());
+        model.addAttribute("currentLab", currentLab);
+        try {
+            String commandResponse = labService.runCommandOnSelectedLab(labName, currentCommand.getCommand());
+            log.info("[runCommand] Inside controller: {}", commandResponse);
+            List<List<String>> outputArray = new ArrayList<>();
+            Scanner scanner = new Scanner(commandResponse);
+            String currentLine = null;
+
+            while (scanner.hasNextLine()) {
+                List<String> words = new ArrayList<>();
+                currentLine = scanner.nextLine();
+
+                if (" ".equals(currentLine.substring(0, 1))) {
+                    words.add(" ");
+                }
+                // StringTokenizer tokenizer = new StringTokenizer(currentLine);
+                // while (tokenizer.hasMoreElements())
+                //     words.add(tokenizer.nextToken());
+                // TODO: Not tested, old impl above.
+                String[] outputStringTokenized = currentLine.split(" ");
+                Arrays.asList(outputStringTokenized).forEach(words::add);
+                outputArray.add(words);
+            }
+
+            log.info("[runCommand] Output array: {}", outputArray);
+            model.addAttribute("success", outputArray);
+            model.addAttribute("responseMessage", commandResponse);
+            scanner.close();
+        } catch (Exception e) {
+            String errorMessage = e.getMessage();
+            log.error("[runCommand] @PostMapping exception: {}", e.getMessage(), e);
+            model.addAttribute("errorMessage", errorMessage);
+        }
+        return "run_Command";
+
     }
 
 }
