@@ -1,8 +1,8 @@
 package tr.com.orioninc.laborant.controller;
 
 
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,11 +22,10 @@ import java.util.StringTokenizer;
 
 @Controller
 @Log4j2
+@AllArgsConstructor
 public class LabController {
-    @Autowired
-    LabService labService;
 
-    @Autowired
+    LabService labService;
     AdminService adminService;
 
     @GetMapping(value = {"/lab/getAllLabsStatus"})

@@ -1,7 +1,7 @@
 package tr.com.orioninc.laborant.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,12 +18,10 @@ import java.util.List;
 
 @Controller
 @Log4j2
+@AllArgsConstructor
 public class AdminController {
 
-    @Autowired
     AdminService adminService;
-
-    @Autowired
     LabService labService;
 
     @GetMapping(value = {"/addNewLab"})
@@ -75,30 +73,3 @@ public class AdminController {
     }
 
 }
-
-/*
-@RestController
-public class AdminController {
-
-    @Autowired
-    AdminService adminService;
-
-    @PostMapping("/admin/addNewLab")
-    public String addNewLab(@RequestParam String labName,@RequestParam String userName,
-    @RequestParam String password,@RequestParam String host,@RequestParam Integer port){
-        return adminService.addNewLab(labName,userName,password,host,port);
-    }
-
-    @GetMapping("/admin/getAllLabs")
-    public List<Lab> getAllLabs(){
-        return adminService.getAllLabs();
-    }
-
-    @DeleteMapping("/admin/deleteLab")
-    public String getAllLabs(@RequestParam String labNameToBeDeleted){
-        return adminService.deleteLab(labNameToBeDeleted);
-    }
-
-
-}
- */
