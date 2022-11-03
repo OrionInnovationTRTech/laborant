@@ -1,8 +1,5 @@
 package tr.com.orioninc.laborant.model;
 
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-
 import javax.persistence.*;
 
 @Entity

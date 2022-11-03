@@ -2,12 +2,12 @@ package tr.com.orioninc.laborant.model;
 
 public class CommandDTO {
 
-    public String command;
-
+    private String command;
 
     public CommandDTO() {
         this.command = null;
     }
+
     public CommandDTO(String command) {
         this.command = command;
     }
