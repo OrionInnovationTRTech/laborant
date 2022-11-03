@@ -18,7 +18,7 @@ public class AdminService {
     private LabRepository labRepo;
 
     public  String addNewLab(String labName, String userName, String password, String host, Integer port) {
-        log.debug("[getAllALabs] called");
+        log.debug("[addNewLab] called");
         Lab searchLab = labRepo.findByLabName(labName);
         if (Objects.isNull(searchLab)) {
             Lab searchHostUserPair = labRepo.findByUserNameAndHost(userName, host);
