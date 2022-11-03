@@ -15,7 +15,6 @@ import tr.com.orioninc.laborant.service.LabService;
 
 import java.util.List;
 
-
 @Controller
 @Log4j2
 @AllArgsConstructor
@@ -24,7 +23,7 @@ public class AdminController {
     AdminService adminService;
     LabService labService;
 
-    @GetMapping(value = {"/addNewLab"})
+    @GetMapping(value = { "/addNewLab" })
     public String addNewLab(Model model) {
         log.debug("[addNewLab] @GetMapping /addNewLab method is called");
         Lab newLab = new Lab();
@@ -32,8 +31,7 @@ public class AdminController {
         return "add_Lab_Form";
     }
 
-
-    @PostMapping(value = {"/addNewLab"})
+    @PostMapping(value = { "/addNewLab" })
     public String submitNewLab(Model model, @ModelAttribute("newLab") Lab lab, RedirectAttributes redirAttrs) {
         log.debug("[submitNewLab] @PostMapping /addNewLab method is called");
         try {
@@ -53,7 +51,7 @@ public class AdminController {
         }
     }
 
-    @GetMapping(value = {"/allLabs"})
+    @GetMapping(value = { "/allLabs" })
     public String getAllLabs(Model model) {
         log.debug("[getAllLabs] @GetMapping /allLabs method is called");
         List<Lab> allLabs = adminService.getAllLabs();
@@ -64,7 +62,7 @@ public class AdminController {
 
     }
 
-    @GetMapping(value = {"/deleteLab/{labName}"})
+    @GetMapping(value = { "/deleteLab/{labName}" })
     public String deleteLab(Model model, @PathVariable String labName) {
         log.debug("[deleteLab] @GetMapping /deleteLab method is called");
         String response = adminService.deleteLab(labName);

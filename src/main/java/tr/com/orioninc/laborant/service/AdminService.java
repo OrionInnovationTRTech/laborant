@@ -17,21 +17,20 @@ public class AdminService {
     @Autowired
     private LabRepository labRepo;
 
-    public  String addNewLab(String labName, String userName, String password, String host, Integer port) {
+    public String addNewLab(String labName, String userName, String password, String host, Integer port) {
         log.debug("[addNewLab] called");
         Lab searchLab = labRepo.findByLabName(labName);
         if (Objects.isNull(searchLab)) {
             Lab searchHostUserPair = labRepo.findByUserNameAndHost(userName, host);
             if (Objects.isNull(searchHostUserPair)) {
-                Lab labToBeAdded = new Lab(labName,userName,password,host,port);
+                Lab labToBeAdded = new Lab(labName, userName, password, host, port);
                 labToBeAdded = labRepo.save(labToBeAdded);
                 log.info("[addNewLab] adding new lab named: {}", labToBeAdded.getLabName());
-                return "Successfully added the new lab named "+  labToBeAdded.getLabName() + " to the database";
+                return "Successfully added the new lab named " + labToBeAdded.getLabName() + " to the database";
             } else {
-                return "There is already a pair in the database with username: "+userName + " and host: " + host ;
+                return "There is already a pair in the database with username: " + userName + " and host: " + host;
             }
-        }
-        else {
+        } else {
             return "There is already a lab named " + labName + " in the database. Try again";
         }
     }
@@ -46,11 +45,11 @@ public class AdminService {
         Lab labToBeDeleted = labRepo.findByLabName(labName);
         if (Objects.isNull(labToBeDeleted)) {
             log.info("[deleteLab] no lab in the database named: {}", labName);
-            return "There isn't a lab named "+labName+" found in the database to be deleted";
+            return "There isn't a lab named " + labName + " found in the database to be deleted";
         } else {
             labRepo.delete(labToBeDeleted);
             log.info("[deleteLab] deleting new lab named: {}", labToBeDeleted.getLabName());
-            return "Lab named "+labName+" is successfully deleted from the database";
+            return "Lab named " + labName + " is successfully deleted from the database";
         }
     }
 

@@ -60,7 +60,7 @@ public class LabService {
         return responseString;
     }
 
-    //TODO: What is the output? What does this method do??
+    // TODO: What is the output? What does this method do??
     public String getAllLabsStatus() {
         log.debug("[getAllLabsStatus] called");
         List<Lab> allLabs = adminService.getAllLabs();
@@ -74,8 +74,8 @@ public class LabService {
             outputString += currentLab.getLabName() + "    " + "Host: " + currentLab.getHost() + "      ";
             try {
                 response = connectAndExecuteCommand(currentLab.getUserName(),
-                    currentLab.getPassword(), currentLab.getHost(), currentLab.getPort(),
-                    "sudo wae-status");
+                        currentLab.getPassword(), currentLab.getHost(), currentLab.getPort(),
+                        "sudo wae-status");
             } catch (InterruptedException e) {
                 log.error("[getAllLabsStatus] InterruptedException: {}", e.getMessage(), e);
                 return "";
@@ -98,7 +98,7 @@ public class LabService {
             log.debug("[generateOutputString] current line: {}", currentLine);
             // StringTokenizer tokenizer = new StringTokenizer(currentLine);
             // while (tokenizer.hasMoreElements())
-            //     words.add(tokenizer.nextToken());
+            // words.add(tokenizer.nextToken());
             // TODO: Not tested, old impl above.
             String[] curLineTokenized = currentLine.split(" ");
             Arrays.asList(curLineTokenized).forEach(words::add);
@@ -154,7 +154,7 @@ public class LabService {
                 List<String> tokens = new ArrayList<>();
                 // StringTokenizer tokenizer = new StringTokenizer(outputString);
                 // while (tokenizer.hasMoreElements())
-                //     tokens.add(tokenizer.nextToken());
+                // tokens.add(tokenizer.nextToken());
                 // TODO: Not tested, old impl above.
                 String[] outputStringTokenized = outputString.split(" ");
                 Arrays.asList(outputStringTokenized).forEach(tokens::add);

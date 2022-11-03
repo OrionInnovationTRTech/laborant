@@ -4,10 +4,10 @@ public class CommandDTO {
 
     public String command;
 
-
     public CommandDTO() {
         this.command = null;
     }
+
     public CommandDTO(String command) {
         this.command = command;
     }

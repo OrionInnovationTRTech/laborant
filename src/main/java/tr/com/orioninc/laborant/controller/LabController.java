@@ -1,6 +1,5 @@
 package tr.com.orioninc.laborant.controller;
 
-
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
@@ -19,7 +18,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
-
 @Controller
 @Log4j2
 @AllArgsConstructor
@@ -28,7 +26,7 @@ public class LabController {
     LabService labService;
     AdminService adminService;
 
-    @GetMapping(value = {"/lab/getAllLabsStatus"})
+    @GetMapping(value = { "/lab/getAllLabsStatus" })
     public String getAllLabs(Model model) {
         log.debug("[getAllLabs] @GetMapping /getAllLabsStatus method is called");
         String response = labService.getAllLabsStatus();
@@ -49,8 +47,9 @@ public class LabController {
         return "response_Message";
     }
 
-    @GetMapping(value = {"/lab/runCommand/{labName}/{userName}/{host}/{port}"})
-    public String runCommandPage(Model model, @PathVariable String labName, @PathVariable String userName, @PathVariable String host, @PathVariable Integer port) {
+    @GetMapping(value = { "/lab/runCommand/{labName}/{userName}/{host}/{port}" })
+    public String runCommandPage(Model model, @PathVariable String labName, @PathVariable String userName,
+            @PathVariable String host, @PathVariable Integer port) {
         log.debug("[runCommandPage] @GetMapping /runCommand method is called");
         try {
             Lab currentLab = new Lab();
@@ -71,9 +70,9 @@ public class LabController {
         }
     }
 
-    @PostMapping(value = {"/lab/runCommand/{labName}"})
+    @PostMapping(value = { "/lab/runCommand/{labName}" })
     public String runCommand(Model model, @PathVariable String labName,
-                             @ModelAttribute("currentCommand") CommandDTO currentCommand) {
+            @ModelAttribute("currentCommand") CommandDTO currentCommand) {
         log.debug("[runCommand] @PostMapping /runCommand method is called");
         if (currentCommand.getCommand() == "") {
             log.info("[runCommand] Empty command.");
