@@ -1,9 +1,9 @@
 
 package tr.com.orioninc.laborant.service;
 
+import lombok.AllArgsConstructor;
 import tr.com.orioninc.laborant.model.Lab;
 import tr.com.orioninc.laborant.repository.LabRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.log4j.Log4j2;
@@ -13,22 +13,23 @@ import java.util.Objects;
 
 @Service
 @Log4j2
+@AllArgsConstructor
 public class AdminService {
-    @Autowired
+
     private LabRepository labRepo;
 
-    public String addNewLab(String labName, String userName, String password, String host, Integer port) {
+    public String addNewLab(String labName, String username, String password, String host, Integer port) {
         log.debug("[addNewLab] called");
         Lab searchLab = labRepo.findByLabName(labName);
         if (Objects.isNull(searchLab)) {
-            Lab searchHostUserPair = labRepo.findByUserNameAndHost(userName, host);
+            Lab searchHostUserPair = labRepo.findByUserNameAndHost(username, host);
             if (Objects.isNull(searchHostUserPair)) {
-                Lab labToBeAdded = new Lab(labName, userName, password, host, port);
+                Lab labToBeAdded = new Lab(labName, username, password, host, port);
                 labToBeAdded = labRepo.save(labToBeAdded);
                 log.info("[addNewLab] adding new lab named: {}", labToBeAdded.getLabName());
                 return "Successfully added the new lab named " + labToBeAdded.getLabName() + " to the database";
             } else {
-                return "There is already a pair in the database with username: " + userName + " and host: " + host;
+                return "There is already a pair in the database with username: " + username + " and host: " + host;
             }
         } else {
             return "There is already a lab named " + labName + " in the database. Try again";
@@ -56,5 +57,30 @@ public class AdminService {
     public Lab findLabByName(String labName) {
         log.debug("[findLabByName] called");
         return labRepo.findByLabName(labName);
+    }
+
+    // TODO REST IMPLEMENTATION
+    // TODO REST IMPLEMENTATION
+        public String updateLabByName(String labName, String username, String password, String host, Integer port) {
+        log.debug("[updateLabByName] called");
+        Lab labToBeUpdated = labRepo.findByLabName(labName);
+        if (Objects.isNull(labToBeUpdated)) {
+            log.info("[updateLabByName] no lab in the database named: {}", labName);
+            return null;
+        } else {
+            try{
+                labToBeUpdated.setUserName(username);
+                labToBeUpdated.setPassword(password);
+                labToBeUpdated.setHost(host);
+                labToBeUpdated.setPort(port);
+                labRepo.save(labToBeUpdated);
+                log.info("[updateLabByName] updating lab named: {}", labToBeUpdated.getLabName());
+                return "Lab named " + labName + " is successfully updated in the database";
+            } catch (Exception e) {
+                log.error("[updateLabByName] exception: {}", e.getMessage(), e);
+                return null;
+            }
+        }
+
     }
 }

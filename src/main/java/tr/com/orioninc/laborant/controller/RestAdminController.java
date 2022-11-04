@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tr.com.orioninc.laborant.model.Lab;
 import tr.com.orioninc.laborant.service.AdminService;
-import tr.com.orioninc.laborant.service.LabService;
 
 import java.util.List;
 
@@ -13,16 +12,16 @@ import java.util.List;
 @AllArgsConstructor
 @RestController
 public class RestAdminController {
-    AdminService adminService;
-    LabService labService;
+    private AdminService adminService;
 
     @GetMapping("/allLabs") // works fine
     public ResponseEntity<List<Lab>> getAllLabs() {
         return ResponseEntity.ok(adminService.getAllLabs());
     }
-    @GetMapping("/addNewLab") //not sure yet, works fine with postman get request
-    public ResponseEntity<Object> addNewLab(@RequestBody Lab lab) {
-        return ResponseEntity.ok(adminService.addNew(lab));
+    @PostMapping("/addNewLab") //not sure yet, works fine with postman get request, Requestbody
+    public ResponseEntity<String> addNewLab(@RequestBody Lab lab) {
+        return ResponseEntity.ok(adminService.addNewLab(lab.getLabName(), lab.getUserName(),
+                lab.getPassword(), lab.getHost(), lab.getPort()));
     }
 
     @DeleteMapping("/deleteLab/{labName}")
@@ -31,8 +30,8 @@ public class RestAdminController {
     }
 
     @PutMapping("/updateLab/{labName}")
-    public ResponseEntity<String> updateLab(@PathVariable("labName") String labName, @RequestBody Lab lab) {
-        return ResponseEntity.ok(adminService.updateLab(labName, lab));
+    public ResponseEntity<String> updateLabByName(@PathVariable("labName") String labName, @RequestBody Lab lab) {
+        return ResponseEntity.ok(adminService.updateLabByName(labName, lab.getUserName(), lab.getPassword(), lab.getHost(), lab.getPort()));
     }
     // deleteLabById can be added
     // updateLabById can be added
