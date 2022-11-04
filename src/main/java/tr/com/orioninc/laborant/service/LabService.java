@@ -43,7 +43,7 @@ public class LabService {
             }
             else {
                 log.info("[connectAndExecuteCommand] session not connected");
-                return null;
+                responseString = "Session not connected";
             }
             // TODO END
 
@@ -55,13 +55,14 @@ public class LabService {
             channel.connect();
 
             while (channel.isConnected()) {
-                Thread.sleep(500);
+                Thread.sleep(200);
             }
 
             responseString = new String(responseStream.toByteArray());
         } catch (JSchException e) {
             log.error("[connectAndExecuteCommand] ssh exception: {}", e.getMessage(), e);
-            return null;
+            responseString = "SSH Exception: " + e.getMessage();
+            return "SSH Exception: " + e.getMessage();
         } finally {
             if (session != null) {
                 session.disconnect();
@@ -118,26 +119,33 @@ public class LabService {
             outputArray.add(words);
         }
         log.debug("[generateOutputString] current line: {}", currentLine);
-        if (outputArray.get(1).get(9).equals("FAI")) {
-            outputString += "SIGNAL 3";
-        } else {
-            boolean stopFound = false;
-            boolean failFound = false;
-            for (String value : outputArray.get(1)) {
-                if (value.equals("STO")) {
-                    stopFound = true;
-                }
-                if (value.equals("FAI")) {
-                    failFound = true;
-                }
-            }
-            if (failFound) {
-                outputString += "SIGNAL 2";
-            } else if (!failFound && stopFound) {
-                outputString += "SIGNAL 1";
+        try {
+            if (outputArray.get(1).get(9).equals("FAI")) {
+                outputString += "SIGNAL 3";
             } else {
-                outputString += "SIGNAL 0";
+                boolean stopFound = false;
+                boolean failFound = false;
+                for (String value : outputArray.get(1)) {
+                    if (value.equals("STO")) {
+                        stopFound = true;
+                    }
+                    if (value.equals("FAI")) {
+                        failFound = true;
+                    }
+                }
+                if (failFound) {
+                    outputString += "SIGNAL 2";
+                } else if (!failFound && stopFound) {
+                    outputString += "SIGNAL 1";
+                } else {
+                    outputString += "SIGNAL 0";
+                }
             }
+        }
+        catch (IndexOutOfBoundsException e) {
+            log.error("[generateOutputString] IndexOutOfBoundsException: {}", e.getMessage(), e);
+            outputString += "COULDN'T CONNECT";
+
         }
         outputString += " \n";
         outputString += response;
@@ -196,6 +204,25 @@ public class LabService {
             log.debug("[runCommandOnSelectedLab] out string: {}", outputString);
         } catch (InterruptedException e) {
             log.error("[runCommandOnSelectedLab] InterruptedException: {}", e.getMessage(), e);
+        }
+        return outputString;
+    }
+
+    public String getLabStatus(String labName) {
+        log.debug("[getLabStatus] called");
+        Lab labToExecute = adminService.findLabByName(labName);
+        if (Objects.isNull(labToExecute)) {
+            log.info("[getLabStatus] no lab to run command");
+            return "There isn't a lab found in the database named " + labName;
+        }
+        String outputString = null;
+        try {
+            outputString = connectAndExecuteCommand(labToExecute.getUserName(), labToExecute.getPassword(),
+                    labToExecute.getHost(), labToExecute.getPort(), "sudo wae-status");
+            log.debug("[getLabStatus] out string: {}", outputString);
+        } catch (InterruptedException e) {
+            log.error("[getLabStatus] InterruptedException: {}", e.getMessage(), e);
+            Thread.currentThread().interrupt();
         }
         return outputString;
     }

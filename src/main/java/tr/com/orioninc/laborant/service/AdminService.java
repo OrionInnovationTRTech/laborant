@@ -81,6 +81,10 @@ public class AdminService {
                 return null;
             }
         }
+    }
 
+
+    public Lab getLab(String labName) {
+        return labRepo.findByLabName(labName);
     }
 }

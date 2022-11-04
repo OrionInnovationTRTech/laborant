@@ -8,28 +8,32 @@ import tr.com.orioninc.laborant.service.AdminService;
 
 import java.util.List;
 
-@RequestMapping("/api")
+@RequestMapping("/v1")
 @AllArgsConstructor
 @RestController
 public class RestAdminController {
     private AdminService adminService;
 
-    @GetMapping("/allLabs") // works fine
+    @GetMapping("/labs/")
     public ResponseEntity<List<Lab>> getAllLabs() {
         return ResponseEntity.ok(adminService.getAllLabs());
     }
-    @PostMapping("/addNewLab") //not sure yet, works fine with postman get request, Requestbody
-    public ResponseEntity<String> addNewLab(@RequestBody Lab lab) {
-        return ResponseEntity.ok(adminService.addNewLab(lab.getLabName(), lab.getUserName(),
+    @GetMapping("/labs/{labName}")
+    public ResponseEntity<Lab> getLab(@PathVariable("labName") String labName) {
+        return ResponseEntity.ok(adminService.getLab(labName));
+    }
+    @PostMapping("/labs/{labName}")
+    public ResponseEntity<String> addNewLab(@PathVariable String labName, @RequestBody Lab lab) {
+        return ResponseEntity.ok(adminService.addNewLab(labName, lab.getUserName(),
                 lab.getPassword(), lab.getHost(), lab.getPort()));
     }
 
-    @DeleteMapping("/deleteLab/{labName}")
+    @DeleteMapping("/labs/{labName}")
     public ResponseEntity<String> deleteLab(@PathVariable("labName") String labName) {
         return ResponseEntity.ok(adminService.deleteLab(labName));
     }
 
-    @PutMapping("/updateLab/{labName}")
+    @PutMapping("/labs/{labName}")
     public ResponseEntity<String> updateLabByName(@PathVariable("labName") String labName, @RequestBody Lab lab) {
         return ResponseEntity.ok(adminService.updateLabByName(labName, lab.getUserName(), lab.getPassword(), lab.getHost(), lab.getPort()));
     }
