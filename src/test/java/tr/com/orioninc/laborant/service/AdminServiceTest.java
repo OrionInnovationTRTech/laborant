@@ -15,7 +15,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-@ExtendWith(MockitoExtension.class)
 @Log4j2
 @DataJpaTest
 class AdminServiceTest {
