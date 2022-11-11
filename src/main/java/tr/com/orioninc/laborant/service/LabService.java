@@ -37,10 +37,9 @@ public class LabService {
             session = new JSch().getSession(username, host, port);
             session.setPassword(password);
             session.setConfig("StrictHostKeyChecking", "no");
-            session.setServerAliveInterval(200); // Check if server is alive every 200  mili seconds
+            session.setServerAliveInterval(200); // Check if server is alive every 200  miliseconds
             session.setServerAliveCountMax(1); // If server is not alive, try to reconnect once
             session.connect();
-            // TODO CHECK FURTHER
             if (session.isConnected()) {
                 log.info("[connectAndExecuteCommand] session connected");
             }
@@ -48,8 +47,6 @@ public class LabService {
                 log.info("[connectAndExecuteCommand] session not connected");
                 responseString = "Session not connected";
             }
-            // TODO END
-
             channel = (ChannelExec) session.openChannel("exec");
             channel.setCommand(command);
             log.debug("[connectAndExecuteCommand] command to be executed: {}", command);
@@ -176,14 +173,10 @@ public class LabService {
                         "sudo wae-status");
                 outputString += "\n  \n";
                  List<String> tokens = new ArrayList<>();
-                 //StringTokenizer tokenizer = new StringTokenizer(outputString);
-                //while (tokenizer.hasMoreElements())
-                 //tokens.add(tokenizer.nextToken());
-                // TODO: Not tested, old impl above.
                     String[] outputStringTokenized = outputString.split(" ");
                     Arrays.asList(outputStringTokenized).forEach(tokens::add);
                                                                             // I just write outputStringTokenized.length-1 instead of 5
-                    String currentVersion = tokens.get(tokens.size()-1);    //??? Idk how did i fix that
+                    String currentVersion = tokens.get(tokens.size()-1);    // TODO CHECK LATER AND FIX
                     labVersions.add(currentVersion);
             } catch (InterruptedException e) {
                 log.error("[getAllLabVersions] InterruptedException: {}", e.getMessage(), e);

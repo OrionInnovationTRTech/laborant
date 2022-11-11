@@ -54,5 +54,4 @@ public class RestAdminController {
     }
     // deleteLabById can be added
     // updateLabById can be added
-    // LabController likewise RestLabController can be added.
 }
