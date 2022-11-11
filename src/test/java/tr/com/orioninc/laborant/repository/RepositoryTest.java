@@ -1,14 +1,10 @@
 package tr.com.orioninc.laborant.repository;
 
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import tr.com.orioninc.laborant.model.Lab;
-import tr.com.orioninc.laborant.repository.LabRepository;
-import tr.com.orioninc.laborant.service.AdminService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
