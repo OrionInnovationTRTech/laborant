@@ -61,30 +61,58 @@ public class AdminService {
 
     // TODO REST IMPLEMENTATION
     // TODO REST IMPLEMENTATION
-        public String updateLabByName(String labName, String username, String password, String host, Integer port) {
+    public Lab updateLabByName(String labName, Lab lab) {
         log.debug("[updateLabByName] called");
         Lab labToBeUpdated = labRepo.findByLabName(labName);
         if (Objects.isNull(labToBeUpdated)) {
             log.info("[updateLabByName] no lab in the database named: {}", labName);
             return null;
         } else {
-            try{
-                labToBeUpdated.setUserName(username);
-                labToBeUpdated.setPassword(password);
-                labToBeUpdated.setHost(host);
-                labToBeUpdated.setPort(port);
+                labToBeUpdated.setUserName(lab.getUserName());
+                labToBeUpdated.setPassword(lab.getPassword());
+                labToBeUpdated.setHost(lab.getHost());
+                labToBeUpdated.setPort(lab.getPort());
                 labRepo.save(labToBeUpdated);
-                log.info("[updateLabByName] updating lab named: {}", labToBeUpdated.getLabName());
-                return "Lab named " + labName + " is successfully updated in the database";
-            } catch (Exception e) {
-                log.error("[updateLabByName] exception: {}", e.getMessage(), e);
+                log.info("[updateLabByName] updating lab named: {} to credentials: {}",
+                        labToBeUpdated.getLabName(), labToBeUpdated.toString());
+                return labToBeUpdated;
+        }
+    }
+
+    public Lab addNewLab(Lab lab) {
+        log.debug("[addNewLab] called");
+        Lab searchLab = labRepo.findByLabName(lab.getLabName());
+        if (Objects.isNull(searchLab)) {
+            Lab searchHostUserPair = labRepo.findByUserNameAndHost(lab.getUserName(), lab.getHost());
+            if (Objects.isNull(searchHostUserPair)) {
+                labRepo.save(lab);
+                log.info("[addNewLab] adding new lab named: {}", lab.getLabName());
+                return lab;
+            } else {
+                log.info("[addNewLab] there is already a pair in the database with username: {} and host: {}", lab.getUserName(), lab.getHost());
                 return null;
             }
+        } else {
+            log.info("[addNewLab] there is already a lab named {} in the database. Try again", lab.getLabName());
+            return null;
         }
     }
 
 
     public Lab getLab(String labName) {
         return labRepo.findByLabName(labName);
+    }
+
+    public boolean deleteLabByName(String labName) {
+        log.debug("[deleteLab] called");
+        Lab labToBeDeleted = labRepo.findByLabName(labName);
+        if (Objects.isNull(labToBeDeleted)) {
+            log.info("[deleteLab] no lab in the database named: {}", labName);
+            return false;
+        } else {
+            labRepo.delete(labToBeDeleted);
+            log.info("[deleteLab] deleting new lab named: {}", labToBeDeleted.getLabName());
+            return true;
+        }
     }
 }

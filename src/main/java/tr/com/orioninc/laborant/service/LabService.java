@@ -9,11 +9,14 @@ import com.jcraft.jsch.Session;
 
 import lombok.extern.log4j.Log4j2;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
-import java.util.*;
+import java.util.List;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -74,7 +77,7 @@ public class LabService {
         return responseString;
     }
 
-    // TODO: What is the output? What does this method do??
+
     public String getAllLabsStatus() {
         log.debug("[getAllLabsStatus] called");
         List<Lab> allLabs = adminService.getAllLabs();
