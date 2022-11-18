@@ -1,4 +1,4 @@
-package tr.com.orioninc.laborant.controller;
+package tr.com.orioninc.laborant.app.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import tr.com.orioninc.laborant.model.CommandDTO;
-import tr.com.orioninc.laborant.model.Lab;
-import tr.com.orioninc.laborant.service.AdminService;
-import tr.com.orioninc.laborant.service.LabService;
+import tr.com.orioninc.laborant.app.model.Lab;
+import tr.com.orioninc.laborant.app.service.AdminService;
+import tr.com.orioninc.laborant.app.service.LabService;
+import tr.com.orioninc.laborant.app.model.CommandDTO;
 
 import java.util.ArrayList;
 import java.util.Arrays;

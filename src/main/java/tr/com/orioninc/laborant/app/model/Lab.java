@@ -1,4 +1,4 @@
-package tr.com.orioninc.laborant.model;
+package tr.com.orioninc.laborant.app.model;
 
 import javax.persistence.*;
 

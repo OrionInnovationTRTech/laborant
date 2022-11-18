@@ -1,12 +1,11 @@
 
-package tr.com.orioninc.laborant.service;
+package tr.com.orioninc.laborant.app.service;
 
 import lombok.AllArgsConstructor;
-import tr.com.orioninc.laborant.model.Lab;
-import tr.com.orioninc.laborant.repository.LabRepository;
-import org.springframework.stereotype.Service;
-
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Service;
+import tr.com.orioninc.laborant.app.model.Lab;
+import tr.com.orioninc.laborant.app.repository.LabRepository;
 
 import java.util.List;
 import java.util.Objects;
@@ -59,8 +58,7 @@ public class AdminService {
         return labRepo.findByLabName(labName);
     }
 
-    // TODO REST IMPLEMENTATION
-    // TODO REST IMPLEMENTATION
+    // REST IMPLEMENTATION
     public Lab updateLabByName(String labName, Lab lab) {
         log.debug("[updateLabByName] called");
         Lab labToBeUpdated = labRepo.findByLabName(labName);
@@ -68,14 +66,14 @@ public class AdminService {
             log.info("[updateLabByName] no lab in the database named: {}", labName);
             return null;
         } else {
-                labToBeUpdated.setUserName(lab.getUserName());
-                labToBeUpdated.setPassword(lab.getPassword());
-                labToBeUpdated.setHost(lab.getHost());
-                labToBeUpdated.setPort(lab.getPort());
-                labRepo.save(labToBeUpdated);
-                log.info("[updateLabByName] updating lab named: {} to credentials: {}",
-                        labToBeUpdated.getLabName(), labToBeUpdated.toString());
-                return labToBeUpdated;
+            labToBeUpdated.setUserName(lab.getUserName());
+            labToBeUpdated.setPassword(lab.getPassword());
+            labToBeUpdated.setHost(lab.getHost());
+            labToBeUpdated.setPort(lab.getPort());
+            labRepo.save(labToBeUpdated);
+            log.info("[updateLabByName] updating lab named: {} to credentials: {}",
+                    labToBeUpdated.getLabName(), labToBeUpdated.toString());
+            return labToBeUpdated;
         }
     }
 
@@ -97,7 +95,6 @@ public class AdminService {
             return null;
         }
     }
-
 
     public Lab getLab(String labName) {
         return labRepo.findByLabName(labName);

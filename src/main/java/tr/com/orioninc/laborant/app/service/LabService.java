@@ -1,7 +1,7 @@
-package tr.com.orioninc.laborant.service;
+package tr.com.orioninc.laborant.app.service;
 
 import lombok.AllArgsConstructor;
-import tr.com.orioninc.laborant.model.Lab;
+import tr.com.orioninc.laborant.app.model.Lab;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;

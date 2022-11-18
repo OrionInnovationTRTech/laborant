@@ -1,9 +1,9 @@
-package tr.com.orioninc.laborant.controller;
+package tr.com.orioninc.laborant.app.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tr.com.orioninc.laborant.service.LabService;
+import tr.com.orioninc.laborant.app.service.LabService;
 
 @RestController
 @RequestMapping("/v1")
@@ -16,7 +16,7 @@ public class RestLabController {
     public ResponseEntity<String> getAllLabsStatus() {
         return ResponseEntity.ok(labService.getAllLabsStatus());
     }
-    @GetMapping("/labs/runCommand/{labName}/{command}")
+    @GetMapping("/labs/runCommand/{labName}")
     public ResponseEntity<String> runCommand(@PathVariable("labName") String labName, @RequestParam String command) {
         try {
             return ResponseEntity.ok(labService.runCommandOnSelectedLab(labName, command));
