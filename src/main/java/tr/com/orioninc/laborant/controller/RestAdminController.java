@@ -39,12 +39,12 @@ public class RestAdminController {
     @DeleteMapping("/labs/{labName}")
     public ResponseEntity<String> deleteLab(@PathVariable("labName") String labName) {
         if (adminService.deleteLabByName(labName)) {
-            log.info("Lab deleted");
+            log.info("[deleteLab] Lab deleted");
             return ResponseEntity.ok("Lab deleted");
         }
         else {
-            log.info("Lab not found");
-            return ResponseEntity.badRequest().body("Lab not found");
+            log.info("[deleteLab] Lab not found");
+            return ResponseEntity.notFound().build();
         }
     }
 

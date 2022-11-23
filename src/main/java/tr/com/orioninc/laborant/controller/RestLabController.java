@@ -18,11 +18,7 @@ public class RestLabController {
     }
     @GetMapping("/labs/runCommand/{labName}/{command}")
     public ResponseEntity<String> runCommand(@PathVariable("labName") String labName, @RequestParam String command) {
-        try {
-            return ResponseEntity.ok(labService.runCommandOnSelectedLab(labName, command));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(labService.runCommandOnSelectedLab(labName, command));
     }
     @GetMapping("/labs/status/{labName}")
     public ResponseEntity<String> getLabStatus(@PathVariable("labName") String labName) {
