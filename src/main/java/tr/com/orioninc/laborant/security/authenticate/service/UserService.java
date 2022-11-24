@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import tr.com.orioninc.laborant.security.authenticate.model.User;
 import tr.com.orioninc.laborant.security.authenticate.repository.UserRepository;
+import tr.com.orioninc.laborant.security.config.PasswordConfig;
 
 import java.util.List;
 

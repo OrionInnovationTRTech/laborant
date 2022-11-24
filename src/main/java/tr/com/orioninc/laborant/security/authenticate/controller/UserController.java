@@ -24,8 +24,6 @@ public class UserController {
 
     @PostMapping("/add")
     public ResponseEntity<User> addNewUser(@RequestBody User user){
-        String encryptedPass = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encryptedPass);
         userService.addNewUser(user);
         if (user.getId() != null) {
             log.info("User added successfully");

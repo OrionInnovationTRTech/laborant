@@ -1,17 +1,16 @@
-package tr.com.orioninc.laborant.repository;
+package tr.com.orioninc.laborant.app.repository;
 
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import tr.com.orioninc.laborant.app.model.Lab;
-import tr.com.orioninc.laborant.app.repository.LabRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @Log4j2
-public class RepositoryTest {
+public class LabRepositoryTest {
 
     @Autowired
     private LabRepository underTest;

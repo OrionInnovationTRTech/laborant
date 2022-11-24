@@ -1,9 +1,7 @@
 package tr.com.orioninc.laborant.security.authenticate.model;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import tr.com.orioninc.laborant.security.config.PasswordConfig;
 
 import javax.persistence.*;
 
@@ -11,8 +9,7 @@ import javax.persistence.*;
 @Setter
 @ToString
 @Entity
-@Table(name = "user")
-@RequiredArgsConstructor
+@Table(name = "LAB_USER")
 public class User{
 
     @Id
@@ -26,6 +23,25 @@ public class User{
     @Column(name = "user_role")
     private String role;
 
+    public User(String username, String password, String role) {
+        this.username = username;
+        this.password = PasswordConfig.passwordEncoder().encode(password);
+        this.role = role;
+    }
 
+
+    public User() {
+        this.id = null;
+        this.username = null;
+        this.password = null;
+        this.role = null;
+    }
+
+    public User(Integer id, String username, String password, String role) {
+        this.id = id;
+        this.username = username;
+        this.password = PasswordConfig.passwordEncoder().encode(password);
+        this.role = role;
+    }
 }
 

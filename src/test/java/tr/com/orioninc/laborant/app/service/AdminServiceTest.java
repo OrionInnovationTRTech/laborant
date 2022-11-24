@@ -1,4 +1,4 @@
-package tr.com.orioninc.laborant.service;
+package tr.com.orioninc.laborant.app.service;
 
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import tr.com.orioninc.laborant.app.model.Lab;
 import tr.com.orioninc.laborant.app.repository.LabRepository;
-import tr.com.orioninc.laborant.app.service.AdminService;
 
 import java.util.List;
 
