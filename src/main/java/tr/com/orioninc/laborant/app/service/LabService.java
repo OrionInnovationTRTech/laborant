@@ -62,7 +62,7 @@ public class LabService {
         } catch (JSchException e) {
             log.error("[connectAndExecuteCommand] ssh exception: {}", e.getMessage(), e);
             responseString = "SSH Exception: " + e.getMessage();
-            return "SSH Exception: " + e.getMessage();
+            return "Couldn't connect to the lab" + e.getMessage();
         } finally {
             if (session != null) {
                 session.disconnect();
