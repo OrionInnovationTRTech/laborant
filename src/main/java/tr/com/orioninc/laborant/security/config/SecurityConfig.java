@@ -3,6 +3,7 @@ package tr.com.orioninc.laborant.security.config;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -46,7 +47,7 @@ public class SecurityConfig {
                 .anyRequest()
                 .authenticated()
                 .and()
-                .httpBasic();
+                .formLogin();
 
 
         http.headers().frameOptions().sameOrigin();
@@ -57,8 +58,18 @@ public class SecurityConfig {
     @Autowired
     public void AuthenticationManager(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder);
+                .ldapAuthentication()
+                .userSearchFilter("(uid={0})")
+                .userSearchBase("dc=example,dc=com")
+                .groupSearchFilter("uniqueMember={0}")
+                .groupSearchBase("ou=mathematicians,dc=example,dc=com")
+                .userDnPatterns("uid={0}")
+                .contextSource()
+                .url("ldap://ldap.forumsys.com:389")
+                .managerDn("cn=read-only-admin,dc=example,dc=com")
+                .managerPassword("password");
+//                .userDetailsService(userDetailsService)
+//                .passwordEncoder(passwordEncoder);
     }
 
 }
