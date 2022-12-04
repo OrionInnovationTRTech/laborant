@@ -49,7 +49,7 @@ public class LabService {
             }
             channel = (ChannelExec) session.openChannel("exec");
             channel.setCommand(command);
-            log.debug("[connectAndExecuteCommand] command to be executed: {}", command);
+            log.info("[connectAndExecuteCommand] command to be executed: {}", command);
             ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
             channel.setOutputStream(responseStream);
             channel.connect();
@@ -62,7 +62,7 @@ public class LabService {
         } catch (JSchException e) {
             log.error("[connectAndExecuteCommand] ssh exception: {}", e.getMessage(), e);
             responseString = "SSH Exception: " + e.getMessage();
-            return "Couldn't connect to the lab" + e.getMessage();
+            return "Couldn't connect to the lab: " + e.getMessage();
         } finally {
             if (session != null) {
                 session.disconnect();

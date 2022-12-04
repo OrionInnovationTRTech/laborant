@@ -5,7 +5,5 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/${MYSQL_DATABASE}
     username: ${MYSQL_USER}
     password: ${MYSQL_PASSWORD}
-  ldap:
-    urls: ldap.forumsys.com:389
-    base: cn=read-only-admin,dc=example,dc=com
-    password: password
+
+

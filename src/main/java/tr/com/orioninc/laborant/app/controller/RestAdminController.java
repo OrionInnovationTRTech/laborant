@@ -24,7 +24,7 @@ public class RestAdminController {
     public ResponseEntity<Lab> getLab(@PathVariable("labName") String labName) {
         return ResponseEntity.ok(adminService.getLab(labName));
     }
-    @PostMapping("/labs/{labName}")
+    @PostMapping("/labs/add/{labName}")
     public ResponseEntity<Lab> addNewLab(@PathVariable String labName, @RequestBody Lab lab) {
         lab.setLabName(labName);
         Lab result = adminService.addNewLab(lab);
@@ -40,10 +40,10 @@ public class RestAdminController {
     public ResponseEntity<String> deleteLab(@PathVariable("labName") String labName) {
         if (adminService.deleteLabByName(labName)) {
             log.info("[deleteLab] Lab deleted");
-            return ResponseEntity.ok("Lab deleted");
+            return ResponseEntity.ok("Lab named: " + labName + " deleted");
         }
         else {
-            log.info("[deleteLab] Lab not found");
+            log.info("[deleteLab] Lab named " + labName + " not found");
             return ResponseEntity.notFound().build();
         }
     }
@@ -52,6 +52,4 @@ public class RestAdminController {
         public ResponseEntity<Lab> updateLabByName(@PathVariable("labName") String labName, @RequestBody Lab lab) {
         return ResponseEntity.ok(adminService.updateLabByName(labName, lab));
     }
-    // deleteLabById can be added
-    // updateLabById can be added
 }

@@ -7,5 +7,4 @@ import tr.com.orioninc.laborant.security.authenticate.model.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
     public User findByUsername(String username);
-
 }

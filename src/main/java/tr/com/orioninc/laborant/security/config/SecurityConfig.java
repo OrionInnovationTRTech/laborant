@@ -3,26 +3,34 @@ package tr.com.orioninc.laborant.security.config;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @AllArgsConstructor
 @Log4j2
 public class SecurityConfig {
-
     private final PasswordEncoder passwordEncoder;
     private UserDetailsService userDetailsService;
 
     private static final String ADMIN = "ADMIN";
     private static final String USER = "USER";
+
+    public AuthenticationProvider activeDirectoryLdapAuthenticationProvider() {
+        ActiveDirectoryLdapAuthenticationProvider provider =
+                new ActiveDirectoryLdapAuthenticationProvider("eu.ad.mycompany.local", "ldap://10.254.156.152:389");
+        provider.setConvertSubErrorCodesToExceptions(true);
+        provider.setUseAuthenticationRequestCredentials(true);
+        return provider;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -34,8 +42,8 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.POST).hasAuthority(ADMIN)
                 .antMatchers(HttpMethod.PUT).hasAuthority(ADMIN)
                 .antMatchers(HttpMethod.DELETE).hasAuthority(ADMIN)
-                .antMatchers(HttpMethod.GET).hasAnyAuthority(ADMIN, USER)
-               // .antMatchers("/users/test").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.GET).authenticated()
+                // .antMatchers("/users/test").hasAuthority("ADMIN")
 //                .antMatchers("/", "index", "/css/*", "/js/*").hasAnyRole(ADMIN.name(), USER.name())
 //                .antMatchers("/v1/**").hasRole(USER.name())
 //                .antMatchers("/v1/**").hasRole(ADMIN.name())
@@ -47,7 +55,7 @@ public class SecurityConfig {
                 .anyRequest()
                 .authenticated()
                 .and()
-                .formLogin();
+                .httpBasic();
 
 
         http.headers().frameOptions().sameOrigin();
@@ -58,18 +66,9 @@ public class SecurityConfig {
     @Autowired
     public void AuthenticationManager(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .ldapAuthentication()
-                .userSearchFilter("(uid={0})")
-                .userSearchBase("dc=example,dc=com")
-                .groupSearchFilter("uniqueMember={0}")
-                .groupSearchBase("ou=mathematicians,dc=example,dc=com")
-                .userDnPatterns("uid={0}")
-                .contextSource()
-                .url("ldap://ldap.forumsys.com:389")
-                .managerDn("cn=read-only-admin,dc=example,dc=com")
-                .managerPassword("password");
-//                .userDetailsService(userDetailsService)
-//                .passwordEncoder(passwordEncoder);
+                .authenticationProvider(activeDirectoryLdapAuthenticationProvider())
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder);
     }
 
 }
