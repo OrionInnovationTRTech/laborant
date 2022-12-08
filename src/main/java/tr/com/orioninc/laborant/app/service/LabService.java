@@ -1,5 +1,7 @@
 package tr.com.orioninc.laborant.app.service;
 
+import com.unboundid.util.json.JSONException;
+import com.unboundid.util.json.JSONObject;
 import lombok.AllArgsConstructor;
 import tr.com.orioninc.laborant.app.model.Lab;
 import com.jcraft.jsch.ChannelExec;
@@ -10,6 +12,8 @@ import com.jcraft.jsch.Session;
 import lombok.extern.log4j.Log4j2;
 
 import org.springframework.stereotype.Service;
+import tr.com.orioninc.laborant.exception.NotConnected;
+import tr.com.orioninc.laborant.exception.NotFound;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
@@ -45,7 +49,7 @@ public class LabService {
             }
             else {
                 log.info("[connectAndExecuteCommand] session not connected");
-                responseString = "Session not connected";
+                throw new NotConnected("Session not connected");
             }
             channel = (ChannelExec) session.openChannel("exec");
             channel.setCommand(command);
@@ -58,11 +62,10 @@ public class LabService {
                 Thread.sleep(200);
             }
 
-            responseString = new String(responseStream.toByteArray());
+            responseString = responseStream.toString();
         } catch (JSchException e) {
             log.error("[connectAndExecuteCommand] ssh exception: {}", e.getMessage(), e);
-            responseString = "SSH Exception: " + e.getMessage();
-            return "Couldn't connect to the lab: " + e.getMessage();
+            throw new NotConnected("Session not connected");
         } finally {
             if (session != null) {
                 session.disconnect();
@@ -92,11 +95,13 @@ public class LabService {
                         "sudo wae-status");
             } catch (InterruptedException e) {
                 log.error("[getAllLabsStatus] InterruptedException: {}", e.getMessage(), e);
-                return "";
+                throw new NotConnected("Connection interrupted");
             }
-            outputString = generateOutputString(outputString, response);
+            if (response == null) {
+                throw new NotConnected("Connection interrupted");
+            }
         }
-        log.debug("[getAllLabsStatus] the output: {}", outputString);
+        log.info("[getAllLabsStatus] the output: {}", outputString);
         return outputString;
     }
 
@@ -187,15 +192,15 @@ public class LabService {
     }
 
     public String runCommandOnSelectedLab(String labName, String commandToBeExecuted) {
+        String outputString = "";
         log.debug("[runCommandOnSelectedLab] called");
         Lab labToExecute = adminService.findLabByName(labName);
         if (Objects.isNull(labToExecute)) {
             log.info("[runCommandOnSelectedLab] no lab to run command");
-            return "There isn't a lab found in the database named " + labName;
+            throw new NotFound("There isn't any lab with the name: " + labName);
         }
-        String outputString = "";
         try {
-            outputString += connectAndExecuteCommand(labToExecute.getUserName(), labToExecute.getPassword(),
+            outputString = connectAndExecuteCommand(labToExecute.getUserName(), labToExecute.getPassword(),
                     labToExecute.getHost(), labToExecute.getPort(), commandToBeExecuted);
             log.debug("[runCommandOnSelectedLab] out string: {}", outputString);
         } catch (InterruptedException e) {
@@ -206,16 +211,16 @@ public class LabService {
 
     public String getLabStatus(String labName) {
         log.debug("[getLabStatus] called");
+        String outputString = null;
         Lab labToExecute = adminService.findLabByName(labName);
         if (Objects.isNull(labToExecute)) {
             log.info("[getLabStatus] no lab to run command");
-            return "There isn't a lab found in the database named " + labName;
+            throw new NotFound("There isn't a lab found in the database named " + labName);
         }
-        String outputString = null;
         try {
             outputString = connectAndExecuteCommand(labToExecute.getUserName(), labToExecute.getPassword(),
                     labToExecute.getHost(), labToExecute.getPort(), "sudo wae-status");
-            log.debug("[getLabStatus] out string: {}", outputString);
+            log.info("[getLabStatus] out string: {}", outputString);
         } catch (InterruptedException e) {
             log.error("[getLabStatus] InterruptedException: {}", e.getMessage(), e);
             Thread.currentThread().interrupt();

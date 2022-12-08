@@ -49,7 +49,7 @@ class UserServiceTest {
     }
 
     @Test
-    void getAllUsers() {
+    void getUser() {
         //given
         User user = new User(
                 "test", "testPassword", "testRole");

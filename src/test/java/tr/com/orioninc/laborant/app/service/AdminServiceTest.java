@@ -10,8 +10,7 @@ import tr.com.orioninc.laborant.app.repository.LabRepository;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j2
 @DataJpaTest
@@ -156,9 +155,9 @@ class AdminServiceTest {
                 "userName", "password", "host", 22);
         labRepository.save(lab);
         //when
-        boolean isDeleted = underTest.deleteLabByName("canDeleteLabByName test lab");
+        Lab deletedLab = underTest.deleteLabByName("canDeleteLabByName test lab");
         //then
-        assertEquals(true, isDeleted);
+        assertNotEquals(null, deletedLab);
     }
 
     @Test
@@ -168,8 +167,8 @@ class AdminServiceTest {
                 "userName", "password", "host", 22);
         labRepository.save(lab);
         //when
-        boolean isDeleted = underTest.deleteLabByName("canDeleteLabByName test lab2");
+        Lab deletedLab =  underTest.deleteLabByName("canDeleteLabByName test lab2");
         //then
-        assertEquals(false, isDeleted);
+        assertNull(deletedLab);
     }
 }

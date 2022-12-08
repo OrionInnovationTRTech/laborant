@@ -100,16 +100,16 @@ public class AdminService {
         return labRepo.findByLabName(labName);
     }
 
-    public boolean deleteLabByName(String labName) {
+    public Lab deleteLabByName(String labName) {
         log.debug("[deleteLab] called");
         Lab labToBeDeleted = labRepo.findByLabName(labName);
         if (Objects.isNull(labToBeDeleted)) {
             log.info("[deleteLab] no lab in the database named: {}", labName);
-            return false;
+            return null;
         } else {
             labRepo.delete(labToBeDeleted);
             log.info("[deleteLab] deleting new lab named: {}", labToBeDeleted.getLabName());
-            return true;
+            return labToBeDeleted;
         }
     }
 }

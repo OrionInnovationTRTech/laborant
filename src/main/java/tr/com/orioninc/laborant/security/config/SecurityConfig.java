@@ -55,7 +55,7 @@ public class SecurityConfig {
                 .anyRequest()
                 .authenticated()
                 .and()
-                .httpBasic();
+                .formLogin();
 
 
         http.headers().frameOptions().sameOrigin();
@@ -64,9 +64,9 @@ public class SecurityConfig {
     }
 
     @Autowired
-    public void AuthenticationManager(AuthenticationManagerBuilder auth) throws Exception {
+    public void authenticationManager(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .authenticationProvider(activeDirectoryLdapAuthenticationProvider())
+               // .authenticationProvider(activeDirectoryLdapAuthenticationProvider())
                 .userDetailsService(userDetailsService)
                 .passwordEncoder(passwordEncoder);
     }

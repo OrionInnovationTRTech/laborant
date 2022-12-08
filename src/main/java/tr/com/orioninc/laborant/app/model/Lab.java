@@ -96,7 +96,7 @@ public class Lab {
 
     @Override
     public String toString() {
-        return "Lab{" +
+        return "Lab {" +
                 "id=" + id +
                 ", labName='" + labName + '\'' +
                 ", userName='" + userName + '\'' +

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import springfox.documentation.annotations.ApiIgnore;
 import tr.com.orioninc.laborant.app.model.Lab;
 import tr.com.orioninc.laborant.app.service.AdminService;
 import tr.com.orioninc.laborant.app.service.LabService;
