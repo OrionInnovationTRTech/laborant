@@ -1,4 +1,4 @@
-package tr.com.orioninc.laborant.security.authenticate.model;
+package tr.com.orioninc.laborant.security.model;
 
 import lombok.Getter;
 import lombok.Setter;

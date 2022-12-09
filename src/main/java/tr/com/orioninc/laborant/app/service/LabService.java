@@ -1,7 +1,5 @@
 package tr.com.orioninc.laborant.app.service;
 
-import com.unboundid.util.json.JSONException;
-import com.unboundid.util.json.JSONObject;
 import lombok.AllArgsConstructor;
 import tr.com.orioninc.laborant.app.model.Lab;
 import com.jcraft.jsch.ChannelExec;
@@ -15,7 +13,10 @@ import org.springframework.stereotype.Service;
 import tr.com.orioninc.laborant.exception.NotConnected;
 import tr.com.orioninc.laborant.exception.NotFound;
 
+import java.io.IOException;
+import java.net.InetAddress;
 import java.io.ByteArrayOutputStream;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -29,50 +30,55 @@ public class LabService {
 
     AdminService adminService;
 
-    public static String connectAndExecuteCommand(String username, String password,
-            String host, int port, String command) throws InterruptedException {
+    public String connectAndExecuteCommand(String username, String password,
+                                           String host, int port, String command) throws InterruptedException {
 
         log.debug("[connectAndExecuteCommand] called");
         Session session = null;
         ChannelExec channel = null;
         String responseString = null;
+        if(adminService.isLabReachable(username)){
+            try {
+                session = new JSch().getSession(username, host, port);
+                session.setPassword(password);
+                session.setConfig("StrictHostKeyChecking", "no");
+                session.setServerAliveInterval(200); // Check if server is alive every 200  miliseconds
+                session.setServerAliveCountMax(1); // If server is not alive, try to reconnect once
+                session.connect();
+                if (session.isConnected()) {
+                    log.info("[connectAndExecuteCommand] session connected");
 
-        try {
-            session = new JSch().getSession(username, host, port);
-            session.setPassword(password);
-            session.setConfig("StrictHostKeyChecking", "no");
-            session.setServerAliveInterval(200); // Check if server is alive every 200  miliseconds
-            session.setServerAliveCountMax(1); // If server is not alive, try to reconnect once
-            session.connect();
-            if (session.isConnected()) {
-                log.info("[connectAndExecuteCommand] session connected");
-            }
-            else {
-                log.info("[connectAndExecuteCommand] session not connected");
-                throw new NotConnected("Session not connected");
-            }
-            channel = (ChannelExec) session.openChannel("exec");
-            channel.setCommand(command);
-            log.info("[connectAndExecuteCommand] command to be executed: {}", command);
-            ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
-            channel.setOutputStream(responseStream);
-            channel.connect();
+                }
+                else {
+                    log.info("[connectAndExecuteCommand] session not connected");
+                }
+                channel = (ChannelExec) session.openChannel("exec");
+                channel.setCommand(command);
+                log.info("[connectAndExecuteCommand] command to be executed: {}", command);
+                ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
+                channel.setOutputStream(responseStream);
+                channel.connect();
 
-            while (channel.isConnected()) {
-                Thread.sleep(200);
-            }
+                while (channel.isConnected()) {
+                    Thread.sleep(200);
+                }
 
-            responseString = responseStream.toString();
-        } catch (JSchException e) {
-            log.error("[connectAndExecuteCommand] ssh exception: {}", e.getMessage(), e);
-            throw new NotConnected("Session not connected");
-        } finally {
-            if (session != null) {
-                session.disconnect();
+                responseString = responseStream.toString();
+            } catch (JSchException e) {
+                log.error("[connectAndExecuteCommand] ssh exception: {}", e.getMessage(), e);
+                return "Error. " + e.getMessage();
+            } finally {
+                if (session != null) {
+                    session.disconnect();
+                }
+                if (channel != null) {
+                    channel.disconnect();
+                }
             }
-            if (channel != null) {
-                channel.disconnect();
-            }
+        }
+        else {
+            log.error("[connectAndExecuteCommand] Lab is not reachable");
+            return "Couldn't connect to the lab. Check your internet or vpn connection.";
         }
         return responseString;
     }
@@ -95,17 +101,14 @@ public class LabService {
                         "sudo wae-status");
             } catch (InterruptedException e) {
                 log.error("[getAllLabsStatus] InterruptedException: {}", e.getMessage(), e);
-                throw new NotConnected("Connection interrupted");
+                return "";
             }
-            if (response == null) {
-                throw new NotConnected("Connection interrupted");
-            }
+            outputString = generateOutputString(outputString, response);
         }
-        log.info("[getAllLabsStatus] the output: {}", outputString);
+        log.debug("[getAllLabsStatus] the output: {}", outputString);
         return outputString;
     }
 
-    // TODO: What does this method do?? Refactor the method.
     private String generateOutputString(String outputString, String response) {
         log.debug("[generateOutputString] called");
         Scanner scanner = new Scanner(response);
@@ -115,10 +118,6 @@ public class LabService {
             List<String> words = new ArrayList<>();
             currentLine = scanner.nextLine();
             log.debug("[generateOutputString] current line: {}", currentLine);
-            // StringTokenizer tokenizer = new StringTokenizer(currentLine);
-            // while (tokenizer.hasMoreElements())
-            // words.add(tokenizer.nextToken());
-            // TODO: Not tested, old impl above.
             String[] curLineTokenized = currentLine.split(" ");
             Arrays.asList(curLineTokenized).forEach(words::add);
             outputArray.add(words);
@@ -192,19 +191,20 @@ public class LabService {
     }
 
     public String runCommandOnSelectedLab(String labName, String commandToBeExecuted) {
-        String outputString = "";
+        String outputString = null;
         log.debug("[runCommandOnSelectedLab] called");
         Lab labToExecute = adminService.findLabByName(labName);
         if (Objects.isNull(labToExecute)) {
-            log.info("[runCommandOnSelectedLab] no lab to run command");
-            throw new NotFound("There isn't any lab with the name: " + labName);
+            log.info("[runCommandOnSelectedLab] lab couldn't found in database");
+            throw new NotFound("Lab couldn't found in database");
         }
         try {
             outputString = connectAndExecuteCommand(labToExecute.getUserName(), labToExecute.getPassword(),
                     labToExecute.getHost(), labToExecute.getPort(), commandToBeExecuted);
             log.debug("[runCommandOnSelectedLab] out string: {}", outputString);
         } catch (InterruptedException e) {
-            log.error("[runCommandOnSelectedLab] InterruptedException: {}", e.getMessage(), e);
+            Thread.currentThread().interrupt();
+            throw new NotConnected("Couldn't connect to the lab");
         }
         return outputString;
     }
@@ -215,7 +215,7 @@ public class LabService {
         Lab labToExecute = adminService.findLabByName(labName);
         if (Objects.isNull(labToExecute)) {
             log.info("[getLabStatus] no lab to run command");
-            throw new NotFound("There isn't a lab found in the database named " + labName);
+            return null;
         }
         try {
             outputString = connectAndExecuteCommand(labToExecute.getUserName(), labToExecute.getPassword(),
