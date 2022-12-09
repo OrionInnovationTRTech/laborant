@@ -5,8 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import tr.com.orioninc.laborant.security.authenticate.model.User;
-import tr.com.orioninc.laborant.security.authenticate.repository.UserRepository;
+import tr.com.orioninc.laborant.security.model.User;
+import tr.com.orioninc.laborant.security.repository.UserRepository;
+import tr.com.orioninc.laborant.security.service.UserService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

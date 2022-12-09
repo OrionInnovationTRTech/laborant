@@ -1,4 +1,4 @@
-package tr.com.orioninc.laborant.security.authenticate.service;
+package tr.com.orioninc.laborant.security.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -6,8 +6,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import tr.com.orioninc.laborant.security.authenticate.model.User;
-import tr.com.orioninc.laborant.security.authenticate.repository.UserRepository;
+import tr.com.orioninc.laborant.security.model.User;
+import tr.com.orioninc.laborant.security.repository.UserRepository;
 import tr.com.orioninc.laborant.security.config.PasswordConfig;
 
 import java.util.List;import java.util.Objects;
@@ -58,6 +58,7 @@ public class UserService implements UserDetailsService {
     }
 
     public List<User> getAllUsers() {
+        log.info("[getAllUsers] Getting all users");
         return userRepository.findAll();
     }
 }

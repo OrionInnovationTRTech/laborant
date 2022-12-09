@@ -55,7 +55,7 @@ public class SecurityConfig {
                 .anyRequest()
                 .authenticated()
                 .and()
-                .formLogin();
+                .formLogin().and().httpBasic();
 
 
         http.headers().frameOptions().sameOrigin();
