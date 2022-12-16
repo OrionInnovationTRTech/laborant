@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 import tr.com.orioninc.laborant.exception.NotConnected;
 import tr.com.orioninc.laborant.exception.NotFound;
 
-import java.io.IOException;
-import java.net.InetAddress;
 import java.io.ByteArrayOutputStream;
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;

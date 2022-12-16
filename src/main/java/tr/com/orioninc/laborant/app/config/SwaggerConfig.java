@@ -30,7 +30,7 @@ public class SwaggerConfig {
                 .title("Spring Boot REST API")
                 .description("\"WELCOME TO LABORANT\"\n" +
                         "This is a REST API for Laborant project." +
-                        " You can use this API to run commands on lab. Now except get methods can only accessed by admin user.")
+                        " You can use this API to run commands on lab. For now, methods that except 'get' methods can only accessed by admin user.")
                 .version("1.0.0")
                 .license("Apache License Version 2.0")
                 .licenseUrl("https://www.apache.org/licenses/LICENSE-2.0\"")
