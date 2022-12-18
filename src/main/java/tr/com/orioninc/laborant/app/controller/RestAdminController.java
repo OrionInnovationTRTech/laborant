@@ -1,5 +1,6 @@
 package tr.com.orioninc.laborant.app.controller;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -84,15 +85,16 @@ public class RestAdminController {
 
     @DeleteMapping("/labs/{labName}")
     @ApiOperation(value = "Deleting a lab from database by giving 'labName' as a path variable")
-    public ResponseEntity<Lab> deleteLab(@PathVariable("labName") String labName) {
+    public ResponseEntity<Lab> deleteLabByName(@PathVariable("labName") String labName) {
         log.info("[deleteLab] Called with labName: {}", labName);
         return ResponseEntity.ok(adminService.deleteLabByName(labName));
     }
-
     @PutMapping("/labs/{labName}")
     @ApiOperation(value = "Updating a lab in database by giving 'labName' as a path variable and Lab in body")
-    public ResponseEntity<Lab> updateLabByName(@PathVariable("labName") String labName, @RequestBody Lab lab) {
+    public ResponseEntity<Lab> updateLabByNameByName(@PathVariable("labName") String labName, @RequestBody Lab lab) {
         log.info("[updateLabByName] Called with labName: {}", labName);
         return ResponseEntity.ok(adminService.updateLabByName(labName, lab));
     }
+
+
 }

@@ -26,13 +26,9 @@ public class RestLabController {
 
     @GetMapping("/labs/runCommand/{labName}")
     @ApiOperation(value = "Running a command on a lab by giving 'labName' as a path variable and command as parameter")
-    public ResponseEntity<String> runCommand(@PathVariable("labName") String labName, @RequestParam String command) {
-        if (labService.runCommandOnSelectedLab(labName, command) == null) {
-            throw new NotFound("Lab named " + labName + " not found");
-        }
-        else {
+    public ResponseEntity<String> runCommand(@PathVariable("labName") String labName, @RequestParam(value = "command",required = false) String command) {
+            log.info("[runCommand] Running command {} on lab {}", command, labName);
             return ResponseEntity.ok(labService.runCommandOnSelectedLab(labName, command));
-        }
     }
 
     @GetMapping("/labs/status/{labName}")

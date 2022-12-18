@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Log4j2
@@ -110,14 +111,14 @@ public class AdminService {
             if (Objects.isNull(searchLab)) {
                 Lab searchHostUserPair = labRepo.findByUserNameAndHost(lab.getUserName(), lab.getHost());
                 if (Objects.isNull(searchHostUserPair)) {
-                    if (isLabReachable(lab.getHost(), 500)) {
+//                    if (isLabReachable(lab.getHost(), 500)) {
                         lab = labRepo.save(lab);
                         log.info("[addNewLab] adding new lab named: {}", lab.getLabName());
                         return lab;
-                    } else {
-                        log.error("[addNewLab] Cannot add lab. Lab is not reachable");
-                        throw new NotConnected("Cannot add lab. The lab is not reachable");
-                    }
+//                    } else {
+//                        log.error("[addNewLab] Cannot add lab. Lab is not reachable");
+//                        throw new NotConnected("Cannot add lab. The lab is not reachable");
+//                    }
                 } else {
                     log.warn("[addNewLab] there is already a pair in the database with username: {} and host: {}", lab.getUserName(), lab.getHost());
                     throw new AlreadyExists("There is already a pair in the database with username: " + lab.getUserName() + " and host: " + lab.getHost());
@@ -167,4 +168,4 @@ public class AdminService {
                 return false;
             }
         }
-    }
+}

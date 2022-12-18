@@ -10,12 +10,10 @@ export const checkAuthentication = () => {
     const username = localStorage.getItem("username");
     const password = localStorage.getItem("password");
   
-    console.log(`Username: ${username}, Password: ${password}`);
   
     return {
       headers: {
-    
-     //   Authorization: "Basic " + btoa(`${username}:${password}`)
+       'Authorization': 'Basic ' + btoa(username + ':' + password),
       }
     };
   };

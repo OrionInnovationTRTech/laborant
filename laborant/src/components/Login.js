@@ -1,58 +1,93 @@
+import { WindowSharp } from '@mui/icons-material';
 import React from 'react';
-import LoginService from '../services/LoginService';
 
-
-class Login extends React.Component {
+class Logout extends React.Component {
   state = {
-    username: '',
-    password: ''
+    isAuthenticated: false,
   };
 
-  loginService = new LoginService();
+  logout = () => {
+    localStorage.clear();
+    window.location.replace('http://localhost:3000/login')
+    this.setState({
+      isAuthenticated: false,
+    });
+  }
+
+  render() {
+    return(
+        <button onClick={this.logout}>Logout</button>
+    );
+  }
+}
+
+class LoginForm extends React.Component {
+  state = {
+    username: '',
+    password: '',
+    isAuthenticated: false,
+  };
 
   handleChange = (event) => {
     this.setState({
-      [event.target.name]: event.target.value
+      [event.target.name]: event.target.value,
     });
   }
 
   handleSubmit = (event) => {
     event.preventDefault();
+
     const { username, password } = this.state;
 
-    console.log('Username:', username);
-    console.log('Password:', password);
-
-    // Update the username and password in the loginService instance
-    this.loginService.username = username;
-    this.loginService.password = password;
-
-    // Perform a GET request to a protected resource
-     this.loginService.get('http://localhost:8080/v1/login')
-    .then(response => {
-      if (response.ok) {
-        console.log('Response status:', response.status);
-      } else {
-        throw new Error('Error logging in: ' + response.statusText);
-      }
+    fetch('http://localhost:8080/v1/login', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Basic ' + btoa(username + ':' + password),
+      },
     })
+      .then((response) => {
+       if (response.ok) {
+        console.log(localStorage.getItem('isAuthenticated'));
 
-    .catch(error => {
-      console.log('Error:', error.message);
-    });
-  }
+          // If the authentication is successful, save the username and password in local storage
+          localStorage.setItem('username', username);
+          localStorage.setItem('password', password);
+          this.setState({
+            isAuthenticated: true,
+          });
+          localStorage.setItem('isAuthenticated', true);
+          window.location.replace('/labs/')
+          
+        
+        }
+        else{
+          throw new Error('Error logging in: ' + response.statusText);
+        }
+      })
+  
+      .catch(error => {
+        console.log('Error:', error.message);
+        alert('Couldn not authenticated');
+      });
+    }
 
   render() {
+    const { username, password, isAuthenticated } = this.state;
+
+    if (localStorage.getItem('isAuthenticated')) {
+      // If the user is authenticated, show a message
+      return <p>You are logged in as {localStorage.getItem('username')}.</p>;
+    }
 
     return (
       <form onSubmit={this.handleSubmit}>
         <label>
-          Username:
-          <input type="text" name="username" onChange={this.handleChange} />
+          username:
+          <input type="text" name="username" value={username} onChange={this.handleChange} />
         </label>
         <label>
-          Password:
-          <input type="password" name="password" onChange={this.handleChange} />
+          password:
+          <input type="password" name="password" value={password} onChange={this.handleChange} />
         </label>
         <button type="submit">Login</button>
       </form>
@@ -60,4 +95,5 @@ class Login extends React.Component {
   }
 }
 
-export default Login;
+export default LoginForm;
+export { Logout };
