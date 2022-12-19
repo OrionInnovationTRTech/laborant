@@ -1,11 +1,10 @@
-    import React, {useState, useEffect, version} from "react";
-    import LabService from "../services/LabService";
-    import {Link} from "react-router-dom";
-    import { checkAuthentication, getHeaders } from "../services/AuthHeader";
-    import axios from "axios";
+import React, {useEffect, useState} from "react";
+import {Link} from "react-router-dom";
+import {checkAuthentication, getHeaders} from "../services/AuthHeader";
+import axios from "axios";
 
 
-    const LabListComponents = () => {
+const LabListComponents = () => {
         checkAuthentication();
         
         
@@ -28,14 +27,13 @@
             })
         }
         useEffect(() => {
-            const labVersion = "CAN'T CONNECT";
+            let labVersion = "CAN'T CONNECT";
             labs.forEach(lab => {
               axios.get(`http://localhost:8080/v1/labs/runCommand/${lab.labName}?command=sudo+wae-status`, getHeaders())
                 .then((response) => {
                     const data = response.data.split('\n').map(row => {
-                        const elements = row.split(' ').filter(element => element !== '');
-                        return elements;
-                        
+                        return row.split(' ').filter(element => element !== '');
+
                       }).filter(row => row.length > 0);
                         console.log(data);
                         if (data[0][1] === "connect") {
@@ -45,11 +43,12 @@
                             labVersion = data[1][1];
                             console.log(labVersion);
                         }
-                        
+                    setLabVersion((prevLabVersions) => ({ ...prevLabVersions, [lab.labName]: labVersion }));
                 }).catch((error) => {
                     labVersion = ("CAN'T CONNECT");
-                });
-                setLabVersion((prevLabVersions) => ({ ...prevLabVersions, [lab.labName]: labVersion }));
+                    setLabVersion((prevLabVersions) => ({ ...prevLabVersions, [lab.labName]: labVersion }));
+              });
+
             });
           }, [labs]);
         
@@ -65,11 +64,6 @@
             })
     }
 }
-            const editLab = (labName) => {
-                // Navigate to the edit lab page and pass the labName as a prop
-                window.location.replace(`/edit-lab/${labName}`);
-            }
-  
 
             return(
                 <div>
