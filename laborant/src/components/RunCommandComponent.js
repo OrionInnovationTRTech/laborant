@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { getHeaders } from '../services/AuthHeader';
+import {Table} from './Table';
 
 const RunCommandComponent = () => {
-    const labName = window.location.pathname.split('/')[2];
-    const [command, setCommand] = useState('');
-    const [response, setResponse] = useState('');
+  const labName = window.location.pathname.split('/')[2];
+  const [command, setCommand] = useState('');
+  const [response, setResponse] = useState('');
 
   const handleCommandChange = (event) => {
     setCommand(event.target.value);
@@ -21,10 +22,11 @@ const RunCommandComponent = () => {
       }
     })
     .then((response) => {
-      setResponse(`Response: ${response.data}`);
+        const data = response.data.split('\n').map(row => row.split(' '));
+        setResponse(<Table data={data} />);
     })
     .catch((error) => {
-      console.error(error);
+      setResponse(`Error: ${error.response.data.message}`);
     });
   };
 

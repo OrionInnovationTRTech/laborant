@@ -75,7 +75,7 @@ public class LabService {
         }
         else {
             log.error("[connectAndExecuteCommand] Lab is not reachable");
-            return "Couldn't connect to the lab. Check your internet or vpn connection.";
+            throw new NotConnected("Couldn't connect to the lab. Check your internet or vpn connection.");
         }
         return responseString;
     }
