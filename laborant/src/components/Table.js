@@ -1,66 +1,17 @@
 import React from 'react';
-import ReactTable from 'react-table';
 
 export const Table = ({ data }) => {
   return (
-    <ReactTable
-      data={data}
-      columns={[
-        {
-          Header: 'HOST',
-          accessor: 'host'
-        },
-        {
-          Header: 'VERSION',
-          accessor: 'version'
-        },
-        {
-          Header: 'ADMIN',
-          accessor: 'admin'
-        },
-        {
-          Header: 'DHCP',
-          accessor: 'dhcp'
-        },
-        {
-          Header: 'DNS',
-          accessor: 'dns'
-        },
-        {
-          Header: 'REPO',
-          accessor: 'repo'
-        },
-        {
-          Header: 'APP',
-          accessor: 'app'
-        },
-        {
-          Header: 'PROXY',
-          accessor: 'proxy'
-        },
-        {
-          Header: 'PRES',
-          accessor: 'pres'
-        },
-        {
-          Header: 'DB',
-          accessor: 'db'
-        },
-        {
-          Header: 'NTPD',
-          accessor: 'ntpd'
-        },
-        {
-          Header: 'TURN',
-          accessor: 'turn'
-        },
-        {
-          Header: 'BROKER',
-          accessor: 'broker'
-        },
-      ]}
-    />
-  );
+      <table>
+       <tbody>
+          {data.map((row, index) => (
+            <tr key={index}>
+                {row.map((element, index) => (
+                    <td key={index} style={{border : '1px solid black'}}>{element}</td>
+                ))}
+            </tr>
+            ))}
+        </tbody>
+        </table>
+    );
 };
-
-export default Table;

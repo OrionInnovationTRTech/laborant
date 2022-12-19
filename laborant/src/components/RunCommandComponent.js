@@ -22,7 +22,11 @@ const RunCommandComponent = () => {
       }
     })
     .then((response) => {
-        const data = response.data.split('\n').map(row => row.split(' '));
+         const data = response.data.split('\n').map(row => {
+            const elements = row.split(' ').filter(element => element !== '');
+            return elements;
+        }).filter(row => row.length > 0);
+        console.log(data);
         setResponse(<Table data={data} />);
     })
     .catch((error) => {
