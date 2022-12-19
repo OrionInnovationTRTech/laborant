@@ -1,15 +1,16 @@
-    import React, {useState, useEffect} from "react";
+    import React, {useState, useEffect, version} from "react";
     import LabService from "../services/LabService";
     import {Link} from "react-router-dom";
     import { checkAuthentication, getHeaders } from "../services/AuthHeader";
     import axios from "axios";
-    import EditLabComponent from "./EditLabComponent";
+
 
     const LabListComponents = () => {
         checkAuthentication();
         
         
         const [labs, setLabs] = useState([]);
+        const [labVersion, setLabVersion] = useState("");
 
         useEffect(() => {
 
@@ -26,6 +27,30 @@
                 console.log(error);
             })
         }
+        useEffect(() => {
+            labs.forEach(lab => {
+              axios.get(`http://localhost:8080/v1/labs/runCommand/${lab.labName}?command=sudo+wae-status`, getHeaders())
+                .then((response) => {
+                    const data = response.data.split('\n').map(row => {
+                        const elements = row.split(' ').filter(element => element !== '');
+                        return elements;
+                      }).filter(row => row.length > 0);
+                        console.log(data);
+                        if (data[0][1] === "connect") {
+                            setLabVersion("CAN'T CONNECT");
+                            console.log(labVersion);
+                        }
+                        else{
+                            setLabVersion(data[1][1]);
+                            console.log(labVersion);
+                        }
+                        
+                }).catch((error) => {
+                    setLabVersion("CAN'T CONNECT");
+                });
+            });
+          }, [labs]);
+        
 
         const deleteLab = (labName) => {
     if (window.confirm("Are you sure you want to delete this lab?")) {
@@ -51,25 +76,26 @@
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <td>Lab Id</td>
-                                <td>Lab Name</td>
-                                <td>Lab Username</td>
-                                <td>Lab Password</td>
-                                <td>Lab Host</td>
-                                <td>Lab Port</td>
+                                <td>Name</td>
+                                <td>Username</td>
+                                <td>Password</td>
+                                <td>Host</td>
+                                <td>Port</td>
+                                <td>Version</td>
+                                
                             </tr>
                         </thead>
                         <tbody>
                         {
                                 labs.map(
                                     labs => 
-                                    <tr key={labs.id}>
-                                        <td>{labs.id}</td>
+                                    <tr key={labs.labName}>
                                         <td>{labs.labName}</td>
                                         <td>{labs.userName}</td>
                                         <td>{labs.password}</td>
                                         <td>{labs.host}</td>
                                         <td>{labs.port}</td>
+                                        <td>{labVersion}</td>
                                         <td>
                                             <button onClick={() => deleteLab(labs.labName)} className="btn btn-danger">Delete</button>
                                             <Link className="btn btn-secondary" to={`/edit-lab/${labs.labName}`}>Edit</Link>
