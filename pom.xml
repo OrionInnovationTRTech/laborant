@@ -32,6 +32,7 @@
 			<version>2.19.0</version>
 		</dependency>
 
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -131,6 +132,75 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>2.7.4</version>
+			</plugin>
+			<plugin>
+
+
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<!-- Use the latest released version:
+                https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
+				<version>1.12.1</version>
+				<configuration>
+					<installDirectory>target</installDirectory>
+					<workingDirectory>laborant</workingDirectory>
+				</configuration>
+				<executions>
+				<execution>
+					<id>install node and npm</id>
+					<goals>
+						<goal>install-node-and-npm</goal>
+					</goals>
+					<configuration>
+						<!-- See https://nodejs.org/en/download/ for latest node and npm (lts) versions -->
+						<nodeVersion>v16.17.1</nodeVersion>
+						<npmVersion>8.15.0</npmVersion>
+					</configuration>
+				</execution>
+
+				<execution>
+					<id>npm ci</id>
+					<goals>
+						<goal>npm</goal>
+					</goals>
+					<!-- Optional configuration which provides for running any npm command -->
+					<configuration>
+						<arguments>ci</arguments>
+					</configuration>
+				</execution>
+				<execution>
+					<id>npm run build</id>
+					<goals>
+						<goal>npm</goal>
+					</goals>
+					<configuration>
+						<arguments>run build</arguments>
+					</configuration>
+				</execution>
+			</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>target/classes/static</outputDirectory>
+							<resources>
+								<resource>
+									<directory>laborant/build</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

@@ -32,14 +32,14 @@ import java.util.List;
 @EnableWebSecurity(debug = true)
 @CrossOrigin(origins = "http://localhost:3000")
 public class SecurityConfig {
+
     private final PasswordEncoder passwordEncoder;
     private UserDetailsService userDetailsService;
-    RestAuthEntryPoint restAuthEntryPoint;
-    private JwtAuthFilter jwtAuthFilter;
 
 
     private static final String ADMIN = "ADMIN";
     private static final String USER = "USER";
+
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

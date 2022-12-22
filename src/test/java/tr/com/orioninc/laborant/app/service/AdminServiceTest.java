@@ -7,9 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import tr.com.orioninc.laborant.app.model.Lab;
 import tr.com.orioninc.laborant.app.repository.LabRepository;
+import tr.com.orioninc.laborant.exception.AlreadyExists;
+import tr.com.orioninc.laborant.exception.NotFound;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j2
@@ -29,6 +32,9 @@ class AdminServiceTest {
 
     @Test
     void canGetAllLabs() {
+        // given
+        Lab lab = new Lab("test", "test", "test", "test", 1);
+        labRepository.save(lab);
         // when
         List<Lab> test = underTest.getAllLabs();
         // then
@@ -74,13 +80,13 @@ class AdminServiceTest {
         Lab lab = new Lab(
                 labName, "testUser", "testPassword", "testHost", 22);
         labRepository.save(lab);
-        log.info("Lab saved: {}", lab);
-        Lab toBeUpdated = new Lab(
-                "update", "update", "update", "update", 222);
-        // when
-        underTest.updateLabByName(toBeUpdated.getLabName(), toBeUpdated);
-        // then
-        assertNotEquals(underTest.getLab(labName), toBeUpdated);
+        Exception exception = assertThrows(NotFound.class, () -> { underTest.updateLabByName("notFound", lab); });
+
+
+        String expectedMessage = "isn't a lab";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
@@ -105,10 +111,11 @@ class AdminServiceTest {
         Lab actuallySame = new Lab( "test",
                 "userName", "password", "host", 22);
         //when
-        underTest.addNewLab(actuallySame);
+        Exception exception = assertThrows(AlreadyExists.class, () -> { underTest.addNewLab(actuallySame); });
         //then
-        assertEquals(null, underTest.addNewLab(actuallySame));
-        log.info("Lab already exists");
+        String expectedMessage = "There is already a lab";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
     }
     @Test
     void willGiveErrorWhenPairOfLabNameAndHostExists() {
@@ -118,11 +125,14 @@ class AdminServiceTest {
         labRepository.save(lab);
         Lab actuallySamePair = new Lab( "test2",
                 "userName", "password2", "host", 222);
-        //when
-        Lab test = underTest.addNewLab(actuallySamePair);
-        //then
-        assertEquals(null, test);
-        log.info("Lab already exists");
+
+        Exception exception = assertThrows(AlreadyExists.class, () -> { underTest.addNewLab(actuallySamePair); });
+
+        String expectedMessage = "There is";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+
     }
 
     @Test
@@ -143,9 +153,13 @@ class AdminServiceTest {
                 "userName", "password", "host", 22);
         labRepository.save(lab);
         //when
-        Lab gettedLab = underTest.getLab("canGetLab test lab2");
-        //then
-        assertEquals(null, gettedLab);
+
+        Exception exception = assertThrows(NotFound.class, () -> { underTest.getLab("notFound"); });
+
+        String expectedMessage = "no lab";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
@@ -167,8 +181,10 @@ class AdminServiceTest {
                 "userName", "password", "host", 22);
         labRepository.save(lab);
         //when
-        Lab deletedLab =  underTest.deleteLabByName("canDeleteLabByName test lab2");
-        //then
-        assertNull(deletedLab);
+        Exception exception = assertThrows(NotFound.class, () -> { underTest.deleteLabByName("canDeleteLabByName test lab2"); });
+        String expectedMessage = "There";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 }
