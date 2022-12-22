@@ -1,5 +1,6 @@
 package tr.com.orioninc.laborant.service;
 
+import lombok.AllArgsConstructor;
 import tr.com.orioninc.laborant.model.Lab;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -8,16 +9,20 @@ import com.jcraft.jsch.Session;
 
 import lombok.extern.log4j.Log4j2;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
-import java.util.*;
+import java.util.List;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 
 @Service
+@AllArgsConstructor
 @Log4j2
 public class LabService {
-    @Autowired
+
     AdminService adminService;
 
     public static String connectAndExecuteCommand(String username, String password,
@@ -32,8 +37,16 @@ public class LabService {
             session = new JSch().getSession(username, host, port);
             session.setPassword(password);
             session.setConfig("StrictHostKeyChecking", "no");
+            session.setServerAliveInterval(200); // Check if server is alive every 200  miliseconds
+            session.setServerAliveCountMax(1); // If server is not alive, try to reconnect once
             session.connect();
-
+            if (session.isConnected()) {
+                log.info("[connectAndExecuteCommand] session connected");
+            }
+            else {
+                log.info("[connectAndExecuteCommand] session not connected");
+                responseString = "Session not connected";
+            }
             channel = (ChannelExec) session.openChannel("exec");
             channel.setCommand(command);
             log.debug("[connectAndExecuteCommand] command to be executed: {}", command);
@@ -42,13 +55,14 @@ public class LabService {
             channel.connect();
 
             while (channel.isConnected()) {
-                Thread.sleep(500);
+                Thread.sleep(200);
             }
 
             responseString = new String(responseStream.toByteArray());
         } catch (JSchException e) {
             log.error("[connectAndExecuteCommand] ssh exception: {}", e.getMessage(), e);
-            return null;
+            responseString = "SSH Exception: " + e.getMessage();
+            return "Couldn't connect to the lab";
         } finally {
             if (session != null) {
                 session.disconnect();
@@ -60,7 +74,7 @@ public class LabService {
         return responseString;
     }
 
-    // TODO: What is the output? What does this method do??
+
     public String getAllLabsStatus() {
         log.debug("[getAllLabsStatus] called");
         List<Lab> allLabs = adminService.getAllLabs();
@@ -105,26 +119,33 @@ public class LabService {
             outputArray.add(words);
         }
         log.debug("[generateOutputString] current line: {}", currentLine);
-        if (outputArray.get(1).get(9).equals("FAI")) {
-            outputString += "SIGNAL 3";
-        } else {
-            boolean stopFound = false;
-            boolean failFound = false;
-            for (String value : outputArray.get(1)) {
-                if (value.equals("STO")) {
-                    stopFound = true;
-                }
-                if (value.equals("FAI")) {
-                    failFound = true;
-                }
-            }
-            if (failFound) {
-                outputString += "SIGNAL 2";
-            } else if (!failFound && stopFound) {
-                outputString += "SIGNAL 1";
+        try {
+            if (outputArray.get(1).get(9).equals("FAI")) {
+                outputString += "SIGNAL 3";
             } else {
-                outputString += "SIGNAL 0";
+                boolean stopFound = false;
+                boolean failFound = false;
+                for (String value : outputArray.get(1)) {
+                    if (value.equals("STO")) {
+                        stopFound = true;
+                    }
+                    if (value.equals("FAI")) {
+                        failFound = true;
+                    }
+                }
+                if (failFound) {
+                    outputString += "SIGNAL 2";
+                } else if (!failFound && stopFound) {
+                    outputString += "SIGNAL 1";
+                } else {
+                    outputString += "SIGNAL 0";
+                }
             }
+        }
+        catch (IndexOutOfBoundsException e) {
+            log.error("[generateOutputString] IndexOutOfBoundsException: {}", e.getMessage(), e);
+            outputString += "COULDN'T CONNECT";
+
         }
         outputString += " \n";
         outputString += response;
@@ -151,15 +172,12 @@ public class LabService {
                         currentLab.getPassword(), currentLab.getHost(), currentLab.getPort(),
                         "sudo wae-status");
                 outputString += "\n  \n";
-                List<String> tokens = new ArrayList<>();
-                // StringTokenizer tokenizer = new StringTokenizer(outputString);
-                // while (tokenizer.hasMoreElements())
-                // tokens.add(tokenizer.nextToken());
-                // TODO: Not tested, old impl above.
-                String[] outputStringTokenized = outputString.split(" ");
-                Arrays.asList(outputStringTokenized).forEach(tokens::add);
-                String currentVersion = tokens.get(15);
-                labVersions.add(currentVersion);
+                 List<String> tokens = new ArrayList<>();
+                    String[] outputStringTokenized = outputString.split(" ");
+                    Arrays.asList(outputStringTokenized).forEach(tokens::add);
+                                                                            // I just write outputStringTokenized.length-1 instead of 5
+                    String currentVersion = tokens.get(tokens.size()-1);    // TODO CHECK LATER AND FIX
+                    labVersions.add(currentVersion);
             } catch (InterruptedException e) {
                 log.error("[getAllLabVersions] InterruptedException: {}", e.getMessage(), e);
                 labVersions.add("UNABLE TO CONNECT");
@@ -182,6 +200,25 @@ public class LabService {
             log.debug("[runCommandOnSelectedLab] out string: {}", outputString);
         } catch (InterruptedException e) {
             log.error("[runCommandOnSelectedLab] InterruptedException: {}", e.getMessage(), e);
+        }
+        return outputString;
+    }
+
+    public String getLabStatus(String labName) {
+        log.debug("[getLabStatus] called");
+        Lab labToExecute = adminService.findLabByName(labName);
+        if (Objects.isNull(labToExecute)) {
+            log.info("[getLabStatus] no lab to run command");
+            return "There isn't a lab found in the database named " + labName;
+        }
+        String outputString = null;
+        try {
+            outputString = connectAndExecuteCommand(labToExecute.getUserName(), labToExecute.getPassword(),
+                    labToExecute.getHost(), labToExecute.getPort(), "sudo wae-status");
+            log.debug("[getLabStatus] out string: {}", outputString);
+        } catch (InterruptedException e) {
+            log.error("[getLabStatus] InterruptedException: {}", e.getMessage(), e);
+            Thread.currentThread().interrupt();
         }
         return outputString;
     }
