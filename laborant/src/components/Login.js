@@ -1,4 +1,3 @@
-import { WindowSharp } from '@mui/icons-material';
 import React from 'react';
 
 class Logout extends React.Component {

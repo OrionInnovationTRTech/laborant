@@ -9,15 +9,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import tr.com.orioninc.laborant.app.model.Lab;
 import tr.com.orioninc.laborant.app.service.AdminService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequestMapping("/v1")
 @AllArgsConstructor
@@ -49,9 +52,17 @@ public class RestAdminController {
 
     @GetMapping("/labs")
     @ApiOperation(value = "Getting all labs as a list of Lab objects")
-    public ResponseEntity<List<Lab>> getAllLabs() {
+    public ResponseEntity<List<Lab>> getAllLabs(Authentication authentication) {
         log.info("[getAllLabs] Getting all labs");
-        return ResponseEntity.ok(adminService.getAllLabs());
+        List<Lab> labs = adminService.getAllLabs();
+        if (!authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
+            // If the authenticated user is not an admin, set the password to "hidden"
+            labs = labs.stream().map(lab -> {
+                lab.setPassword("hidden");
+                return lab;
+            }).collect(Collectors.toList());
+        }
+        return ResponseEntity.ok(labs);
     }
 
     @GetMapping("/labs/{labName}")
@@ -81,6 +92,25 @@ public class RestAdminController {
     public ResponseEntity<Lab> addNewLab(@RequestBody Lab lab) {
         log.info("[addNewLab] Called with lab: {}", lab.toString());
         return ResponseEntity.ok(adminService.addNewLab(lab));
+    }
+
+    @PostMapping("/labs/bulk-add")
+    @ApiOperation(value = "Adding multiple labs to the database by giving list of Labs in body")
+    public ResponseEntity<String> addBulkLab (@RequestBody List<Lab> labs) {
+        log.info("[addNewLab] Called with labs: {}", labs.toString());
+        int a = 0;
+        int b = 0;
+        for (Lab lab : labs) {
+           try {
+               adminService.addNewLab(lab);
+               a++;
+           } catch (Exception e) {
+               log.warn("[addNewLab] Lab {} could not be added", lab.toString());
+               b++;
+           }
+        }
+        int c = a+b;
+        return ResponseEntity.ok("Requested to add with " + c + " labs. " + a + " of them were added successfully, " + b + " of them couldn't added due to duplicate lab credentials.");
     }
 
     @DeleteMapping("/labs/{labName}")

@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import tr.com.orioninc.laborant.exception.AlreadyExists;
 import tr.com.orioninc.laborant.exception.NotFound;
 import tr.com.orioninc.laborant.security.model.User;
 import tr.com.orioninc.laborant.security.service.UserService;
@@ -25,7 +26,7 @@ public class UserController {
     public ResponseEntity<User> addNewUser(@RequestBody User user) {
         if (userService.isUserExists(user.getUsername())) {
             log.info("[addNewUser] User {} already exists", user.getUsername());
-            throw new NotFound("User " + user.getUsername() + " already exists");
+            throw new AlreadyExists("User " + user.getUsername() + " already exists");
         } else {
             userService.addNewUser(user);
             log.info("[addNewUser] User added: {}", user.toString());

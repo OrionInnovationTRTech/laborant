@@ -111,11 +111,11 @@ public class AdminService {
             if (Objects.isNull(searchLab)) {
                 Lab searchHostUserPair = labRepo.findByUserNameAndHost(lab.getUserName(), lab.getHost());
                 if (Objects.isNull(searchHostUserPair)) {
-//                    if (isLabReachable(lab.getHost(), 500)) {
+//TODO                    if (isLabReachable(lab.getHost(), 500)) {
                         lab = labRepo.save(lab);
                         log.info("[addNewLab] adding new lab named: {}", lab.getLabName());
                         return lab;
-//                    } else {
+//todo                    } else {
 //                        log.error("[addNewLab] Cannot add lab. Lab is not reachable");
 //                        throw new NotConnected("Cannot add lab. The lab is not reachable");
 //                    }

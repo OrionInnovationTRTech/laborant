@@ -19,7 +19,10 @@ const AddLabComponent = () => {
         LabService.addLab(lab).then((response) => {
             console.log(response.status);
             if (response.status === 200) {
-                setMessage('Lab Added Successfully.');
+                setMessage(<p style={{color: 'green'}}>Lab Added Successfully. Redirecting...'</p>);
+                setTimeout(() => {
+                    window.location.replace('/labs');
+                  }, 1500);
               } else if (response.status === 400) {
                 setMessage(`Failed to add lab. ${response.data.message}`);
               } else {
@@ -29,7 +32,6 @@ const AddLabComponent = () => {
                 setMessage(`Failed to add lab. Error: ${error.response.data.message}`);
             });
           
-            window.location.replace('/labs');
         console.log('lab => ' + JSON.stringify(lab));
     }
 
