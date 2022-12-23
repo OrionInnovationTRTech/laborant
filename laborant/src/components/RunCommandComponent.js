@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { getHeaders } from '../services/AuthHeader';
-import {Table} from './Table';
+import {Table} from './StatusTable';
 
 const RunCommandComponent = () => {
   const labName = window.location.pathname.split('/')[2];

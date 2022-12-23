@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react";
 import LabService from "../services/LabService";
 import {Link} from "react-router-dom";
+import axios from "axios";
 
 const UserListComponents = () => {
     
@@ -12,10 +13,9 @@ const UserListComponents = () => {
     }, []);
 
     const getAllUsers = () => {
-         UserService.getUsers({
+         axios.get('http://localhost:8080/users/', {
             headers: {
-              // Attach the cookie to the request headers
-              Cookie: cookie,
+                'Authorization' : 'Basic ' + btoa(localStorage.getItem('username') + ':' + localStorage.getItem('password')),
             },
           }).then((response) => {
             setLabs(response.data);

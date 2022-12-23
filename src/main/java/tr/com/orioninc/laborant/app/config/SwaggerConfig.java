@@ -1,6 +1,5 @@
 package tr.com.orioninc.laborant.app.config;
 
-import io.swagger.annotations.Contact;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RestController;

@@ -35,7 +35,6 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     private UserDetailsService userDetailsService;
     RestAuthEntryPoint restAuthEntryPoint;
-    private JwtAuthFilter jwtAuthFilter;
 
 
     private static final String ADMIN = "ADMIN";

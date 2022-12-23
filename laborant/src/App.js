@@ -1,5 +1,4 @@
 import './App.css';
-import AppBar from './components/AppBar';
 import LabListComponents from './components/LabListComponents';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -9,6 +8,7 @@ import LoginForm from './components/Login';
 import {checkAuthentication} from './services/AuthHeader'
 import EditLabComponent from './components/EditLabComponent';
 import RunCommandComponent from './components/RunCommandComponent';
+import BulkAddLabComponent from './components/BulkAddLabComponent';
 
 function App() {
   checkAuthentication();
@@ -24,6 +24,7 @@ function App() {
           <Route path="/login" element={<LoginForm/>}></Route>
           <Route path="/edit-lab/:labName" element={<EditLabComponent/>}></Route> 
           <Route path="/run-command/:labName" element={<RunCommandComponent/>}></Route>
+          <Route path="/bulk-add" element={<BulkAddLabComponent/>}></Route>
         </Routes>
       </div>   
       <Footer />
