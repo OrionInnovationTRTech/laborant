@@ -33,19 +33,14 @@ public class RestAdminController {
     @GetMapping("/login")
     @ApiOperation(value = "Login")
     public ResponseEntity<Map<String, String>> getSession(HttpServletRequest request) {
-        // Check if the user is authenticated
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
-            // Get the session ID
             String sessionId = request.getSession().getId();
-
-            // Return the session ID as a response
             Map<String, String> response = new HashMap<>();
             response.put("sessionId", sessionId);
             log.info("[getSession] Session ID: {}", response);
             return ResponseEntity.ok(response);
         } else {
-            // Return an error if the user is not authenticated
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
@@ -56,7 +51,6 @@ public class RestAdminController {
         log.info("[getAllLabs] Getting all labs");
         List<Lab> labs = adminService.getAllLabs();
         if (!authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
-            // If the authenticated user is not an admin, set the password to "hidden"
             labs = labs.stream().map(lab -> {
                 lab.setPassword("hidden");
                 return lab;

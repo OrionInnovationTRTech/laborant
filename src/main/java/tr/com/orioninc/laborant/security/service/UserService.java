@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import tr.com.orioninc.laborant.exception.NotFound;
 import tr.com.orioninc.laborant.security.model.User;
 import tr.com.orioninc.laborant.security.repository.UserRepository;
 import tr.com.orioninc.laborant.security.config.PasswordConfig;
@@ -60,5 +61,24 @@ public class UserService implements UserDetailsService {
     public List<User> getAllUsers() {
         log.info("[getAllUsers] Getting all users");
         return userRepository.findAll();
+    }
+
+    public boolean changePassword(String username, String oldPassword, String newPassword) {
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            if (PasswordConfig.passwordEncoder().matches(oldPassword, user.getPassword())) {
+                user.setPassword(PasswordConfig.passwordEncoder().encode(newPassword));
+                userRepository.save(user);
+                log.info("[changePassword] Password changed for user {}", username);
+                return true;
+            } else {
+                log.info("[changePassword] Old password is wrong for user {}", username);
+                return false;
+            }
+        } else {
+            log.info("[changePassword] User {} not found", username);
+            throw new NotFound("User not found");
+        }
+
     }
 }

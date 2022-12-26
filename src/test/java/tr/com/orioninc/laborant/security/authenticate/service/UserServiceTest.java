@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import tr.com.orioninc.laborant.security.config.PasswordConfig;
 import tr.com.orioninc.laborant.security.model.User;
 import tr.com.orioninc.laborant.security.repository.UserRepository;
 import tr.com.orioninc.laborant.security.service.UserService;
@@ -19,7 +20,6 @@ class UserServiceTest {
     @Autowired
     private UserRepository userRepository;
     private UserService underTest;
-
 
     @BeforeEach
     void setUp() {
@@ -59,5 +59,17 @@ class UserServiceTest {
         int result = underTest.getAllUsers().size();
         //then
         assertEquals(1, result);
+    }
+
+    @Test
+    void changePassword() {
+        //given
+        User user = new User("test", "testPassword", "testRole");
+        underTest.addNewUser(user);
+        //when
+        underTest.changePassword("test", "testPassword", "newPassword");
+        //then
+        assertTrue(PasswordConfig.passwordEncoder().matches("newPassword", userRepository.findByUsername("test").getPassword()));
+
     }
 }

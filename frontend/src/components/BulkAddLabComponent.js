@@ -36,7 +36,7 @@ const BulkAddLabs = () => {
       <form onSubmit={handleSubmit}>
         <label htmlFor="csvData">Enter Labs as CSV:</label>
         <br />
-        <textarea cols={60} rows={10} onResize={(e) => e.preventDefault()}
+        <textarea cols={60} rows={10} 
           id="csvData"
           value={csvData}
           onChange={(e) => setCsvData(e.target.value)}

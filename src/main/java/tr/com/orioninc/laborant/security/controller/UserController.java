@@ -21,6 +21,13 @@ public class UserController {
 
     private UserService userService;
 
+    @PutMapping("/change-password")
+    @ApiOperation(value = "Change password")
+    public ResponseEntity<Boolean> changePassword(@RequestParam String username, @RequestParam String oldPassword, @RequestParam String newPassword) {
+        log.info("[changePassword] Changing password for user {}", username);
+        return ResponseEntity.ok(userService.changePassword(username, oldPassword, newPassword));
+    }
+
     @PostMapping("/add")
     @ApiOperation(value = "Adding new user to database")
     public ResponseEntity<User> addNewUser(@RequestBody User user) {

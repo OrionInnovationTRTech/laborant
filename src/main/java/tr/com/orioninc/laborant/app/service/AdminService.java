@@ -111,14 +111,14 @@ public class AdminService {
             if (Objects.isNull(searchLab)) {
                 Lab searchHostUserPair = labRepo.findByUserNameAndHost(lab.getUserName(), lab.getHost());
                 if (Objects.isNull(searchHostUserPair)) {
-//TODO                    if (isLabReachable(lab.getHost(), 500)) {
+                    if (isLabReachable(lab.getHost(), 500)) {
                         lab = labRepo.save(lab);
                         log.info("[addNewLab] adding new lab named: {}", lab.getLabName());
                         return lab;
-//todo                    } else {
-//                        log.error("[addNewLab] Cannot add lab. Lab is not reachable");
-//                        throw new NotConnected("Cannot add lab. The lab is not reachable");
-//                    }
+                    } else {
+                        log.error("[addNewLab] Cannot add lab. Lab is not reachable");
+                        throw new NotConnected("Cannot add lab. The lab is not reachable");
+                    }
                 } else {
                     log.warn("[addNewLab] there is already a pair in the database with username: {} and host: {}", lab.getUserName(), lab.getHost());
                     throw new AlreadyExists("There is already a pair in the database with username: " + lab.getUserName() + " and host: " + lab.getHost());
