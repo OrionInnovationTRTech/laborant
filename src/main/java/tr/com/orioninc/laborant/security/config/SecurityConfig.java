@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,15 +15,18 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 @Configuration
 @AllArgsConstructor
@@ -33,9 +35,8 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000")
 public class SecurityConfig {
 
-    private final PasswordEncoder passwordEncoder;
     private UserDetailsService userDetailsService;
-
+    private final PasswordEncoder passwordEncoder;
 
     private static final String ADMIN = "ADMIN";
     private static final String USER = "USER";
@@ -52,12 +53,23 @@ public class SecurityConfig {
     }
 
     public AuthenticationProvider activeDirectoryLdapAuthenticationProvider() {
+
+        Properties prop = new Properties();
+        try (InputStream input = new FileInputStream("src/main/resources/ldap.properties")) {
+            prop.load(input);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        String serverIp = prop.getProperty("server.ip");
+        String serverDomain = prop.getProperty("server.domain");
+
         ActiveDirectoryLdapAuthenticationProvider provider =
-                new ActiveDirectoryLdapAuthenticationProvider("eu.ad.mycompany.local", "ldap://10.254.156.152:389");
+                new ActiveDirectoryLdapAuthenticationProvider(serverDomain, "ldap://" + serverIp);
         provider.setConvertSubErrorCodesToExceptions(true);
         provider.setUseAuthenticationRequestCredentials(true);
         return provider;
     }
+
 
     @Bean
     @CrossOrigin(origins = "http://localhost:3000")
@@ -96,10 +108,23 @@ public class SecurityConfig {
 
     @Autowired
     public void authenticationManager(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                //.authenticationProvider(activeDirectoryLdapAuthenticationProvider())
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder);
+        Properties prop = new Properties();
+        try (InputStream input = new FileInputStream("src/main/resources/ldap.properties")) {
+            prop.load(input);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        String isLdapEnabled = prop.getProperty("server.enabled");
+        if (isLdapEnabled.equals("true")) {
+            auth
+                    .authenticationProvider(activeDirectoryLdapAuthenticationProvider())
+                    .userDetailsService(userDetailsService)
+                    .passwordEncoder(passwordEncoder);
+        } else {
+            auth
+                    .userDetailsService(userDetailsService)
+                    .passwordEncoder(passwordEncoder);
+        }
     }
 }
 
