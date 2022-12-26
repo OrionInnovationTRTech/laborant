@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS lab(
     host varchar(255) NOT NULL,
     port INT
 );
-CREATE TABLE IF NOT EXISTS user(
+CREATE TABLE IF NOT EXISTS lab_user(
     id INT AUTO_INCREMENT PRIMARY KEY,
     username varchar(255) NOT NULL UNIQUE,
     password varchar(255) NOT NULL,
