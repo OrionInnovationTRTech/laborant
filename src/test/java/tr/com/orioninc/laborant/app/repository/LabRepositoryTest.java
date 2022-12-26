@@ -26,7 +26,7 @@ public class LabRepositoryTest {
         Lab foundLab = underTest.findByLabName(labName);
 
         // then
-        assertThat(foundLab).isNotNull();
+        assertThat(foundLab).isNotNull().returns("testLab", Lab::getLabName);
         log.info("Lab found: {}", foundLab);
     }
 
@@ -55,7 +55,7 @@ public class LabRepositoryTest {
         Lab foundLab = underTest.findByUserNameAndHost(lab.getUserName(), lab.getHost());
 
         // then
-        assertThat(foundLab).isNotNull();
+        assertThat(foundLab).isNotNull().returns("testLab", Lab::getLabName);
         log.info("Lab found: {}", foundLab);
     }
     @Test

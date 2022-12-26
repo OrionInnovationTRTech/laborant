@@ -10,6 +10,7 @@ import tr.com.orioninc.laborant.app.repository.LabRepository;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j2
@@ -46,6 +47,7 @@ class AdminServiceTest {
         Lab foundLab = underTest.findLabByName(labName);
         // then
         assertEquals(lab, foundLab);
+        assertThat(foundLab).isNotNull().returns("testLab", Lab::getLabName);
     }
 
     @Test
@@ -61,11 +63,11 @@ class AdminServiceTest {
         // when
         underTest.updateLabByName(labName, toBeUpdated);
         // then
-        assertEquals(underTest.getLab(labName).getLabName(), toBeUpdated.getLabName());
-        assertEquals(underTest.getLab(labName).getUserName(), toBeUpdated.getUserName());
-        assertEquals(underTest.getLab(labName).getPassword(), toBeUpdated.getPassword());
-        assertEquals(underTest.getLab(labName).getHost(), toBeUpdated.getHost());
-        assertEquals(underTest.getLab(labName).getPort(), toBeUpdated.getPort());
+        assertThat(underTest.findLabByName(labName)).isNotNull()
+                .returns("update", Lab::getUserName)
+                .returns("update", Lab::getPassword)
+                .returns("update", Lab::getHost)
+                .returns(222, Lab::getPort);
     }
     @Test
     void willGiveErrorWhenUpdateLabByName() {
