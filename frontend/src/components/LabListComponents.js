@@ -128,7 +128,7 @@
                                     <tr key={labs.labName}>
                                         <td>{labs.labName}</td>
                                         <td>{labs.userName}</td>
-                                        <td>{labs.password}</td>
+                                        <td style={{ color: labs.password === "hidden" ? "gray" : "black" }}>{labs.password}</td>
                                         <td>{labs.host}</td>
                                         <td>{labs.port}</td>
                                         <td>{labVersion[labs.labName]}</td>

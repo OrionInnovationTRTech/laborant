@@ -1,6 +1,5 @@
 import React ,{useState} from "react";
 import LabService from "../services/LabService";
-import {Navigate, useNavigate} from "react-router-dom";
 
 const AddLabComponent = () => {
 
@@ -10,7 +9,6 @@ const AddLabComponent = () => {
     const [password, setPassword] = useState('');
     const [host, setHost] = useState('');
     const [port, setPort] = useState('');
-    const history = useNavigate();
 
     const saveLab = (e) => {
         e.preventDefault();
@@ -19,7 +17,7 @@ const AddLabComponent = () => {
         LabService.addLab(lab).then((response) => {
             console.log(response.status);
             if (response.status === 200) {
-                setMessage(<p style={{color: 'green'}}>Lab Added Successfully. Redirecting...'</p>);
+                setMessage(<p style={{color: 'green'}}>Lab Added Successfully. Redirecting...</p>);
                 setTimeout(() => {
                     window.location.replace('/labs');
                   }, 1500);
