@@ -5,15 +5,3 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/${MYSQL_DATABASE}
     username: ${MYSQL_USER}
     password: ${MYSQL_PASSWORD}
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
-  web:
-    cors:
-      allowed-origins: "http://localhost:4200"
-      allowed-methods: GET, POST, PATCH, PUT, DELETE, OPTIONS, HEAD
-      max-age: 3600
-      allowed-headers: "Requestor-Type"
-      exposed-headers: "X-Get-Header"
-
-
