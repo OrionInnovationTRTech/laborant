@@ -6,9 +6,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class LaborantApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(LaborantApplication.class, args);
-	}
+    public static void main(String[] args) throws Exception {
+        SpringApplication.run(LaborantApplication.class, args);
+    }
 
 
 }
