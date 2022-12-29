@@ -8,9 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import tr.com.orioninc.laborant.exception.AlreadyExists;
-import tr.com.orioninc.laborant.exception.NotAuthorized;
-import tr.com.orioninc.laborant.exception.NotFound;
+import tr.com.orioninc.laborant.exception.custom.NotAuthorizedException;
+import tr.com.orioninc.laborant.exception.custom.NotFoundException;
 import tr.com.orioninc.laborant.security.model.User;
 import tr.com.orioninc.laborant.security.service.UserService;
 
@@ -32,7 +31,7 @@ public class UserController {
             log.info("[changePassword] Changing password for user {}", username);
             return ResponseEntity.ok(userService.changePassword(username, oldPassword, newPassword));
         } else {
-            throw new NotAuthorized("You are not authorized to change password for this user");
+            throw new NotAuthorizedException("You are not authorized to change password for this user");
         }
     }
 
@@ -41,7 +40,7 @@ public class UserController {
     public ResponseEntity<User> addNewUser(@RequestBody User user, Authentication auth) {
         if (auth == null || !auth.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
             log.error("[addNewUser] User {} is not authorized to add new user", auth.getName());
-            throw new NotAuthorized("You are not authorized to add new user");
+            throw new NotAuthorizedException("You are not authorized to add new user");
         }
         else {
             userService.addNewUser(user);
@@ -58,7 +57,7 @@ public class UserController {
 
         if (auth == null || !auth.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
             log.error("[addNewUser] User {} is not authorized to delete a user", auth.getName());
-            throw new NotAuthorized("You are not authorized to delete user");
+            throw new NotAuthorizedException("You are not authorized to delete user");
         }
         else {
             if (userService.deleteUserByUsername(username)) {
@@ -67,7 +66,7 @@ public class UserController {
             }
             else {
                 log.info("[deleteUser] User {} not found", username);
-                throw new NotFound("User named " + username + " not found");
+                throw new NotFoundException("User named " + username + " not found");
             }
         }
     }
@@ -81,11 +80,11 @@ public class UserController {
                 return ResponseEntity.ok(userService.loadUserByUsername(username));
             } else {
                 log.info("[getUser] User {} not found", username);
-                throw new NotFound("User named " + username + " not found");
+                throw new NotFoundException("User named " + username + " not found");
             }
         } else {
             log.error("[addNewUser] User {} is not authorized to get user credentials except itself ", auth.getName());
-            throw new NotAuthorized("You are not authorized to get any user's info rather than yourself");
+            throw new NotAuthorizedException("You are not authorized to get any user's info rather than yourself");
         }
     }
 
@@ -94,12 +93,12 @@ public class UserController {
     public ResponseEntity<List<User>> getAllUsers(Authentication auth) {
         if (auth == null || !auth.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
             log.error("[addNewUser] User {} is not authorized to get all ysers", auth.getName());
-            throw new NotAuthorized("You are not authorized to get all users data");
+            throw new NotAuthorizedException("You are not authorized to get all users data");
         }
         else {
             if (userService.getAllUsers().isEmpty()) {
                 log.info("[getAllUsers] No user found");
-                throw new NotFound("No user found");
+                throw new NotFoundException("No user found");
             } else {
                 log.info("[getAllUsers] Users found");
                 return ResponseEntity.ok(userService.getAllUsers());

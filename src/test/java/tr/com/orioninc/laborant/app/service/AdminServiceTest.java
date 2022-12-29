@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import tr.com.orioninc.laborant.app.model.Lab;
 import tr.com.orioninc.laborant.app.repository.LabRepository;
-import tr.com.orioninc.laborant.exception.AlreadyExists;
-import tr.com.orioninc.laborant.exception.NotConnected;
-import tr.com.orioninc.laborant.exception.NotFound;
+import tr.com.orioninc.laborant.exception.custom.AlreadyExistsException;
+import tr.com.orioninc.laborant.exception.custom.NotConnectedException;
+import tr.com.orioninc.laborant.exception.custom.NotFoundException;
 
 import java.util.List;
 
@@ -90,7 +90,7 @@ class AdminServiceTest {
         try {
             underTest.updateLabByName(toBeUpdated.getLabName(), toBeUpdated);
             fail("Expected NotFound exception");
-        } catch (NotFound e) {
+        } catch (NotFoundException e) {
             // expected
         }
         // then
@@ -108,7 +108,7 @@ class AdminServiceTest {
         try {
             underTest.addNewLab(lab);
             fail("Expected NotConnect exception since the testlab is not connected");
-        } catch (NotConnected notConnected) {
+        } catch (NotConnectedException notConnected) {
             // expected
         }
     }
@@ -125,7 +125,7 @@ class AdminServiceTest {
         try {
             underTest.addNewLab(actuallySame);
             fail("Expected NotFound exception");
-        } catch (AlreadyExists e) {
+        } catch (AlreadyExistsException e) {
             // expected
         }
     }
@@ -141,7 +141,7 @@ class AdminServiceTest {
         try {
             underTest.addNewLab(actuallySamePair);
             fail("Expected NotFound exception");
-        } catch (AlreadyExists e) {
+        } catch (AlreadyExistsException e) {
             // expected
         }
     }
@@ -167,7 +167,7 @@ class AdminServiceTest {
         try {
             underTest.getLab("canGetLab test lab2");
             fail("Expected NotFound exception");
-        } catch (NotFound e) {
+        } catch (NotFoundException e) {
             // expected
         }
     }
@@ -194,7 +194,7 @@ class AdminServiceTest {
         try {
             Lab deletedLab = underTest.deleteLabByName("canDeleteLabByName test lab2");
             fail("Expected NotFound exception");
-        } catch (NotFound e) {
+        } catch (NotFoundException e) {
             // expected
         }
     }

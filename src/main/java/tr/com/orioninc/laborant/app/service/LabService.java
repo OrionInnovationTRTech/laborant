@@ -10,8 +10,8 @@ import com.jcraft.jsch.Session;
 import lombok.extern.log4j.Log4j2;
 
 import org.springframework.stereotype.Service;
-import tr.com.orioninc.laborant.exception.NotConnected;
-import tr.com.orioninc.laborant.exception.NotFound;
+import tr.com.orioninc.laborant.exception.custom.NotConnectedException;
+import tr.com.orioninc.laborant.exception.custom.NotFoundException;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
@@ -75,7 +75,7 @@ public class LabService {
         }
         else {
             log.error("[connectAndExecuteCommand] Lab is not reachable");
-            throw new NotConnected("Lab is not reachable");
+            throw new NotConnectedException("Lab is not reachable");
         }
         return responseString;
     }
@@ -203,7 +203,7 @@ public class LabService {
         Lab labToExecute = adminService.findLabByName(labName);
         if (Objects.isNull(labToExecute)) {
             log.info("[runCommandOnSelectedLab] lab couldn't found in database");
-            throw new NotFound("Lab couldn't found in database");
+            throw new NotFoundException("Lab couldn't found in database");
         }
         try {
             outputString = connectAndExecuteCommand(labToExecute.getUserName(), labToExecute.getPassword(),
@@ -211,7 +211,7 @@ public class LabService {
             log.debug("[runCommandOnSelectedLab] out string: {}", outputString);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new NotConnected("Couldn't connect to the lab");
+            throw new NotConnectedException("Couldn't connect to the lab");
         }
         return outputString;
     }

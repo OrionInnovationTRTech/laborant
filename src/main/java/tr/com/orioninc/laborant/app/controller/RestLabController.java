@@ -1,14 +1,12 @@
 package tr.com.orioninc.laborant.app.controller;
 
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tr.com.orioninc.laborant.app.service.LabService;
-import tr.com.orioninc.laborant.exception.NotConnected;
-import tr.com.orioninc.laborant.exception.NotFound;
+import tr.com.orioninc.laborant.exception.custom.NotFoundException;
 
 @RestController
 @RequestMapping("/v1")
@@ -36,7 +34,7 @@ public class RestLabController {
     public ResponseEntity<String> getLabStatus(@PathVariable("labName") String labName) {
         if (labService.getLabStatus(labName) == null) {
             log.warn("[getLabStatus] Lab with name {} not found in database", labName);
-            throw new NotFound("Lab named " + labName + " not found");
+            throw new NotFoundException("Lab named " + labName + " not found");
         }
         else {
             return ResponseEntity.ok(labService.getLabStatus(labName));

@@ -6,19 +6,17 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import tr.com.orioninc.laborant.app.model.Lab;
 import tr.com.orioninc.laborant.app.repository.LabRepository;
-import tr.com.orioninc.laborant.exception.AlreadyExists;
-import tr.com.orioninc.laborant.exception.NotConnected;
-import tr.com.orioninc.laborant.exception.NotFound;
+import tr.com.orioninc.laborant.exception.custom.AlreadyExistsException;
+import tr.com.orioninc.laborant.exception.custom.NotConnectedException;
+import tr.com.orioninc.laborant.exception.custom.NotFoundException;
 import tr.com.orioninc.laborant.security.model.User;
 import tr.com.orioninc.laborant.security.repository.UserRepository;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @Log4j2
@@ -58,7 +56,7 @@ public class AdminService {
     public List<Lab> getAllLabs() {
         if (labRepo.findAll().isEmpty()) {
             log.warn("[getAllLabs] No lab found in database");
-            throw new NotFound("There is no lab in database");
+            throw new NotFoundException("There is no lab in database");
         } else {
             log.info("[getAllLabs] All labs are listed");
             return labRepo.findAll();
@@ -71,14 +69,14 @@ log.debug("[assignUserToLab] called");
         Lab lab = labRepo.findByLabName(labName);
         if (Objects.isNull(user)) {
             log.warn("[assignUserToLab] User with username {} not found in database", userName);
-            throw new NotFound("User with username " + userName + " not found in database");
+            throw new NotFoundException("User with username " + userName + " not found in database");
         } else if (Objects.isNull(lab)) {
             log.warn("[assignUserToLab] Lab with name {} not found in database", labName);
-            throw new NotFound("Lab with name " + labName + " not found in database");
+            throw new NotFoundException("Lab with name " + labName + " not found in database");
         } else {
             if (user.getLabs().contains(lab)) {
                 log.warn("[assignUserToLab] User with username {} already assigned to lab with name {}", userName, labName);
-                throw new AlreadyExists("User with username " + userName + " already assigned to lab with name " + labName);
+                throw new AlreadyExistsException("User with username " + userName + " already assigned to lab with name " + labName);
             } else {
                 user.getLabs().add(lab);
                 userRepo.save(user);
@@ -94,10 +92,10 @@ log.debug("[assignUserToLab] called");
         Lab lab = labRepo.findByLabName(labName);
         if (Objects.isNull(user)) {
             log.warn("[unassignUserFromLab] User with username {} not found in database", userName);
-            throw new NotFound("User with username " + userName + " not found in database");
+            throw new NotFoundException("User with username " + userName + " not found in database");
         } else if (Objects.isNull(lab)) {
             log.warn("[unassignUserFromLab] Lab with name {} not found in database", labName);
-            throw new NotFound("Lab with name " + labName + " not found in database");
+            throw new NotFoundException("Lab with name " + labName + " not found in database");
         } else {
             if (user.getLabs().contains(lab)) {
                 user.getLabs().remove(lab);
@@ -106,7 +104,7 @@ log.debug("[assignUserToLab] called");
                 return "User with username " + userName + " unassigned from lab with name " + labName;
             } else {
                 log.warn("[unassignUserFromLab] User with username {} not assigned to lab with name {}", userName, labName);
-                throw new NotFound("User with username " + userName + " not assigned to lab with name " + labName);
+                throw new NotFoundException("User with username " + userName + " not assigned to lab with name " + labName);
             }
         }
     }
@@ -116,7 +114,7 @@ log.debug("[assignUserToLab] called");
         Lab lab = labRepo.findByLabName(labName);
         if (Objects.isNull(lab)) {
             log.warn("[getAssignedLabUsers] Lab with name {} not found in database", labName);
-            throw new NotFound("Lab with name " + labName + " not found in database");
+            throw new NotFoundException("Lab with name " + labName + " not found in database");
         } else {
             log.info("[getAssignedLabUsers] All users assigned to lab with name {} are listed", labName);
             ArrayList<String> assignedUsers = new ArrayList<>();
@@ -160,7 +158,7 @@ log.debug("[assignUserToLab] called");
         } else {
             if (Objects.isNull(labToBeUpdated)) {
                 log.warn("[updateLabByName] no lab in the database named: {}", labName);
-                throw new NotFound("There isn't a lab named " + labName + " found in the database to be updated");
+                throw new NotFoundException("There isn't a lab named " + labName + " found in the database to be updated");
             } else {
                 labToBeUpdated.setUserName(lab.getUserName());
                 labToBeUpdated.setPassword(lab.getPassword());
@@ -190,15 +188,15 @@ log.debug("[assignUserToLab] called");
                         return lab;
                     } else {
                         log.error("[addNewLab] Cannot add lab. Lab is not reachable");
-                        throw new NotConnected("Cannot add lab. The lab is not reachable");
+                        throw new NotConnectedException("Cannot add lab. The lab is not reachable");
                     }
                 } else {
                     log.warn("[addNewLab] there is already a pair in the database with username: {} and host: {}", lab.getUserName(), lab.getHost());
-                    throw new AlreadyExists("There is already a pair in the database with username: " + lab.getUserName() + " and host: " + lab.getHost());
+                    throw new AlreadyExistsException("There is already a pair in the database with username: " + lab.getUserName() + " and host: " + lab.getHost());
                 }
             } else {
                 log.warn("[addNewLab] there is already a lab named {} in the database. Try again", lab.getLabName());
-                throw new AlreadyExists("There is already a lab named " + lab.getLabName() + " in the database. Try again");
+                throw new AlreadyExistsException("There is already a lab named " + lab.getLabName() + " in the database. Try again");
             }
         }
     }
@@ -206,7 +204,7 @@ log.debug("[assignUserToLab] called");
     public Lab getLab(String labName) {
         if (findLabByName(labName) == null) {
             log.warn("[getLab] No lab found in database named {}", labName);
-            throw new NotFound("There is no lab in database named " + labName);
+            throw new NotFoundException("There is no lab in database named " + labName);
         } else {
             log.info("[getLab] Lab is listed");
             return labRepo.findByLabName(labName);
@@ -218,7 +216,7 @@ log.debug("[assignUserToLab] called");
         Lab labToBeDeleted = labRepo.findByLabName(labName);
         if (Objects.isNull(labToBeDeleted)) {
             log.warn("[deleteLab] no lab in the database named: {}", labName);
-            throw new NotFound("There isn't a lab named " + labName + " found in the database to be deleted");
+            throw new NotFoundException("There isn't a lab named " + labName + " found in the database to be deleted");
         } else {
             labRepo.delete(labToBeDeleted);
             log.info("[deleteLab] deleting new lab named: {}", labToBeDeleted.getLabName());

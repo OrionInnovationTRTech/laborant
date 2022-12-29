@@ -1,4 +1,4 @@
-package tr.com.orioninc.laborant.exception;
+package tr.com.orioninc.laborant.exception.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

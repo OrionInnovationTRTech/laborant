@@ -6,8 +6,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import tr.com.orioninc.laborant.exception.AlreadyExists;
-import tr.com.orioninc.laborant.exception.NotFound;
+import tr.com.orioninc.laborant.exception.custom.AlreadyExistsException;
+import tr.com.orioninc.laborant.exception.custom.NotFoundException;
 import tr.com.orioninc.laborant.security.model.User;
 import tr.com.orioninc.laborant.security.repository.UserRepository;
 import tr.com.orioninc.laborant.security.config.PasswordConfig;
@@ -28,7 +28,7 @@ public class UserService implements UserDetailsService {
             log.info("[addNewUser] User added: {}", user.toString());
         } else {
             log.error("[addNewUser] User {} already exists", user.getUsername());
-            throw new AlreadyExists("User " + user.getUsername() + " already exists");
+            throw new AlreadyExistsException("User " + user.getUsername() + " already exists");
 
         }
     }
@@ -80,7 +80,7 @@ public class UserService implements UserDetailsService {
             }
         } else {
             log.info("[changePassword] User {} not found", username);
-            throw new NotFound("User not found");
+            throw new NotFoundException("User not found");
         }
 
     }
