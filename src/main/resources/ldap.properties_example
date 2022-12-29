@@ -1,0 +1,3 @@
+server.ip={server-ip:server-domain}
+server.domain={server-domain}
+server.enabled={true||false}
