@@ -17,6 +17,7 @@
         const [labVersion, setLabVersion] = useState({});
         const [isMulti, setIsMulti] = useState({});
         const [search, setSearch] = useState('');
+        const [assignedUsers, setAssignedUsers] = useState({});
 
 
 
@@ -28,7 +29,19 @@
 
         useEffect(() => {
             getLabVersion();
+            getUsers();
     },[labs]);
+
+        const getUsers = () => {
+            labs.forEach(lab => {axios.get(`http://localhost:8080/v1/lab-users/${lab.labName}`, getHeaders())
+            .then((response) => {
+            // set the list of assigned users for the lab
+            setAssignedUsers((prevAssignedUsers) => ({...prevAssignedUsers, [lab.labName]: response.data.join('\n')}));
+            }).catch((error) => {
+                setAssignedUsers("Error");
+            });
+        })};    
+
         const getAllLabs = () => {
             axios.get('http://localhost:8080/v1/labs/', getHeaders())
             .then((response) => {
@@ -106,6 +119,7 @@
                                 <td>Host</td>
                                 <td>Port</td>
                                 <td>Version</td>
+                                <td>Assigned Users</td>
                                 <td>isMulti</td>
                                 <td>Actions</td>
 
@@ -132,6 +146,7 @@
                                         <td>{labs.host}</td>
                                         <td>{labs.port}</td>
                                         <td>{labVersion[labs.labName]}</td>
+                                        <td>{assignedUsers[labs.labName]}</td>
                                         <td>{isMulti[labs.labName]}</td>
                                         <td>
                                             <button onClick={() => deleteLab(labs.labName)} className="btn btn-danger">Delete</button>

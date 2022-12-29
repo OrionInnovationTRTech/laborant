@@ -12,6 +12,9 @@ import BulkAddLabComponent from './components/BulkAddLabComponent';
 import UserListComponents from './components/UserListComponents';
 import AddUserComponent from './components/AddUserComponent';
 import NotFound from './components/NotFound';
+import NotAuthorized from './components/NotAuthorized'
+import AssignUsers from './components/AssignUserComponent';
+import LabUserComponent from './components/LabUserComponent';
 
 function App() {
   checkAuthentication();
@@ -36,11 +39,27 @@ function App() {
           <Route path="/edit-lab/:labName" element={<EditLabComponent/>}></Route> 
           <Route path="/run-command/:labName" element={<RunCommandComponent/>}></Route>
           <Route path="/bulk-add" element={<BulkAddLabComponent/>}></Route>
+          <Route path="panel/" element={
+              isAdmin() ? (
+                <LabUserComponent/>
+              ) : (
+                <NotAuthorized/>
+              )
+          }
+          />
+          <Route path="panel/assign-users/" element={
+              isAdmin() ? (
+                <AssignUsers/>
+              ) : (
+                <NotAuthorized/>
+              )
+          }
+          />
           <Route path='/users' element={
               isAdmin() ? (
                 <UserListComponents />
               ) : (
-                <NotFound/>
+                <NotAuthorized/>
               )
             }
           />
@@ -48,7 +67,7 @@ function App() {
               isAdmin() ? (
                 <AddUserComponent />
               ) : (
-                <NotFound/>
+                <NotAuthorized/>
               )
             }
           />

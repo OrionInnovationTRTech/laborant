@@ -1,8 +1,19 @@
 package tr.com.orioninc.laborant.app.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import lombok.Getter;
+import lombok.Setter;
+import tr.com.orioninc.laborant.security.model.User;
+
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "lab")
 public class Lab {
     @Id
@@ -19,6 +30,12 @@ public class Lab {
     private String host;
     @Column(name = "port")
     private Integer port;
+
+    @ManyToMany(mappedBy = "labs")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id")
+    private List<User> users;
+
+
 
     public Lab() {
         this.id = null;
@@ -43,54 +60,6 @@ public class Lab {
         this.userName = userName;
         this.password = password;
         this.host = host;
-        this.port = port;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getLabName() {
-        return labName;
-    }
-
-    public void setLabName(String labName) {
-        this.labName = labName;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public Integer getPort() {
-        return port;
-    }
-
-    public void setPort(Integer port) {
         this.port = port;
     }
 

@@ -45,6 +45,21 @@ public class RestAdminController {
         }
     }
 
+    @PostMapping("/assign")
+    public ResponseEntity<String> assignUserToLab(@RequestParam String username, @RequestParam String labName) {
+        return ResponseEntity.ok(adminService.assignUserToLab(username, labName));
+    }
+
+    @DeleteMapping("/unassign")
+    public ResponseEntity<String> unassignUserFromLab(@RequestParam String username, @RequestParam String labName) {
+        return ResponseEntity.ok(adminService.unassignUserFromLab(username, labName));
+    }
+
+    @GetMapping("/lab-users/{labName}")
+    public ResponseEntity<ArrayList<String>> getAssignedLabUsers(@PathVariable String labName) {
+        return ResponseEntity.ok(adminService.getAssignedLabUsers(labName));
+    }
+
     @GetMapping("/labs")
     @ApiOperation(value = "Getting all labs as a list of Lab objects")
     public ResponseEntity<List<Lab>> getAllLabs(Authentication authentication) {
@@ -61,25 +76,14 @@ public class RestAdminController {
 
     @GetMapping("/labs/{labName}")
     @ApiOperation(value = "Getting a lab by giving 'labName' as a path variable")
-    public ResponseEntity<Lab> getLab(@PathVariable("labName") String labName) {
+    public ResponseEntity<Lab> getLab(@PathVariable("labName") String labName, Authentication authentication) {
         log.info("[getLab] Getting lab with name {}", labName);
-        return ResponseEntity.ok(adminService.getLab(labName));
+        Lab lab = adminService.getLab(labName);
+        if (!authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
+            lab.setPassword("hidden");
+        }
+        return ResponseEntity.ok(lab);
     }
-
-//    @PostMapping("/login")
-//    @ApiOperation(value = "Logging in to the system")
-//    public ResponseEntity<String> login(@RequestParam("username") String username, @RequestParam("password") String password) {
-//       Authentication authentication;
-//        try{
-//            authentication = new UsernamePasswordAuthenticationToken(username, password);
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//            log.info("[login] User {} logged in", username);
-//            return ResponseEntity.ok("Successfully logged in");
-//        } catch (BadCredentialsException e) {
-//            log.warn("[login] User {} failed to log in", username);
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Wrong username or password");
-//        }
-//    }
 
     @PostMapping("/labs/add/")
     @ApiOperation(value = "Adding a lab to database by giving Lab in body")

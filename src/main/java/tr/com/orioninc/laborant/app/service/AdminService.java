@@ -9,9 +9,13 @@ import tr.com.orioninc.laborant.app.repository.LabRepository;
 import tr.com.orioninc.laborant.exception.AlreadyExists;
 import tr.com.orioninc.laborant.exception.NotConnected;
 import tr.com.orioninc.laborant.exception.NotFound;
+import tr.com.orioninc.laborant.security.model.User;
+import tr.com.orioninc.laborant.security.repository.UserRepository;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,6 +26,7 @@ import java.util.Optional;
 public class AdminService {
 
     private LabRepository labRepo;
+    private UserRepository userRepo;
 
     public String addNewLab(String labName, String username, String password, String host, Integer port) throws IOException {
         log.debug("[addNewLab] called");
@@ -59,6 +64,74 @@ public class AdminService {
             return labRepo.findAll();
         }
     }
+
+    public String assignUserToLab(String userName, String labName) {
+log.debug("[assignUserToLab] called");
+        User user = userRepo.findByUsername(userName);
+        Lab lab = labRepo.findByLabName(labName);
+        if (Objects.isNull(user)) {
+            log.warn("[assignUserToLab] User with username {} not found in database", userName);
+            throw new NotFound("User with username " + userName + " not found in database");
+        } else if (Objects.isNull(lab)) {
+            log.warn("[assignUserToLab] Lab with name {} not found in database", labName);
+            throw new NotFound("Lab with name " + labName + " not found in database");
+        } else {
+            if (user.getLabs().contains(lab)) {
+                log.warn("[assignUserToLab] User with username {} already assigned to lab with name {}", userName, labName);
+                throw new AlreadyExists("User with username " + userName + " already assigned to lab with name " + labName);
+            } else {
+                user.getLabs().add(lab);
+                userRepo.save(user);
+                log.info("[assignUserToLab] User with username {} assigned to lab with name {}", userName, labName);
+                return "User with username " + userName + " assigned to " + labName;
+            }
+        }
+    }
+
+    public String unassignUserFromLab(String userName, String labName) {
+        log.debug("[unassignUserFromLab] called");
+        User user = userRepo.findByUsername(userName);
+        Lab lab = labRepo.findByLabName(labName);
+        if (Objects.isNull(user)) {
+            log.warn("[unassignUserFromLab] User with username {} not found in database", userName);
+            throw new NotFound("User with username " + userName + " not found in database");
+        } else if (Objects.isNull(lab)) {
+            log.warn("[unassignUserFromLab] Lab with name {} not found in database", labName);
+            throw new NotFound("Lab with name " + labName + " not found in database");
+        } else {
+            if (user.getLabs().contains(lab)) {
+                user.getLabs().remove(lab);
+                userRepo.save(user);
+                log.info("[unassignUserFromLab] User with username {} unassigned from lab with name {}", userName, labName);
+                return "User with username " + userName + " unassigned from lab with name " + labName;
+            } else {
+                log.warn("[unassignUserFromLab] User with username {} not assigned to lab with name {}", userName, labName);
+                throw new NotFound("User with username " + userName + " not assigned to lab with name " + labName);
+            }
+        }
+    }
+
+    public ArrayList<String> getAssignedLabUsers(String labName) {
+        log.debug("[getAssignedLabUsers] called");
+        Lab lab = labRepo.findByLabName(labName);
+        if (Objects.isNull(lab)) {
+            log.warn("[getAssignedLabUsers] Lab with name {} not found in database", labName);
+            throw new NotFound("Lab with name " + labName + " not found in database");
+        } else {
+            log.info("[getAssignedLabUsers] All users assigned to lab with name {} are listed", labName);
+            ArrayList<String> assignedUsers = new ArrayList<>();
+            for (User user : userRepo.findAll()) {
+                if (user.getLabs().contains(lab)) {
+                    assignedUsers.add(user.getUsername());
+                }
+            }
+            return assignedUsers;
+        }
+    }
+
+
+
+
 
     public String deleteLab(String labName) {
         log.debug("[deleteLab] called");
@@ -168,4 +241,7 @@ public class AdminService {
                 return false;
             }
         }
+
+
+
 }

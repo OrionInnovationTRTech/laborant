@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import tr.com.orioninc.laborant.exception.AlreadyExists;
 import tr.com.orioninc.laborant.exception.NotFound;
 import tr.com.orioninc.laborant.security.model.User;
 import tr.com.orioninc.laborant.security.repository.UserRepository;
@@ -26,7 +27,9 @@ public class UserService implements UserDetailsService {
             userRepository.save(user);
             log.info("[addNewUser] User added: {}", user.toString());
         } else {
-            log.info("[addNewUser] User {} already exists", user.getUsername());
+            log.error("[addNewUser] User {} already exists", user.getUsername());
+            throw new AlreadyExists("User " + user.getUsername() + " already exists");
+
         }
     }
 

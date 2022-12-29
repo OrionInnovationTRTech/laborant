@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import tr.com.orioninc.laborant.app.model.Lab;
 import tr.com.orioninc.laborant.app.repository.LabRepository;
+import tr.com.orioninc.laborant.exception.AlreadyExists;
+import tr.com.orioninc.laborant.exception.NotConnected;
+import tr.com.orioninc.laborant.exception.NotFound;
 
 import java.util.List;
 
@@ -25,11 +28,15 @@ class AdminServiceTest {
 
     @BeforeEach
     void setUp() {
-        underTest = new AdminService(labRepository);
+        underTest = new AdminService(labRepository, null);
     }
 
     @Test
     void canGetAllLabs() {
+        // given
+        Lab lab = new Lab(
+                "testLab", "testUser", "testPassword", "testHost", 22);
+        labRepository.save(lab);
         // when
         List<Lab> test = underTest.getAllLabs();
         // then
@@ -80,10 +87,16 @@ class AdminServiceTest {
         Lab toBeUpdated = new Lab(
                 "update", "update", "update", "update", 222);
         // when
-        underTest.updateLabByName(toBeUpdated.getLabName(), toBeUpdated);
+        try {
+            underTest.updateLabByName(toBeUpdated.getLabName(), toBeUpdated);
+            fail("Expected NotFound exception");
+        } catch (NotFound e) {
+            // expected
+        }
         // then
-        assertNotEquals(underTest.getLab(labName), toBeUpdated);
+        // the test will pass if the NotFound exception is thrown
     }
+
 
     @Test
     void canAddNewLab() {
@@ -92,10 +105,12 @@ class AdminServiceTest {
         Lab lab = new Lab(
                 labName, "testUser", "testPassword", "testHost", 22);
         // when
-        underTest.addNewLab(lab);
-        log.info("Lab added: {}", lab);
-        // then
-        assertNotEquals(null, labRepository.findByLabName(labName));
+        try {
+            underTest.addNewLab(lab);
+            fail("Expected NotConnect exception since the testlab is not connected");
+        } catch (NotConnected notConnected) {
+            // expected
+        }
     }
 
     @Test
@@ -107,10 +122,12 @@ class AdminServiceTest {
         Lab actuallySame = new Lab( "test",
                 "userName", "password", "host", 22);
         //when
-        underTest.addNewLab(actuallySame);
-        //then
-        assertEquals(null, underTest.addNewLab(actuallySame));
-        log.info("Lab already exists");
+        try {
+            underTest.addNewLab(actuallySame);
+            fail("Expected NotFound exception");
+        } catch (AlreadyExists e) {
+            // expected
+        }
     }
     @Test
     void willGiveErrorWhenPairOfLabNameAndHostExists() {
@@ -121,10 +138,12 @@ class AdminServiceTest {
         Lab actuallySamePair = new Lab( "test2",
                 "userName", "password2", "host", 222);
         //when
-        Lab test = underTest.addNewLab(actuallySamePair);
-        //then
-        assertEquals(null, test);
-        log.info("Lab already exists");
+        try {
+            underTest.addNewLab(actuallySamePair);
+            fail("Expected NotFound exception");
+        } catch (AlreadyExists e) {
+            // expected
+        }
     }
 
     @Test
@@ -145,9 +164,12 @@ class AdminServiceTest {
                 "userName", "password", "host", 22);
         labRepository.save(lab);
         //when
-        Lab gettedLab = underTest.getLab("canGetLab test lab2");
-        //then
-        assertEquals(null, gettedLab);
+        try {
+            underTest.getLab("canGetLab test lab2");
+            fail("Expected NotFound exception");
+        } catch (NotFound e) {
+            // expected
+        }
     }
 
     @Test
@@ -169,8 +191,11 @@ class AdminServiceTest {
                 "userName", "password", "host", 22);
         labRepository.save(lab);
         //when
-        Lab deletedLab =  underTest.deleteLabByName("canDeleteLabByName test lab2");
-        //then
-        assertNull(deletedLab);
+        try {
+            Lab deletedLab = underTest.deleteLabByName("canDeleteLabByName test lab2");
+            fail("Expected NotFound exception");
+        } catch (NotFound e) {
+            // expected
+        }
     }
 }

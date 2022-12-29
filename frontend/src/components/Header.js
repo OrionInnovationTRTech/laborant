@@ -17,7 +17,7 @@ const Header = () => {
   <div style={{flex: 1}}></div>
   {localStorage.getItem('username') === 'admin' && (
           <button style={{marginRight: '20px'}}>
-            <Link to="/users">Users</Link>
+            <Link to="/panel">Admin Panel</Link>
           </button>
         )}
   <Logout />  

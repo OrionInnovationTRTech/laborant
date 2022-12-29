@@ -25,4 +25,9 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleNotConnected(NotConnected e, WebRequest request) {
         return new ResponseEntity<>(new ApiError(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR, LocalDateTime.now()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler
+    public ResponseEntity<Object> handleNotAuthorized(NotAuthorized e, WebRequest request) {
+        return new ResponseEntity<>(new ApiError(e.getMessage(),HttpStatus.UNAUTHORIZED, LocalDateTime.now()), HttpStatus.UNAUTHORIZED);
+    }
 }
