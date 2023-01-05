@@ -1,4 +1,4 @@
-package tr.com.orioninc.laborant.security.service;
+package tr.com.orioninc.laborant.app.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -8,9 +8,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import tr.com.orioninc.laborant.exception.custom.AlreadyExistsException;
 import tr.com.orioninc.laborant.exception.custom.NotFoundException;
-import tr.com.orioninc.laborant.security.model.User;
-import tr.com.orioninc.laborant.security.repository.UserRepository;
+import tr.com.orioninc.laborant.app.model.User;
+import tr.com.orioninc.laborant.app.repository.UserRepository;
 import tr.com.orioninc.laborant.security.config.PasswordConfig;
+import tr.com.orioninc.laborant.security.service.CustomUserDetails;
 
 import java.util.List;import java.util.Objects;
 

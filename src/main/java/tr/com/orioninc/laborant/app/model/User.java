@@ -1,10 +1,12 @@
-package tr.com.orioninc.laborant.security.model;
+package tr.com.orioninc.laborant.app.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import tr.com.orioninc.laborant.app.model.Lab;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -28,7 +30,8 @@ public class User {
     @Column(name = "user_role")
     private String user_role;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
     @JoinTable(
             name = "lab_user_table",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -36,6 +39,16 @@ public class User {
     )
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id")
     private List<Lab> labs = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
+    @JoinTable(
+            name = "team_user_table",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "team_id")
+    )
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id")
+    private List<Team> teams = new ArrayList<>();
 
 
 

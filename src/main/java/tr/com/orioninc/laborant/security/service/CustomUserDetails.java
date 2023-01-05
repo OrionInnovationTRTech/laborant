@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import tr.com.orioninc.laborant.security.model.User;
+import tr.com.orioninc.laborant.app.model.User;
 
 import java.util.Collection;
 import java.util.Collections;

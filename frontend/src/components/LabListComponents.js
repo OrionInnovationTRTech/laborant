@@ -18,6 +18,9 @@
         const [isMulti, setIsMulti] = useState({});
         const [search, setSearch] = useState('');
         const [assignedUsers, setAssignedUsers] = useState({});
+        const [expanded, setExpanded] = useState(false);
+        const toggleExpanded = () => setExpanded(!expanded);
+        const loggedInUser = localStorage.getItem('username');
 
 
 
@@ -42,7 +45,7 @@
             });
         })};    
 
-        const getAllLabs = () => {
+         const getAllLabs = () => {
             axios.get('http://localhost:8080/v1/labs/', getHeaders())
             .then((response) => {
                 setLabs(response.data);
@@ -52,11 +55,11 @@
             })
         };
 
-            const getLabVersion = () => {
+             const getLabVersion = () => {
                 let labVersion = "CAN'T CONNECT";
                 let isMulti = "";
                 labs.forEach(lab => {
-                    axios.get(`http://localhost:8080/v1/labs/runCommand/${lab.labName}?command=sudo+wae-status`, getHeaders())
+                    axios.get(`http://localhost:8080/v1/labs/status/${lab.labName}`, getHeaders())
                         .then((response) => {
                             const data = response.data.split('\n').map(row => {
                                 return row.split(' ').filter(element => element !== '');
@@ -90,12 +93,56 @@
         axios.delete("http://localhost:8080/v1/labs/" + labName, getHeaders())
             .then((response) => {
                 console.log(response);
-                window.location.replace('/labs');
+                setTimeout(() => {
+                    window.location.replace('/labs');
+                  }, 50);
             }).catch((error) => {
-                console.log(error);
+                window.alert(error.response.data.message);
             })
     }
 }
+
+        const reserveLab = (labName) => {
+            if (window.confirm("Are you sure you want to reserve this lab?")) {
+                axios.put(`http://localhost:8080/v1/reserve-lab`, {}, {
+                headers: {
+                    'Authorization': 'Basic ' + btoa(localStorage.getItem('username') + ':' + localStorage.getItem('password')),
+                },
+                params:  {
+                    labName: labName
+                }
+                })
+                    .then((response) => {
+                        console.log(response);
+                        setTimeout(() => {
+                            window.location.replace('/labs');
+                          }, 50);
+                    }).catch((error) => {
+                        window.alert(error.response.data.message);
+                    })
+            }
+        }
+
+        const unreserveLab = (labName) => {
+            if (window.confirm("Are you sure you want to unreserve this lab?")) {
+                axios.put(`http://localhost:8080/v1/unreserve-lab`, {}, {
+                headers: {
+                    'Authorization': 'Basic ' + btoa(localStorage.getItem('username') + ':' + localStorage.getItem('password')),
+                },
+                params:  {
+                    labName: labName
+                }
+                })
+                    .then((response) => {
+                        console.log(response);
+                        setTimeout(() => {
+                            window.location.replace('/labs');
+                          }, 50);
+                    }).catch((error) => {
+                        window.alert(error.response.data.message);
+                    })
+                }
+        }
 
             return(
                 <div>
@@ -119,9 +166,12 @@
                                 <td>Host</td>
                                 <td>Port</td>
                                 <td>Version</td>
-                                <td>Assigned Users</td>
-                                <td>isMulti</td>
-                                <td>Actions</td>
+                                <td>Assigned User</td>
+                                <td>Is Multi</td>
+                                <td>Is Reserved</td>
+                                <td>Actions <button onClick={toggleExpanded} className="btn btn-outline-success">
+                                    {expanded ? '▼' : '▶'}
+                                </button></td>
 
                             </tr>
                         </thead>
@@ -135,7 +185,10 @@
                                         labs.userName.toLowerCase().includes(search) ||
                                         labs.password.toLowerCase().includes(search) ||
                                         labs.host.toLowerCase().includes(search) ||
-                                        labVersion[labs.labName].toLowerCase().includes(search);
+                                        labs.reserved.toLowerCase().includes(search) ||
+                                        labVersion[labs.labName].toLowerCase().includes(search) ||
+                                        assignedUsers[labs.labName].toLowerCase().includes(search) ||
+                                        isMulti[labs.labName].toLowerCase().includes(search);
 
                                     }).map(
                                     labs =>
@@ -148,10 +201,26 @@
                                         <td>{labVersion[labs.labName]}</td>
                                         <td>{assignedUsers[labs.labName]}</td>
                                         <td>{isMulti[labs.labName]}</td>
+                                        <td>{labs.reserved === true ? "TRUE"  : ""}
+                                        </td>
                                         <td>
-                                            <button onClick={() => deleteLab(labs.labName)} className="btn btn-danger">Delete</button>
-                                            <Link className="btn btn-secondary" to={`/edit-lab/${labs.labName}`}>Edit</Link>
-                                            <Link className="btn btn-success" to={`/run-command/${labs.labName}`}>Run Command</Link>
+                                            <table>
+                                                            {expanded && (
+                                                                <>
+
+                                                                    <button onClick={() => deleteLab(labs.labName)} className="btn btn-danger">Delete</button>
+                                                                    <Link className="btn btn-secondary" to={`/edit-lab/${labs.labName}`}>Edit</Link>
+                                                                    <Link className="btn btn-success" to={`/run-command/${labs.labName}`}>Run Status</Link>
+                                                                    { labs.users === null || labs.users.length === 0 || labs.users.some(user => user.username === loggedInUser) ? (
+                                                                        labs.reserved ? (
+                                                                            <button onClick={() => unreserveLab(labs.labName)} className="btn btn-dark">Unreserve</button>
+                                                                        ) : (
+                                                                            <button onClick={() => reserveLab(labs.labName)} className="btn btn-warning">Reserve</button>
+                                                                        )
+                                                                    ) : null }
+                                                                </>
+                                                            )}
+                                            </table>
                                         </td>
                                     </tr>
                                 )
@@ -160,8 +229,8 @@
                         </tbody>
                         </Table>
                     </Container>
-        
-                    
+
+
 
                 </div>
 

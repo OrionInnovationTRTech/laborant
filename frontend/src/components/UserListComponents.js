@@ -50,7 +50,7 @@ const UserListComponents = () => {
                         <InputGroup className='my-3'>
                             <Form.Control
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder='Filter labs...'
+                            placeholder='Filter users...'
                             />
                         </InputGroup>
                         </Form>
@@ -60,6 +60,7 @@ const UserListComponents = () => {
                             <td>Username</td>
                             <td>Password</td>
                             <td>Role</td>
+                            <td>Assigned Labs</td>
                             <td>Actions</td>
                         </tr>
                     </thead>
@@ -75,6 +76,7 @@ const UserListComponents = () => {
                                     <td>{users.username}</td>
                                     <td style={{ color: "gray"}}>hidden</td>
                                     <td>{users.user_role}</td>
+                                    <td>{users.labs.map((lab) => lab.labName).join(', ')}</td>
                                     <td>
                                         <button onClick={() => deleteUser(users.username)} className="btn btn-danger">Delete</button>
                                     </td>

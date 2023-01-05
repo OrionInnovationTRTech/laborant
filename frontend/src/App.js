@@ -13,8 +13,11 @@ import UserListComponents from './components/UserListComponents';
 import AddUserComponent from './components/AddUserComponent';
 import NotFound from './components/NotFound';
 import NotAuthorized from './components/NotAuthorized'
-import AssignUsers from './components/AssignUserComponent';
-import LabUserComponent from './components/LabUserComponent';
+import AdminPanelComponent from './components/AdminPanelComponent';
+import AssignUsersPanel from './components/AssignUserPanel';
+import AssignTeamPanel from "./components/AssignTeamPanel";
+import AddTeamComponent from "./components/AddTeamComponent";
+import TeamListComponents from "./components/TeamListComponents";
 
 function App() {
   checkAuthentication();
@@ -41,7 +44,7 @@ function App() {
           <Route path="/bulk-add" element={<BulkAddLabComponent/>}></Route>
           <Route path="panel/" element={
               isAdmin() ? (
-                <LabUserComponent/>
+                <AdminPanelComponent/>
               ) : (
                 <NotAuthorized/>
               )
@@ -49,7 +52,15 @@ function App() {
           />
           <Route path="panel/assign-users/" element={
               isAdmin() ? (
-                <AssignUsers/>
+                <AssignUsersPanel/>
+              ) : (
+                <NotAuthorized/>
+              )
+          }
+          />
+          <Route path="panel/assign-teams/" element={
+              isAdmin() ? ( 
+                <AssignTeamPanel/>
               ) : (
                 <NotAuthorized/>
               )
@@ -63,14 +74,30 @@ function App() {
               )
             }
           />
-          <Route path="/add-user"  element={
+          <Route path='/add-team' element={
+                isAdmin() ? (
+                    <AddTeamComponent />
+                ) : (
+                    <NotAuthorized/>
+                )
+            }
+            />
+          <Route path='/add-user'  element={
               isAdmin() ? (
                 <AddUserComponent />
               ) : (
                 <NotAuthorized/>
               )
             }
-          />
+            />
+            <Route path='/teams' element={
+                isAdmin() ? (
+                    <TeamListComponents />
+                ) : (
+                    <NotAuthorized/>
+                )
+            }
+            />
           <Route path="*" element={<NotFound/>}></Route>          
         </Routes>
       </div>   

@@ -4,8 +4,8 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import tr.com.orioninc.laborant.security.model.User;
-import tr.com.orioninc.laborant.security.repository.UserRepository;
+import tr.com.orioninc.laborant.app.model.User;
+import tr.com.orioninc.laborant.app.repository.UserRepository;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 

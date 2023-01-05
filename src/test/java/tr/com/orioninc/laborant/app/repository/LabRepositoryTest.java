@@ -72,4 +72,18 @@ public class LabRepositoryTest {
         assertThat(foundLab).isNull();
         log.info("Lab not found");
     }
+
+    @Test
+    void canReserveLab(){
+        // given
+        String labName = "testLab";
+        Lab lab = new Lab(
+                labName, "testUser", "testPassword", "testHost", 22);
+        underTest.save(lab);
+        // when
+        lab.setReserved(true);
+        underTest.save(lab);
+        // then
+        assertThat(lab.getReserved()).isTrue();
+    }
 }

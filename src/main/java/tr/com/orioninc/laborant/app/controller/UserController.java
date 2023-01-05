@@ -1,4 +1,4 @@
-package tr.com.orioninc.laborant.security.controller;
+package tr.com.orioninc.laborant.app.controller;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -10,8 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import tr.com.orioninc.laborant.exception.custom.NotAuthorizedException;
 import tr.com.orioninc.laborant.exception.custom.NotFoundException;
-import tr.com.orioninc.laborant.security.model.User;
-import tr.com.orioninc.laborant.security.service.UserService;
+import tr.com.orioninc.laborant.app.model.User;
+import tr.com.orioninc.laborant.app.service.UserService;
 
 import java.util.List;
 import java.util.Objects;

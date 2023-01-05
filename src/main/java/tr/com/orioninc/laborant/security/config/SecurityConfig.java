@@ -31,7 +31,7 @@ import java.util.Properties;
 @Configuration
 @AllArgsConstructor
 @Log4j2
-@EnableWebSecurity(debug = false)
+@EnableWebSecurity(debug = true)
 @CrossOrigin(origins = "http://localhost:3000")
 public class SecurityConfig {
 
@@ -81,12 +81,12 @@ public class SecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED).and()
                 .authorizeRequests()
-                .antMatchers("/", "/index", "/css/*", "/js/*").permitAll()
-                .antMatchers(HttpMethod.POST).authenticated()
-                .antMatchers(HttpMethod.PUT).hasAuthority(ADMIN)
-                .antMatchers(HttpMethod.DELETE).hasAuthority(ADMIN)
-                .antMatchers(HttpMethod.OPTIONS).permitAll()
-                .antMatchers(HttpMethod.GET).authenticated()
+//                .antMatchers("/", "/index", "/css/*", "/js/*").permitAll()
+//                .antMatchers(HttpMethod.POST).authenticated()
+//                .antMatchers(HttpMethod.PUT).hasAuthority(ADMIN)
+//                .antMatchers(HttpMethod.DELETE).hasAuthority(ADMIN)
+//                .antMatchers(HttpMethod.OPTIONS).permitAll()
+//                .antMatchers(HttpMethod.GET).authenticated()
                 // .antMatchers("/users/test").hasAuthority("ADMIN")
 //                .antMatchers("/", "index", "/css/*", "/js/*").hasAnyRole(ADMIN.name(), USER.name())
 //                .antMatchers("/v1/**").hasRole(USER.name())

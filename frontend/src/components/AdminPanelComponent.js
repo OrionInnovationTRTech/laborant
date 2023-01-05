@@ -9,7 +9,7 @@ import axios from "axios";
 
 
 
-const LabUserComponent = () => {
+const AdminPanelComponent = () => {
     checkAuthentication();
 
 
@@ -21,13 +21,12 @@ const LabUserComponent = () => {
 
     useEffect(() => {
 
-
         getAllLabs();
     }, []);
 
     useEffect(() => {
         getUsers();
-},[labs]);
+    },[labs]);
 
     const getUsers = () => {
         labs.forEach(lab => {axios.get(`http://localhost:8080/v1/lab-users/${lab.labName}`, getHeaders())
@@ -64,7 +63,8 @@ if (window.confirm("Are you sure you want to delete this lab?")) {
             <div>
                 <h1 className = "text-center"> Admin Panel
                 <Link to ="/" className="btn btn-secondary" style={{marginLeft: '100px'}}>Lab Panel</Link>
-                <Link to="/panel/assign-users" className="btn btn-success">Assign Users Panel</Link>
+                <Link to="/panel/assign-users" className="btn btn-success">Assign Users</Link>
+                <Link to="/panel/assign-teams" className="btn btn-danger">Assign Teams</Link>
                 <Link to="/users" className="btn btn-info">Users Panel</Link>
                 </h1>
             
@@ -97,7 +97,8 @@ if (window.confirm("Are you sure you want to delete this lab?")) {
                                     ? labs
                                     : labs.labName.toLowerCase().includes(search) ||
                                     labs.userName.toLowerCase().includes(search) ||
-                                    labs.host.toLowerCase().includes(search) 
+                                    labs.host.toLowerCase().includes(search) ||
+                                    assignedUsers[labs.labName].toLowerCase().includes(search);
 
                                 }).map(
                                 labs =>
@@ -124,4 +125,4 @@ if (window.confirm("Are you sure you want to delete this lab?")) {
 
         )
    }
-export default LabUserComponent;
+export default AdminPanelComponent;

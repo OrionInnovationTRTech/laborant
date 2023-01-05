@@ -1,12 +1,11 @@
 package tr.com.orioninc.laborant.app.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Getter;
 import lombok.Setter;
-import tr.com.orioninc.laborant.security.model.User;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -30,10 +29,17 @@ public class Lab {
     private String host;
     @Column(name = "port")
     private Integer port;
+    @Column(name = "reserved", nullable = true)
+    private Boolean reserved = false;
 
     @ManyToMany(mappedBy = "labs")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id")
     private List<User> users;
+
+    @ManyToMany(mappedBy = "labs")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id")
+    private List<Team> teams;
+
 
 
 
@@ -52,6 +58,10 @@ public class Lab {
         this.password = password;
         this.host = host;
         this.port = port;
+    }
+
+    public Lab(Boolean reserved) {
+        this.reserved = reserved;
     }
 
     public Lab(Integer id, String labName, String userName, String password, String host, Integer port) {
