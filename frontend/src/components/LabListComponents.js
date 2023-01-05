@@ -49,7 +49,7 @@
             axios.get('http://localhost:8080/v1/labs/', getHeaders())
             .then((response) => {
                 setLabs(response.data);
-                console.log(response.data);
+                console.log("labs: " + response.data);
             }).catch((error) => {
                 console.log(error);
             })
@@ -59,6 +59,7 @@
                 let labVersion = "CAN'T CONNECT";
                 let isMulti = "";
                 labs.forEach(lab => {
+                    console.log("for: " +lab.labName)
                     axios.get(`http://localhost:8080/v1/labs/status/${lab.labName}`, getHeaders())
                         .then((response) => {
                             const data = response.data.split('\n').map(row => {
@@ -68,7 +69,7 @@
 
                                 console.log(data);
                                 labVersion = data[1][1];
-                                console.log(labVersion);
+                                console.log(lab.labName  + " " + labVersion);
 
                                 if(data[2] !== undefined && data[2] !== null){
                                     isMulti = "TRUE";
@@ -78,6 +79,7 @@
                             setLabVersion((prevLabVersions) => ({...prevLabVersions, [lab.labName]: labVersion}));
                                 setIsMulti((prevIsMulti) => ({...prevIsMulti, [lab.labName]:isMulti}));
                         }).catch((error) => {
+                            console.log(lab.labName + "couldnt connect")
                         labVersion = "CAN'T CONNECT";
                         setLabVersion((prevLabVersions) => ({...prevLabVersions, [lab.labName]: labVersion}));
                         setIsMulti((prevIsMulti) => ({...prevIsMulti, [lab.labName]:isMulti}));

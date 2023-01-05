@@ -31,7 +31,7 @@ import java.util.Properties;
 @Configuration
 @AllArgsConstructor
 @Log4j2
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity(debug = false)
 @CrossOrigin(origins = "http://localhost:3000")
 public class SecurityConfig {
 

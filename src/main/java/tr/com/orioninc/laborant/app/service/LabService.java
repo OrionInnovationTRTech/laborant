@@ -41,15 +41,15 @@ public class LabService {
                 session.setServerAliveCountMax(1); // If server is not alive, try to reconnect once
                 session.connect();
                 if (session.isConnected()) {
-                    log.info("[connectAndExecuteCommand] session connected");
+                    log.info("[connectAndExecuteCommand] session connected for lab {}", host);
 
                 }
                 else {
-                    log.info("[connectAndExecuteCommand] session not connected");
+                    log.info("[connectAndExecuteCommand] session not connected for lab {}", host);
                 }
                 channel = (ChannelExec) session.openChannel("exec");
                 channel.setCommand("sudo wae-status");
-                log.info("[connectAndExecuteCommand] command to be executed: {}", "sudo wae-status");
+                log.info("[connectAndExecuteCommand] command to be executed: {} for lab {}", "sudo wae-status", host);
                 ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
                 channel.setOutputStream(responseStream);
                 channel.connect();
@@ -75,6 +75,7 @@ public class LabService {
             log.error("[connectAndExecuteCommand] Lab is not reachable");
             throw new NotConnectedException("Lab is not reachable");
         }
+        log.info("For lab {} response is: {}", host, responseString);
         return responseString;
     }
 
