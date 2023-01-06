@@ -16,6 +16,7 @@ const AdminPanelComponent = () => {
     const [labs, setLabs] = useState([]);
     const [search, setSearch] = useState('');
     const [assignedUsers, setAssignedUsers] = useState({});
+    const [assignedTeams, setAssignedTeams] = useState('');
 
 
 
@@ -26,16 +27,26 @@ const AdminPanelComponent = () => {
 
     useEffect(() => {
         getUsers();
+        getTeams();
     },[labs]);
 
-    const getUsers = () => {
+     const getUsers = () => {
         labs.forEach(lab => {axios.get(`http://localhost:8080/v1/lab-users/${lab.labName}`, getHeaders())
         .then((response) => {
         setAssignedUsers((prevAssignedUsers) => ({...prevAssignedUsers, [lab.labName]: response.data.join('\n')}));
         }).catch((error) => {
             setAssignedUsers("Error");
         });
-    })};    
+    })};
+
+    const getTeams = () => {
+        labs.forEach(lab => {axios.get(`http://localhost:8080/v1/lab-teams/${lab.labName}`, getHeaders())
+            .then((response) => {
+                setAssignedTeams((prevAssignedTeams) => ({...prevAssignedTeams, [lab.labName]: response.data.join('\n')}));
+            }).catch((error) => {
+                setAssignedTeams("Error");
+            });
+        })};
 
     const getAllLabs = () => {
         axios.get('http://localhost:8080/v1/labs/', getHeaders())
@@ -84,7 +95,7 @@ if (window.confirm("Are you sure you want to delete this lab?")) {
                             <td>Name</td>
                             <td>Username</td>
                             <td>Host</td>
-                            <td>Assigned Users</td>
+                            <td>Users/Teams</td>
                             <td>Actions</td>
 
                         </tr>
@@ -98,7 +109,8 @@ if (window.confirm("Are you sure you want to delete this lab?")) {
                                     : labs.labName.toLowerCase().includes(search) ||
                                     labs.userName.toLowerCase().includes(search) ||
                                     labs.host.toLowerCase().includes(search) ||
-                                    assignedUsers[labs.labName].toLowerCase().includes(search);
+                                    assignedUsers[labs.labName].toLowerCase().includes(search) ||
+                                    assignedTeams[labs.labName].toLowerCase().includes(search);
 
                                 }).map(
                                 labs =>
@@ -106,7 +118,10 @@ if (window.confirm("Are you sure you want to delete this lab?")) {
                                     <td>{labs.labName}</td>
                                     <td>{labs.userName}</td>
                                     <td>{labs.host}</td>
-                                    <td>{assignedUsers[labs.labName]}</td>
+                                    <td>{assignedUsers[labs.labName]}
+                                        {"\n"}
+                                    {assignedTeams[labs.labName] ? <span style={{color: 'green'}}>{assignedTeams[labs.labName]}</span> : ''}
+                                    </td>
                                     <td>
                                         <button onClick={() => deleteLab(labs.labName)} className="btn btn-danger">Delete</button>
                                         <Link className="btn btn-secondary" to={`/edit-lab/${labs.labName}`}>Edit</Link>

@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from "axios";
 
 class Logout extends React.Component {
   state = {
@@ -38,15 +39,20 @@ class LoginForm extends React.Component {
 
     const { username, password } = this.state;
 
-    fetch('http://localhost:8080/v1/login', {
-      method: 'GET',
+    axios.get(`http://localhost:8080/users/${username}`, {
       headers: {
         'Authorization': 'Basic ' + btoa(username + ':' + password),
       },
     })
       .then((response) => {
-       if (response.ok) {
-        console.log(localStorage.getItem('isAuthenticated'));
+       if (response.status === 200) {
+           if (response.data.authorities[0].authority.includes("ADMIN")) {
+               console.log("admin");
+               localStorage.setItem('isAdmin', true);
+           } else {
+                console.log("not admin");
+               localStorage.setItem('isAdmin', false);
+           }
 
           // If the authentication is successful, save the username and password in local storage
           localStorage.setItem('username', username);
@@ -55,18 +61,16 @@ class LoginForm extends React.Component {
             isAuthenticated: true,
           });
           localStorage.setItem('isAuthenticated', true);
-          window.location.replace('/labs/')
-          
-        
+          window.location.replace('/labs');
         }
         else{
           throw new Error('Error logging in: ' + response.statusText);
         }
       })
-  
+
       .catch(error => {
         console.log('Error:', error.message);
-        alert('Couldn not authenticated');
+        alert('Could not authenticated');
       });
     }
 

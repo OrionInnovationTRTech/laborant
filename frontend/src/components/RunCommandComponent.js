@@ -13,6 +13,7 @@ const RunCommandComponent = () => {
 }, []);
 
   const runCommand = () => {
+    setResponse('Running on progress...');
     axios.get(`http://localhost:8080/v1/labs/status/${labName}`,getHeaders())
     .then((response) => {
          const data = response.data.split('\n').map(row => {
@@ -20,7 +21,13 @@ const RunCommandComponent = () => {
             return elements;
         }).filter(row => row.length > 0);
         console.log(data);
-        setResponse(<Table data={data} />);
+
+        if(data[0] !== undefined && data[0] !== null){
+            setResponse(<Table data={data}/>);
+        }
+        else {
+            setResponse("Can't retrieve status")
+        }
     })
     .catch((error) => {
       setResponse(`Error: ${error.response.data.message}`);

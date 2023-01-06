@@ -32,12 +32,12 @@ public class LabService {
         Session session = null;
         ChannelExec channel = null;
         String responseString = null;
-        if(adminService.isLabReachable(host,100)){
+        if(adminService.isLabReachable(host,200)){
             try {
                 session = new JSch().getSession(username, host, port);
                 session.setPassword(password);
                 session.setConfig("StrictHostKeyChecking", "no");
-                session.setServerAliveInterval(100); // Check if server is alive every 200  miliseconds
+                session.setServerAliveInterval(300); // Check if server is alive every 200  miliseconds
                 session.setServerAliveCountMax(1); // If server is not alive, try to reconnect once
                 session.connect();
                 if (session.isConnected()) {
@@ -60,8 +60,7 @@ public class LabService {
 
                 responseString = responseStream.toString();
             } catch (JSchException e) {
-                log.error("[connectAndExecuteCommand] ssh exception: {}", e.getMessage(), e);
-                return "Error. " + e.getMessage();
+                throw new NotConnectedException("Couldn't connect to lab");
             } finally {
                 if (session != null) {
                     session.disconnect();
