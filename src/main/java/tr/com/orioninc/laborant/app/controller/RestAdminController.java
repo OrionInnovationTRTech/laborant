@@ -74,6 +74,11 @@ public class RestAdminController {
         return ResponseEntity.ok(adminService.getAssignedLabUsers(labName));
     }
 
+    @GetMapping("/lab-teams/{labName}")
+    public ResponseEntity<ArrayList<String>> getAssignedLabTeams(@PathVariable String labName) {
+        return ResponseEntity.ok(adminService.getAssignedLabTeams(labName));
+    }
+
     @GetMapping("/labs")
     @ApiOperation(value = "Getting all labs as a list of Lab objects")
     public ResponseEntity<List<Lab>> getAllLabs(Authentication authentication) {

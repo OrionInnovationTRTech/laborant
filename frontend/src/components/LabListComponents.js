@@ -19,6 +19,7 @@
         const [search, setSearch] = useState('');
         const [assignedUsers, setAssignedUsers] = useState({});
         const [expanded, setExpanded] = useState(false);
+        const [assignedTeams, setAssignedTeams] = useState('');
         const toggleExpanded = () => setExpanded(!expanded);
         const loggedInUser = localStorage.getItem('username');
 
@@ -33,17 +34,27 @@
         useEffect(() => {
             getLabVersion();
             getUsers();
+            getTeams();
     },[labs]);
 
-        const getUsers = () => {
+         const getUsers = () => {
             labs.forEach(lab => {axios.get(`http://localhost:8080/v1/lab-users/${lab.labName}`, getHeaders())
             .then((response) => {
-            // set the list of assigned users for the lab
             setAssignedUsers((prevAssignedUsers) => ({...prevAssignedUsers, [lab.labName]: response.data.join('\n')}));
             }).catch((error) => {
                 setAssignedUsers("Error");
             });
-        })};    
+        })};
+
+         const getTeams = () => {
+            labs.forEach(lab => {axios.get(`http://localhost:8080/v1/lab-teams/${lab.labName}`, getHeaders())
+            .then((response) => {
+            setAssignedTeams((prevAssignedTeams) => ({...prevAssignedTeams, [lab.labName]: response.data.join('\n')}));
+            }).catch((error) => {
+                setAssignedTeams("Error");
+            });
+        })};
+
 
          const getAllLabs = () => {
             axios.get('http://localhost:8080/v1/labs/', getHeaders())
@@ -75,9 +86,11 @@
                                     isMulti = "TRUE";
                                 }
 
-
-                            setLabVersion((prevLabVersions) => ({...prevLabVersions, [lab.labName]: labVersion}));
                                 setIsMulti((prevIsMulti) => ({...prevIsMulti, [lab.labName]:isMulti}));
+                                setLabVersion((prevLabVersions) => ({
+                                    ...prevLabVersions,
+                                    [lab.labName]: isMulti[lab.labName] ? `${labVersion} *` : labVersion
+                                }));
                         }).catch((error) => {
                             console.log(lab.labName + "couldnt connect")
                         labVersion = "CAN'T CONNECT";
@@ -168,11 +181,11 @@
                                 <td>Host</td>
                                 <td>Port</td>
                                 <td>Version</td>
-                                <td>Assigned User</td>
+                                <td>Users/Teams</td>
                                 <td>Is Multi</td>
                                 <td>Is Reserved</td>
-                                <td>Actions <button onClick={toggleExpanded} className="btn btn-outline-success">
-                                    {expanded ? '▼' : '▶'}
+                                <td><button onClick={toggleExpanded} className="btn btn-outline-success">
+                                    {expanded ? 'Actions ▼' : 'Actions ▶'}
                                 </button></td>
 
                             </tr>
@@ -187,9 +200,9 @@
                                         labs.userName.toLowerCase().includes(search) ||
                                         labs.password.toLowerCase().includes(search) ||
                                         labs.host.toLowerCase().includes(search) ||
-                                        labs.reserved.toLowerCase().includes(search) ||
                                         labVersion[labs.labName].toLowerCase().includes(search) ||
                                         assignedUsers[labs.labName].toLowerCase().includes(search) ||
+                                        assignedTeams[labs.labName].toLowerCase().includes(search) ||
                                         isMulti[labs.labName].toLowerCase().includes(search);
 
                                     }).map(
@@ -201,7 +214,11 @@
                                         <td>{labs.host}</td>
                                         <td>{labs.port}</td>
                                         <td>{labVersion[labs.labName]}</td>
-                                        <td>{assignedUsers[labs.labName]}</td>
+                                        <td>
+                                            {assignedUsers[labs.labName]}
+                                            {"\n"}
+                                            {assignedTeams[labs.labName] ? <span style={{color: 'green'}}>{assignedTeams[labs.labName]}</span> : ''}
+                                        </td>
                                         <td>{isMulti[labs.labName]}</td>
                                         <td>{labs.reserved === true ? "TRUE"  : ""}
                                         </td>

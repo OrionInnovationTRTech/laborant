@@ -352,4 +352,24 @@ public class AdminService {
     }
 
 
+    public ArrayList<String> getAssignedLabTeams(String labName) {
+        log.debug("[getAssignedLabTeams] called");
+        if (Objects.equals(labName, "") || labName == null){
+            throw new IllegalArgumentException("Lab name cannot be empty");
+        }
+        Lab lab = labRepo.findByLabName(labName);
+        if (Objects.isNull(lab)) {
+            log.warn("[getAssignedLabTeams] no lab in the database named: {}", labName);
+            throw new NotFoundException("There isn't a lab named " + labName + " found in the database to get assigned teams");
+        } else {
+            ArrayList<String> assignedTeams = new ArrayList<>();
+            for (Team team : teamRepo.findAll()) {
+                if (team.getLabs().contains(lab)) {
+                    assignedTeams.add(team.getName());
+                }
+            }
+            log.info("[getAssignedLabTeams] returning assigned teams");
+            return assignedTeams;
+        }
+    }
 }

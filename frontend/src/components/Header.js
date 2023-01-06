@@ -15,7 +15,7 @@ const Header = () => {
   </text>
   )}
   <div style={{flex: 1}}></div>
-  {localStorage.getItem('username') === 'admin' && (
+  {localStorage.getItem('isAdmin') === 'true' && (
           <button style={{marginRight: '20px'}}>
             <Link to="/panel">Admin Panel</Link>
           </button>

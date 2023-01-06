@@ -22,8 +22,7 @@ import TeamListComponents from "./components/TeamListComponents";
 function App() {
   checkAuthentication();
   function isAdmin() {
-    const username = localStorage.getItem('username');
-    if (username === 'admin') {
+    if (localStorage.getItem('isAdmin') === 'true') {
       return true;
     } else {
       return false;
