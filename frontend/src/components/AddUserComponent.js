@@ -1,10 +1,10 @@
 import React ,{useState} from "react";
-import { getHeaders } from "../services/AuthHeader";
+import {checkAuthentication, getHeaders} from "../services/AuthHeader";
 import axios from "axios";
 
 
 const AddUserComponent = () => {
-
+    checkAuthentication();
     const [message, setMessage] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');

@@ -184,6 +184,42 @@ public class AdminService {
         }
     }
 
+    public ArrayList<String> getAssignedTeamLabs(String teamName){
+        log.debug("[getAssignedTeamLabs] called");
+        Team team = teamRepo.findByName(teamName);
+        if (Objects.isNull(team)) {
+            log.warn("[getAssignedTeamLabs] Team with name {} not found in database", teamName);
+            throw new NotFoundException("Team with name " + teamName + " not found in database");
+        } else {
+            log.info("[getAssignedTeamLabs] All labs assigned to team with name {} are listed", teamName);
+            ArrayList<String> assignedLabs = new ArrayList<>();
+            for (Lab lab : labRepo.findAll()) {
+                if (lab.getTeams().contains(team)) {
+                    assignedLabs.add(lab.getLabName());
+                }
+            }
+            return assignedLabs;
+        }
+    }
+
+    public ArrayList<String> getAssignedUserLabs(String username){
+        log.debug("[getAssignedUserLabs] called");
+        User user = userRepo.findByUsername(username);
+        if (Objects.isNull(user)) {
+            log.warn("[getAssignedUserLabs] User with username {} not found in database", username);
+            throw new NotFoundException("User with username " + username + " not found in database");
+        } else {
+            log.info("[getAssignedUserLabs] All labs assigned to user with username {} are listed", username);
+            ArrayList<String> assignedLabs = new ArrayList<>();
+            for (Lab lab : labRepo.findAll()) {
+                if (lab.getUsers().contains(user)) {
+                    assignedLabs.add(lab.getLabName());
+                }
+            }
+            return assignedLabs;
+        }
+    }
+
     public Lab findLabByName(String labName) {
         if (Objects.equals(labName, "") || labName == null){
             throw new IllegalArgumentException("Lab name cannot be empty");
@@ -262,18 +298,28 @@ public class AdminService {
             throw new NotFoundException("There isn't a lab named " + labName + " found in the database to be deleted");
         } else {
             if (!userRepo.findAll().isEmpty()) {
-                for (User user : userRepo.findAll()) {
-                    if (user.getLabs().contains(labToBeDeleted)) {
+                if (!labToBeDeleted.getUsers().isEmpty()) {
+                    for (User user : labToBeDeleted.getUsers()) {
                         user.getLabs().remove(labToBeDeleted);
                         userRepo.save(user);
-                        log.info("[deleteLabByName] User with username {} unassigned from lab with name {}", user.getUsername(), labName);
+                        log.info("[deleteLabByName] removing lab named: {} from user named: {}", labToBeDeleted.getLabName(), user.getUsername());
+                        }
+                    }
+                }
+            }
+            if (!teamRepo.findAll().isEmpty()) {
+                if (!labToBeDeleted.getTeams().isEmpty()) {
+                    for (Team team : labToBeDeleted.getTeams()) {
+                        team.getLabs().remove(labToBeDeleted);
+                        teamRepo.save(team);
+                        log.info("[deleteLabByName] removing lab named: {} from team named: {}", labToBeDeleted.getLabName(), team.getName());
                     }
                 }
             }
             labRepo.delete(labToBeDeleted);
             log.info("[deleteLabByName] deleting new lab named: {}", labToBeDeleted.getLabName());
             return labToBeDeleted;
-        }
+
     }
     public boolean isLabReachable (String host,int timeout) {
         log.info("[isLabReachable] checking if lab with host {} is reachable", host);

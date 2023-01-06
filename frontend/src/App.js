@@ -18,6 +18,7 @@ import AssignUsersPanel from './components/AssignUserPanel';
 import AssignTeamPanel from "./components/AssignTeamPanel";
 import AddTeamComponent from "./components/AddTeamComponent";
 import TeamListComponents from "./components/TeamListComponents";
+import ChangePasswordComponent from "./components/ChangePasswordComponent";
 
 function App() {
   checkAuthentication();
@@ -97,6 +98,7 @@ function App() {
                 )
             }
             />
+            <Route path='/change-password' element={<ChangePasswordComponent/>}></Route>
           <Route path="*" element={<NotFound/>}></Route>          
         </Routes>
       </div>   

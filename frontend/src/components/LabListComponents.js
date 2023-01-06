@@ -100,7 +100,7 @@
                                    }));
                                }
                         }).catch((error) => {
-                            console.log(lab.labName + "couldnt connect")
+                            console.log(lab.labName + "could not connect")
                         console.log("for lab:" + lab.labName + "     " + error)
                         labVersion = "CAN'T CONNECT";
                         setLabVersion((prevLabVersions) => ({...prevLabVersions, [lab.labName]: labVersion}));
@@ -117,9 +117,7 @@
         axios.delete("http://localhost:8080/v1/labs/" + labName, getHeaders())
             .then((response) => {
                 console.log(response);
-                setTimeout(() => {
-                    window.location.replace('/labs');
-                  }, 50);
+                window.location.reload();
             }).catch((error) => {
                 window.alert(error.response.data.message);
             })
@@ -170,7 +168,8 @@
 
             return(
                 <div>
-                    <h1 className = "text-center"> Lab List<Link to="/add-lab" className="btn btn-primary" style={{marginLeft: '700px'}}>Add Lab</Link></h1>
+                    <h1 className = "text-center"> Lab List<Link to="/add-lab" className="btn btn-primary" style={{marginLeft: '600px'}}>Add Lab</Link><Link to="/bulk-add" className="btn btn-outline-primary">Bulk Add</Link></h1>
+
 
                      <Container>
                         <Form>
@@ -191,7 +190,6 @@
                                 <td>Port</td>
                                 <td>Version</td>
                                 <td>Users/Teams</td>
-                                <td>Is Multi</td>
                                 <td>Is Reserved</td>
                                 <td><button onClick={toggleExpanded} className="btn btn-outline-success">
                                     {expanded ? 'Actions ▼' : 'Actions ▶'}
@@ -211,9 +209,7 @@
                                         labs.host.toLowerCase().includes(search) ||
                                         labVersion[labs.labName].toLowerCase().includes(search) ||
                                         assignedUsers[labs.labName].toLowerCase().includes(search) ||
-                                        assignedTeams[labs.labName].toLowerCase().includes(search) ||
-                                        isMulti[labs.labName].toLowerCase().includes(search);
-
+                                        assignedTeams[labs.labName].toLowerCase().includes(search);
                                     }).map(
                                     labs =>
                                     <tr key={labs.labName}>
@@ -228,7 +224,6 @@
                                             {"\n"}
                                             {assignedTeams[labs.labName] ? <span style={{color: 'green'}}>{assignedTeams[labs.labName]}</span> : ''}
                                         </td>
-                                        <td>{isMulti[labs.labName]}</td>
                                         <td>{labs.reserved === true ? "TRUE"  : ""}
                                         </td>
                                         <td>
@@ -257,9 +252,19 @@
                         </tbody>
                         </Table>
                     </Container>
+                    <div>
+                        <h8 className="text-center">Total Labs: {labs.length} </h8>
+                        <h8 className={labs.length === 0 ? "text-center" : "d-none"}>No labs to display.</h8>
+                        <br />
+                        <h8 className={labs.length === 0 ? "d-none" : "text-center"}>Click on the "Actions" button to see more options.</h8>
+                        <br />
+                        <h8 className="text-center">The lab versions which has '**' indicates that it is a multi lab.</h8>
+                        <br/>
+                        <body className="text-center">Green text on Users/Teams indicates that it is a team, not user. Black text is shows that owner is user. <br/>Password is hidden for users who doesnt own the lab or admin.
+                        Reservation can only be made by lab owner if it is assigned to single user. If it is a team lab everyone can reserve it.</body>
 
 
-
+                 </div>
                 </div>
 
             )

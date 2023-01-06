@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../laborant.png'
 import { Logout } from './Login';
+import ChangePasswordComponent from "./ChangePasswordComponent";
 
 
 const Header = () => {
@@ -20,7 +21,11 @@ const Header = () => {
             <Link to="/panel">Admin Panel</Link>
           </button>
         )}
-  <Logout />  
+          <button style={{marginRight: '20px'}}>
+          <Link to="/change-password">Change Pass</Link>
+          </button>
+          <Logout />
+
 </div>
 
       

@@ -79,6 +79,18 @@ public class RestAdminController {
         return ResponseEntity.ok(adminService.getAssignedLabTeams(labName));
     }
 
+    @GetMapping("/team-labs/{teamName}")
+    public ResponseEntity<ArrayList<String>> getAssignedTeamLabs(@PathVariable String teamName) {
+        return ResponseEntity.ok(adminService.getAssignedTeamLabs(teamName));
+    }
+
+    @GetMapping("/user-labs/{username}")
+    public ResponseEntity<ArrayList<String>> getAssignedUserLabs(@PathVariable String username) {
+        return ResponseEntity.ok(adminService.getAssignedUserLabs(username));
+    }
+
+
+
     @GetMapping("/labs")
     @ApiOperation(value = "Getting all labs as a list of Lab objects")
     public ResponseEntity<List<Lab>> getAllLabs(Authentication authentication) {
@@ -126,7 +138,7 @@ public class RestAdminController {
     @PostMapping("/labs/bulk-add")
     @ApiOperation(value = "Adding multiple labs to the database by giving list of Labs in body")
     public ResponseEntity<String> addBulkLab (@RequestBody List<Lab> labs) {
-        log.info("[addNewLab] Called with labs: {}", labs.toString());
+        log.info("[addBulkLab] Called with labs: {}", labs.toString());
         int a = 0;
         int b = 0;
         for (Lab lab : labs) {
@@ -134,7 +146,7 @@ public class RestAdminController {
                adminService.addNewLab(lab);
                a++;
            } catch (Exception e) {
-               log.warn("[addNewLab] Lab {} could not be added", lab.toString());
+               log.warn("[addBulkLab] Lab {} could not be added", lab.toString());
                b++;
            }
         }

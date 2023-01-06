@@ -11,13 +11,21 @@ const ChangePassword = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        const requestBody = {
+        const requestParam = {
             oldPassword,
             newPassword,
         };
 
-        axios
-            .post('http://localhost:8080/v1/change-password', requestBody, getHeaders())
+        axios.put(`http://localhost:8080/users/change-password`, {}, {
+            headers: {
+                'Authorization': 'Basic ' + btoa(localStorage.getItem('username') + ':' + localStorage.getItem('password')),
+            },
+            params:  {
+                username: localStorage.getItem('username'),
+                oldPassword: requestParam.oldPassword,
+                newPassword: requestParam.newPassword
+            }
+                })
             .then((response) => {
                 setSuccess('Password changed successfully');
                 setError('');

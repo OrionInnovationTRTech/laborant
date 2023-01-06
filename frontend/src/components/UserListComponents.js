@@ -5,17 +5,19 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
-import { getHeaders } from "../services/AuthHeader";
+import {checkAuthentication, getHeaders} from "../services/AuthHeader";
 
 
 const UserListComponents = () => {
-    
+    checkAuthentication();
     const [users, setUsers] = useState([]);
     const [search, setSearch] = useState('');
+    const [assignedLabs, setAssignedLabs] = useState({});
 
     useEffect(() => {
 
         getAllUsers();
+        getLabs();
     }, []);
 
     const getAllUsers = () => {
@@ -27,6 +29,16 @@ const UserListComponents = () => {
             console.log(error);
         })
     }
+
+    const getLabs = () => {
+        users.forEach(user => {axios.get(`http://localhost:8080/v1/user-labs/${user.username}`, getHeaders())
+            .then((response) => {
+                setAssignedLabs((prevAssignedLabs) => ({...prevAssignedLabs, [user.username]: response.data.join('\n')}));
+            }).catch((error) => {
+                setAssignedLabs("Error");
+            });
+        })};
+
 
     const deleteUser = (username) => {
         if (window.confirm("Are you sure you want to delete this user?")) {
@@ -76,7 +88,7 @@ const UserListComponents = () => {
                                     <td>{users.username}</td>
                                     <td style={{ color: "gray"}}>hidden</td>
                                     <td>{users.user_role}</td>
-                                    <td>{users.labs.map((lab) => lab.labName).join(', ')}</td>
+                                    <td>{assignedLabs[users.username]}</td>
                                     <td>
                                         <button onClick={() => deleteUser(users.username)} className="btn btn-danger">Delete</button>
                                     </td>

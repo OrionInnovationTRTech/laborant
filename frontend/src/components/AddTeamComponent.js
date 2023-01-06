@@ -1,10 +1,11 @@
 import React ,{useState} from "react";
 import { getHeaders } from "../services/AuthHeader";
 import axios from "axios";
+import {checkAuthentication} from "../services/AuthHeader";
 
 
 const AddTeamComponent = () => {
-
+    checkAuthentication();
     const [message, setMessage] = useState('');
     const [name, setName] = useState('');
 

@@ -73,10 +73,10 @@ if (window.confirm("Are you sure you want to delete this lab?")) {
         return(
             <div>
                 <h1 className = "text-center"> Admin Panel
-                <Link to ="/" className="btn btn-secondary" style={{marginLeft: '100px'}}>Lab Panel</Link>
-                <Link to="/panel/assign-users" className="btn btn-success">Assign Users</Link>
+                <Link to="/panel/assign-users" className="btn btn-success" style={{marginLeft: '100px'}}>Assign Users</Link>
                 <Link to="/panel/assign-teams" className="btn btn-danger">Assign Teams</Link>
                 <Link to="/users" className="btn btn-info">Users Panel</Link>
+                <Link to="/teams" className="btn btn-warning">Teams Panel</Link>
                 </h1>
             
 

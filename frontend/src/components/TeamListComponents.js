@@ -5,17 +5,19 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
-import { getHeaders } from "../services/AuthHeader";
+import {checkAuthentication, getHeaders} from "../services/AuthHeader";
 
 
 const TeamListComponents = () => {
-
+    checkAuthentication();
     const [teams, setTeams] = useState([]);
     const [search, setSearch] = useState('');
+    const [assignedLabs, setAssignedLabs] = useState({});
 
     useEffect(() => {
-
+        getLabs();
         getAllTeams();
+
     }, []);
 
     const getAllTeams = () => {
@@ -39,6 +41,15 @@ const TeamListComponents = () => {
             })
         }
     }
+
+    const getLabs = () => {
+        teams.forEach(team => {axios.get(`http://localhost:8080/v1/team-labs/${team.name}`, getHeaders())
+            .then((response) => {
+                setAssignedLabs((prevAssignedLabs) => ({...prevAssignedLabs, [team.name]: response.data.join('\n')}));
+            }).catch((error) => {
+                setAssignedLabs("Error");
+            });
+        })};
 
 
     return(
@@ -72,7 +83,7 @@ const TeamListComponents = () => {
                             teams =>
                                 <tr key = {teams.name}>
                                     <td>{teams.name}</td>
-                                    <td>{teams.labs.map((lab) => lab.labName).join(', ')}</td>
+                                    <td>{assignedLabs[teams.name]}</td>
                                     <td>
                                         <button onClick={() => deleteTeam(teams.name)} className="btn btn-danger">Delete</button>
                                     </td>

@@ -1,8 +1,9 @@
 import React ,{useState} from "react";
 import LabService from "../services/LabService";
+import {checkAuthentication} from "../services/AuthHeader";
 
 const EditLabComponent = () => {
-
+    checkAuthentication();
     const [message, setMessage] = useState('');
     const [labName] = useState(window.location.pathname.split('/')[2]);
     const [userName, setUserName] = useState('');

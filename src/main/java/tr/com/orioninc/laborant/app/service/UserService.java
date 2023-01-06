@@ -76,8 +76,7 @@ public class UserService implements UserDetailsService {
                 log.info("[changePassword] Password changed for user {}", username);
                 return true;
             } else {
-                log.info("[changePassword] Old password is wrong for user {}", username);
-                return false;
+                throw new IllegalArgumentException("Old password is not correct");
             }
         } else {
             log.info("[changePassword] User {} not found", username);
