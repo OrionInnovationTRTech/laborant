@@ -1,9 +1,9 @@
 import axios from "axios";
 import { getHeaders } from "./AuthHeader";
 
-const LAB_REST_API_URL = 'http://localhost:8080/v1/labs'
-const LAB_REST_API_ADD_URL = 'http://localhost:8080/v1/labs/add/'
-const LAB_REST_API_UPDATE_URL = 'http://localhost:8080/v1/labs'
+const LAB_REST_API_URL = `${process.env.REACT_APP_SPRING_HOST}/v1/labs`
+const LAB_REST_API_ADD_URL = `${process.env.REACT_APP_SPRING_HOST}/v1/labs/add/`
+const LAB_REST_API_UPDATE_URL = `${process.env.REACT_APP_SPRING_HOST}/v1/labs`
 
 class LabService {
     getLabs(){

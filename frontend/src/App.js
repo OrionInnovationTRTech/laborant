@@ -1,5 +1,5 @@
 import './App.css';
-import LabListComponents from './components/LabListComponents';
+import ReservationListComponent from './components/ReservationListComponent';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import {BrowserRouter as Router, Routes, Route } from 'react-router-dom';
@@ -19,7 +19,8 @@ import AssignTeamPanel from "./components/AssignTeamPanel";
 import AddTeamComponent from "./components/AddTeamComponent";
 import TeamListComponents from "./components/TeamListComponents";
 import ChangePasswordComponent from "./components/ChangePasswordComponent";
-
+import LabReservationForm from "./components/LabReservationComponent";
+import LabListComponent from "./components/LabListComponent";
 function App() {
   checkAuthentication();
   function isAdmin() {
@@ -35,13 +36,17 @@ function App() {
       <Header />
       <div className= "container">
         <Routes>
-          <Route exact path = "/" element = {<LabListComponents/>}></Route>
-          <Route path = "/labs" element = {<LabListComponents/>}></Route>
-          <Route path = "/add-lab" element = {<AddLabComponent/>}></Route>
+          <Route exact path = "/" element = {<ReservationListComponent/>}></Route>
+          <Route path = "/labs" element = {<ReservationListComponent/>}></Route>
+          <Route path = "/add-lab" element = { isAdmin() ? <AddLabComponent/> : <NotAuthorized/>}></Route>
           <Route path="/login" element={<LoginForm/>}></Route>
           <Route path="/edit-lab/:labName" element={<EditLabComponent/>}></Route> 
           <Route path="/run-command/:labName" element={<RunCommandComponent/>}></Route>
-          <Route path="/bulk-add" element={<BulkAddLabComponent/>}></Route>
+          <Route path="/reserve-lab/:labName" element={<LabReservationForm/>}></Route>
+          <Route path="/bulk-add" element={
+              isAdmin() ? <BulkAddLabComponent/> : <NotAuthorized/>
+          }></Route>
+          <Route path="/lab-list" element={<LabListComponent/>}></Route>}
           <Route path="panel/" element={
               isAdmin() ? (
                 <AdminPanelComponent/>

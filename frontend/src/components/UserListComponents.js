@@ -15,13 +15,15 @@ const UserListComponents = () => {
     const [assignedLabs, setAssignedLabs] = useState({});
 
     useEffect(() => {
-
         getAllUsers();
-        getLabs();
     }, []);
 
+    useEffect(() => {
+        getLabs();
+    }, [users]);
+
     const getAllUsers = () => {
-         axios.get('http://localhost:8080/users/', getHeaders())
+         axios.get(`${process.env.REACT_APP_SPRING_HOST}/users/`, getHeaders())
           .then((response) => {
             setUsers(response.data);
             console.log(response.data);
@@ -31,7 +33,7 @@ const UserListComponents = () => {
     }
 
     const getLabs = () => {
-        users.forEach(user => {axios.get(`http://localhost:8080/v1/user-labs/${user.username}`, getHeaders())
+        users.forEach(user => {axios.get(`${process.env.REACT_APP_SPRING_HOST}/v1/user-labs/${user.username}`, getHeaders())
             .then((response) => {
                 setAssignedLabs((prevAssignedLabs) => ({...prevAssignedLabs, [user.username]: response.data.join('\n')}));
             }).catch((error) => {
@@ -42,7 +44,7 @@ const UserListComponents = () => {
 
     const deleteUser = (username) => {
         if (window.confirm("Are you sure you want to delete this user?")) {
-            axios.delete("http://localhost:8080/users/delete/" + username, getHeaders())
+            axios.delete(`${process.env.REACT_APP_SPRING_HOST}/users/delete/` + username, getHeaders())
                 .then((response) => {
                     console.log(response);
                     window.location.replace('/users');

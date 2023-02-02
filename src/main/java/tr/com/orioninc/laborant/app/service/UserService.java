@@ -6,6 +6,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import tr.com.orioninc.laborant.app.model.Lab;
+import tr.com.orioninc.laborant.app.repository.LabRepository;
 import tr.com.orioninc.laborant.exception.custom.AlreadyExistsException;
 import tr.com.orioninc.laborant.exception.custom.NotFoundException;
 import tr.com.orioninc.laborant.app.model.User;
@@ -21,6 +23,7 @@ import java.util.List;import java.util.Objects;
 public class UserService implements UserDetailsService {
 
     private UserRepository userRepository;
+    private LabRepository labRepository;
 
     public void addNewUser(User user) {
         if (!isUserExists(user.getUsername())) {
@@ -53,6 +56,20 @@ public class UserService implements UserDetailsService {
     public boolean deleteUserByUsername(String username) {
         User user = userRepository.findByUsername(username);
         if (user != null) {
+            if (!user.getLabs().isEmpty()) {
+                user.setLabs(null);
+                userRepository.save(user);
+            }
+            for (Lab lab: labRepository.findAll()) {
+                if (lab.getReserved() != null && lab.getReservedBy() != null) {
+                    if (lab.getReservedBy().equals(user)) {
+                        lab.setReservedBy(null);
+                        lab.setReserved(false);
+                        lab.setReservedUntil(null);
+                        labRepository.save(lab);
+                    }
+                }
+            }
             userRepository.delete(user);
             log.info("[deleteUserByUsername] User {} deleted", username);
             return true;

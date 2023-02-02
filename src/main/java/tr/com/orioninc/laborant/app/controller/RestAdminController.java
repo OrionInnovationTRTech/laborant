@@ -15,10 +15,9 @@ import tr.com.orioninc.laborant.app.service.AdminService;
 import tr.com.orioninc.laborant.exception.custom.NotAuthorizedException;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequestMapping("/v1")
@@ -89,111 +88,6 @@ public class RestAdminController {
         return ResponseEntity.ok(adminService.getAssignedUserLabs(username));
     }
 
-
-
-    @GetMapping("/labs")
-    @ApiOperation(value = "Getting all labs as a list of Lab objects")
-    public ResponseEntity<List<Lab>> getAllLabs(Authentication authentication) {
-        log.info("[getAllLabs] Getting all labs");
-        List<Lab> labs = adminService.getAllLabs();
-
-        String authenticatedUsername = authentication.getName();
-        boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"));
-
-        labs = labs.stream().map(lab -> {
-            boolean userAssignedToLab = lab.getUsers().stream().anyMatch(user -> user.getUsername().equals(authenticatedUsername));
-            if (!userAssignedToLab && !isAdmin) {
-                lab.setPassword("hidden");
-            }
-            return lab;
-        }).collect(Collectors.toList());
-        return ResponseEntity.ok(labs);
-    }
-
-
-    @GetMapping("/labs/{labName}")
-    @ApiOperation(value = "Getting a lab by giving 'labName' as a path variable")
-    public ResponseEntity<Lab> getLab(@PathVariable("labName") String labName, Authentication authentication) {
-        log.info("[getLab] Getting lab with name {}", labName);
-        Lab lab = adminService.getLab(labName);
-
-        String authenticatedUsername = authentication.getName();
-        boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"));
-
-        boolean userAssignedToLab = lab.getUsers().stream().anyMatch(user -> user.getUsername().equals(authenticatedUsername));
-        if (!userAssignedToLab && !isAdmin) {
-            lab.setPassword("hidden");
-        }
-
-        return ResponseEntity.ok(lab);
-    }
-
-    @PostMapping("/labs/add/")
-    @ApiOperation(value = "Adding a lab to database by giving Lab in body")
-    public ResponseEntity<Lab> addNewLab(@RequestBody Lab lab) {
-        log.info("[addNewLab] Called with lab: {}", lab.toString());
-        return ResponseEntity.ok(adminService.addNewLab(lab));
-    }
-
-    @PostMapping("/labs/bulk-add")
-    @ApiOperation(value = "Adding multiple labs to the database by giving list of Labs in body")
-    public ResponseEntity<String> addBulkLab (@RequestBody List<Lab> labs) {
-        log.info("[addBulkLab] Called with labs: {}", labs.toString());
-        int a = 0;
-        int b = 0;
-        for (Lab lab : labs) {
-           try {
-               adminService.addNewLab(lab);
-               a++;
-           } catch (Exception e) {
-               log.warn("[addBulkLab] Lab {} could not be added", lab.toString());
-               b++;
-           }
-        }
-        int c = a+b;
-        return ResponseEntity.ok("Requested to add with " + c + " labs. " + a + " of them were added successfully, " + b + " of them couldn't added due to duplicate lab credentials.");
-    }
-
-    @DeleteMapping("/labs/{labName}")
-    @ApiOperation(value = "Deleting a lab from database by giving 'labName' as a path variable")
-    public ResponseEntity<Lab> deleteLabByName(@PathVariable("labName") String labName,Authentication auth) {
-        if (auth.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
-            log.info("[deleteLabByName] Called with labName: {}", labName);
-            return ResponseEntity.ok(adminService.deleteLabByName(labName));
-        } else {
-            Lab lab = adminService.getLab(labName);
-            //if lab is not assigned to any user, then delete can be done by any user
-            if (lab.getUsers().isEmpty()) {
-                log.info("[deleteLabByName] Called with labName: {}", labName);
-                return ResponseEntity.ok(adminService.deleteLabByName(labName));
-            } else {
-                throw new NotAuthorizedException("User is not authorized to delete this lab");
-            }
-        }
-    }
-
-    @PutMapping("/labs/{labName}")
-    @ApiOperation(value = "Updating a lab in database by giving 'labName' as a path variable and Lab in body")
-    public ResponseEntity<Lab> updateLabByNameByName(@PathVariable("labName") String labName, @RequestBody Lab lab,Authentication authentication) {
-
-        String authenticatedUsername = authentication.getName();
-        boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"));
-
-        if (isAdmin) {
-            log.info("[updateLabByName] Called with labName: {}", labName);
-            return ResponseEntity.ok(adminService.updateLabByName(labName, lab));
-        } else {
-            Lab lab1 = adminService.getLab(labName);
-            boolean userAssignedToLab = lab1.getUsers().stream().anyMatch(user -> user.getUsername().equals(authenticatedUsername));
-            if (userAssignedToLab) {
-                log.info("[updateLabByName] Called with labName: {}", labName);
-                return ResponseEntity.ok(adminService.updateLabByName(labName, lab));
-            } else {
-                throw new NotAuthorizedException("User is not authorized to update this lab");
-            }
-        }
-    }
-
     @PutMapping("/assign-team")
     @ApiOperation(value = "Assigning a team to a user by giving 'username' and 'teamName' in parameters")
     public ResponseEntity<String> assignLabToTeam(@RequestParam("labName") String labName, @RequestParam("teamName") String teamName, Authentication authentication) {
@@ -217,49 +111,4 @@ public class RestAdminController {
             throw new NotAuthorizedException("User is not authorized to unassign a lab from a team");
         }
     }
-
-    @PutMapping("/reserve-lab")
-    @ApiOperation(value = "Reserving a lab by giving 'labName' in parameters")
-    public ResponseEntity<Lab> reserveLab(@RequestParam String labName, Authentication authentication) {
-        log.info("[reserveLab] Called with labName: {}", labName);
-        if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
-            return ResponseEntity.ok(adminService.reserveLab(labName));
-        } else  {
-            Lab lab = adminService.getLab(labName);
-            if (lab.getUsers().isEmpty()) {
-                return ResponseEntity.ok(adminService.reserveLab(labName));
-            } else {
-                boolean userAssignedToLab = lab.getUsers().stream().anyMatch(user -> user.getUsername().equals(authentication.getName()));
-                if (userAssignedToLab) {
-                    return ResponseEntity.ok(adminService.updateLabByName(labName, lab));
-                } else {
-                    throw new NotAuthorizedException("User is not authorized to reserve this lab");
-                }
-            }
-        }
-    }
-
-    @PutMapping("/unreserve-lab")
-    @ApiOperation(value = "Unreserving a lab by giving 'labName' in parameters")
-    public ResponseEntity<Lab> unreserveLab(@RequestParam String labName, Authentication authentication) {
-        log.info("[unreserveLab] Called with labName: {}", labName);
-        if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
-            return ResponseEntity.ok(adminService.unreserveLab(labName));
-        } else  {
-            Lab lab = adminService.getLab(labName);
-            if (lab.getUsers().isEmpty()) {
-                return ResponseEntity.ok(adminService.unreserveLab(labName));
-            } else {
-                boolean userAssignedToLab = lab.getUsers().stream().anyMatch(user -> user.getUsername().equals(authentication.getName()));
-                if (userAssignedToLab) {
-                    return ResponseEntity.ok(adminService.updateLabByName(labName, lab));
-                } else {
-                    throw new NotAuthorizedException("User is not authorized to unreserve this lab");
-                }
-            }
-        }
-    }
-
-
-
 }

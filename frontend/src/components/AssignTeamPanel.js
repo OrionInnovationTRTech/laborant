@@ -24,7 +24,7 @@ const AssignTeamPanel = () => {
 
     const getAllLabs = () => {
         axios
-            .get("http://localhost:8080/v1/labs/", getHeaders())
+            .get(`${process.env.REACT_APP_SPRING_HOST}/v1/labs/`, getHeaders())
             .then((response) => {
                 const updatedLabs = response.data.map((lab) => ({
                     ...lab,
@@ -47,7 +47,7 @@ const AssignTeamPanel = () => {
 
     const getTeams = () => {
         axios
-            .get("http://localhost:8080/teams/", getHeaders())
+            .get(`${process.env.REACT_APP_SPRING_HOST}/teams/`, getHeaders())
             .then((response) => {
                 const selectedLabObject = labs.find(lab => lab.labName === selectedLab);
                 const selectedLabId = selectedLabObject.id;
@@ -75,7 +75,7 @@ const AssignTeamPanel = () => {
             teamName: selectedTeam,
             labName: selectedLab
         };
-        axios.put(`http://localhost:8080/v1/assign-team`, {}, {
+        axios.put(`${process.env.REACT_APP_SPRING_HOST}/v1/assign-team`, {}, {
             headers: {
                 'Authorization': 'Basic ' + btoa(localStorage.getItem('username') + ':' + localStorage.getItem('password')),
             },
@@ -97,7 +97,7 @@ const AssignTeamPanel = () => {
             teamName: selectedTeam,
             labName: selectedLab
         };
-        axios.put(`http://localhost:8080/v1/unassign-team`, {}, {
+        axios.put(`${process.env.REACT_APP_SPRING_HOST}/v1/unassign-team`, {}, {
             headers: {
                 'Authorization': 'Basic ' + btoa(localStorage.getItem('username') + ':' + localStorage.getItem('password')),
             },

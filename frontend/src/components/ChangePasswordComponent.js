@@ -16,7 +16,7 @@ const ChangePassword = () => {
             newPassword,
         };
 
-        axios.put(`http://localhost:8080/users/change-password`, {}, {
+        axios.put(`${process.env.REACT_APP_SPRING_HOST}/users/change-password`, {}, {
             headers: {
                 'Authorization': 'Basic ' + btoa(localStorage.getItem('username') + ':' + localStorage.getItem('password')),
             },

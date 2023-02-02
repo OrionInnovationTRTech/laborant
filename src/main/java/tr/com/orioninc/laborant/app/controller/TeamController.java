@@ -36,10 +36,14 @@ public class TeamController {
 
     @DeleteMapping("/delete/{teamName}")
     @ApiOperation(value = "Deleting a team from database by giving 'teamName' as a path variable")
-    public ResponseEntity<Team> deleteTeamByName(@PathVariable("teamName") String teamName, Authentication auth) {
+    public ResponseEntity<String> deleteTeamByName(@PathVariable("teamName") String teamName, Authentication auth) {
         if (auth.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
             log.info("[deleteTeamByName] Called with teamName: {}", teamName);
-            return ResponseEntity.ok(teamService.deleteTeamByName(teamName));
+            if (teamService.deleteTeamByName(teamName)) {
+                return ResponseEntity.ok("Team deleted successfully");
+            } else {
+                return ResponseEntity.ok("Team not found");
+            }
         } else {
             throw new NotAuthorizedException("User is not authorized to delete a team");
         }

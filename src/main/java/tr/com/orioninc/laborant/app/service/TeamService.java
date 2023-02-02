@@ -28,12 +28,12 @@ public class TeamService {
         }
     }
 
-    public Team deleteTeamByName(String teamName) {
+    public boolean deleteTeamByName(String teamName) {
         Team team = teamRepo.findByName(teamName);
         if (team != null) {
             teamRepo.delete(team);
             log.info("[deleteTeamByName] Team {} deleted", teamName);
-            return team;
+            return true;
         } else {
             log.info("[deleteTeamByName] Team {} not found", teamName);
             throw new NotFoundException("Team " + teamName + " not found");

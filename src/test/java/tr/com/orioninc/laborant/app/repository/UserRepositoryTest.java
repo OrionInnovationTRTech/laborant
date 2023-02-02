@@ -1,9 +1,10 @@
-package tr.com.orioninc.laborant.security.authenticate.repository;
+package tr.com.orioninc.laborant.app.repository;
 
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import tr.com.orioninc.laborant.app.model.User;
 import tr.com.orioninc.laborant.app.repository.UserRepository;
 
@@ -21,7 +22,7 @@ public class UserRepositoryTest {
         // given
         String userName = "test";
         User user = new User(
-                "test", "testPassword", "testRole");
+                "test", "testPassword", "USER");
         underTest.save(user);
         // when
         User foundUser = underTest.findByUsername(userName);

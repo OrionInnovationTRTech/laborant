@@ -8,6 +8,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -40,7 +41,13 @@ public class Lab {
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id")
     private List<Team> teams;
 
+    @ManyToOne
+    @JoinColumn(name = "reserved_by")
+    private User reservedBy;
 
+    @Column(name = "reserved_until")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date reservedUntil;
 
 
     public Lab() {

@@ -5,6 +5,7 @@ import {checkAuthentication} from "../services/AuthHeader";
 const EditLabComponent = () => {
     checkAuthentication();
     const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
     const [labName] = useState(window.location.pathname.split('/')[2]);
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
@@ -18,17 +19,17 @@ const EditLabComponent = () => {
         LabService.updateLab(lab).then((response) => {
             console.log(response.status);
             if (response.status === 200) {
-               setMessage(<p style={{color: 'green'}}>Lab Updated Successfully. Redirecting...</p>)
+               setMessage('Lab Updated Successfully. Redirecting...');
                       setTimeout(() => {
                   window.location.replace('/labs');
                 }, 1500);
               } else if (response.status === 400) {
-                setMessage(`Failed to update lab. ${response.data.message}`);
+                setError(`Failed to update lab. ${response.data.message}`);
               } else {
-                setMessage(`Failed to update lab. HTTP status code: ${response.status}`);
+                setError(`Failed to update lab. HTTP status code: ${response.status}`);
               }
             }).catch((error) => {
-                setMessage(`Failed to update lab. Error: ${error.response.data.message}`);
+                setError(`Failed to update lab. Error: ${error.response.data.message}`);
             });
         console.log('lab => ' + JSON.stringify(lab));
     }
@@ -90,7 +91,8 @@ const EditLabComponent = () => {
                                 </input>
                                 </div>
                                 <div>
-                                 {message}
+                                    {error && <div style={{color: 'red'}}>{error}</div>}
+                                    {message && <div style={{color: 'green'}}>{message}</div>}
                                 </div>
                                 <button className = "btn btn-success" onClick={(e) => saveLab(e)}>Save</button>
                         </form>

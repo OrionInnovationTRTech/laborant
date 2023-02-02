@@ -1,10 +1,15 @@
-package tr.com.orioninc.laborant.security.authenticate.service;
+package tr.com.orioninc.laborant.app.service;
 
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import tr.com.orioninc.laborant.app.repository.LabRepository;
+import tr.com.orioninc.laborant.app.service.LabService;
 import tr.com.orioninc.laborant.security.config.PasswordConfig;
 import tr.com.orioninc.laborant.app.model.User;
 import tr.com.orioninc.laborant.app.repository.UserRepository;
@@ -19,12 +24,16 @@ class UserServiceTest {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private LabRepository labRepository;
+    @MockBean
     private UserService underTest;
 
     @BeforeEach
     void setUp() {
-        underTest = new UserService(userRepository);
+        underTest = new UserService(userRepository, labRepository);
     }
+
 
     @Test
     void addNewUser() {

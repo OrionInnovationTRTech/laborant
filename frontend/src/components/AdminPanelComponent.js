@@ -31,7 +31,7 @@ const AdminPanelComponent = () => {
     },[labs]);
 
      const getUsers = () => {
-        labs.forEach(lab => {axios.get(`http://localhost:8080/v1/lab-users/${lab.labName}`, getHeaders())
+        labs.forEach(lab => {axios.get(`${process.env.REACT_APP_SPRING_HOST}/v1/lab-users/${lab.labName}`, getHeaders())
         .then((response) => {
         setAssignedUsers((prevAssignedUsers) => ({...prevAssignedUsers, [lab.labName]: response.data.join('\n')}));
         }).catch((error) => {
@@ -40,7 +40,7 @@ const AdminPanelComponent = () => {
     })};
 
     const getTeams = () => {
-        labs.forEach(lab => {axios.get(`http://localhost:8080/v1/lab-teams/${lab.labName}`, getHeaders())
+        labs.forEach(lab => {axios.get(`${process.env.REACT_APP_SPRING_HOST}/v1/lab-teams/${lab.labName}`, getHeaders())
             .then((response) => {
                 setAssignedTeams((prevAssignedTeams) => ({...prevAssignedTeams, [lab.labName]: response.data.join('\n')}));
             }).catch((error) => {
@@ -49,7 +49,7 @@ const AdminPanelComponent = () => {
         })};
 
     const getAllLabs = () => {
-        axios.get('http://localhost:8080/v1/labs/', getHeaders())
+        axios.get(`${process.env.REACT_APP_SPRING_HOST}/v1/labs/`, getHeaders())
         .then((response) => {
             setLabs(response.data);
             console.log(response.data);
@@ -60,10 +60,10 @@ const AdminPanelComponent = () => {
 
     const deleteLab = (labName) => {
 if (window.confirm("Are you sure you want to delete this lab?")) {
-    axios.delete("http://localhost:8080/v1/labs/" + labName, getHeaders())
+    axios.delete(`${process.env.REACT_APP_SPRING_HOST}/v1/labs/` + labName, getHeaders())
         .then((response) => {
             console.log(response);
-            window.location.replace('/labs');
+            window.location.reload();
         }).catch((error) => {
             console.log(error);
         })
@@ -77,6 +77,7 @@ if (window.confirm("Are you sure you want to delete this lab?")) {
                 <Link to="/panel/assign-teams" className="btn btn-danger">Assign Teams</Link>
                 <Link to="/users" className="btn btn-info">Users Panel</Link>
                 <Link to="/teams" className="btn btn-warning">Teams Panel</Link>
+                <Link to="/add-lab" className="btn btn-primary">Add Lab</Link>
                 </h1>
             
 

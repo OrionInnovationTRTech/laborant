@@ -14,7 +14,7 @@ const BulkAddLabs = () => {
       header: true,
     }).data;
     console.log(labs);
-    axios.post('http://localhost:8080/v1/labs/bulk-add', labs,{
+    axios.post(`${process.env.REACT_APP_SPRING_HOST}/v1/labs/bulk-add`, labs,{
       headers: {
         'Authorization' : 'Basic ' + btoa(localStorage.getItem('username') + ':' + localStorage.getItem('password'))
       }
@@ -57,7 +57,7 @@ const BulkAddLabs = () => {
               ))}
             </ul>
           ) : (
-            <p>{response}</p>
+              <div style={{whiteSpace: "pre-wrap"}}>{response}</div>
           )}
         </div>
       )}

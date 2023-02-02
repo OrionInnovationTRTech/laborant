@@ -39,7 +39,7 @@ class LoginForm extends React.Component {
 
     const { username, password } = this.state;
 
-    axios.get(`http://localhost:8080/users/${username}`, {
+    axios.get(`${process.env.REACT_APP_SPRING_HOST}/users/${username}`, {
       headers: {
         'Authorization': 'Basic ' + btoa(username + ':' + password),
       },

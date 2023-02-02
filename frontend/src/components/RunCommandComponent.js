@@ -14,7 +14,7 @@ const RunCommandComponent = () => {
 
   const runCommand = () => {
     setResponse('Running on progress...');
-    axios.get(`http://localhost:8080/v1/labs/status/${labName}`,getHeaders())
+    axios.get(`${process.env.REACT_APP_SPRING_HOST}/v1/labs/status/${labName}`,getHeaders())
     .then((response) => {
          const data = response.data.split('\n').map(row => {
             const elements = row.split(' ').filter(element => element !== '');

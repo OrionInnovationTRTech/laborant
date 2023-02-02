@@ -15,13 +15,16 @@ const TeamListComponents = () => {
     const [assignedLabs, setAssignedLabs] = useState({});
 
     useEffect(() => {
-        getLabs();
         getAllTeams();
 
     }, []);
 
+    useEffect(() => {
+        getLabs();
+    }, [teams]);
+
     const getAllTeams = () => {
-        axios.get('http://localhost:8080/teams/', getHeaders())
+        axios.get(`${process.env.REACT_APP_SPRING_HOST}/teams/`, getHeaders())
             .then((response) => {
                 setTeams(response.data);
                 console.log(response.data);
@@ -32,10 +35,10 @@ const TeamListComponents = () => {
 
     const deleteTeam = (name) => {
         if (window.confirm("Are you sure you want to delete this user?")) {
-            axios.delete("http://localhost:8080/teams/delete/" + name, getHeaders())
+            axios.delete(`${process.env.REACT_APP_SPRING_HOST}/teams/delete/` + name, getHeaders())
                 .then((response) => {
                     console.log(response);
-                    window.location.replace('/teams');
+                    window.location.reload();
                 }).catch((error) => {
                 console.log(error);
             })
@@ -43,7 +46,7 @@ const TeamListComponents = () => {
     }
 
     const getLabs = () => {
-        teams.forEach(team => {axios.get(`http://localhost:8080/v1/team-labs/${team.name}`, getHeaders())
+        teams.forEach(team => {axios.get(`${process.env.REACT_APP_SPRING_HOST}/v1/team-labs/${team.name}`, getHeaders())
             .then((response) => {
                 setAssignedLabs((prevAssignedLabs) => ({...prevAssignedLabs, [team.name]: response.data.join('\n')}));
             }).catch((error) => {
@@ -68,9 +71,9 @@ const TeamListComponents = () => {
                 <Table hover>
                     <thead>
                     <tr>
-                        <td>Team Name</td>
-                        <td>Assigned Labs</td>
-                        <td>Actions</td>
+                        <td style={{fontSize: '20px'}}><b>Teams</b></td>
+                        <td style={{fontSize: '20px'}}><b>Assigned Labs</b></td>
+                        <td style={{fontSize: '20px'}}><b>Actions</b></td>
                     </tr>
                     </thead>
                     <tbody>

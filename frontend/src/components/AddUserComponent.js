@@ -6,6 +6,7 @@ import axios from "axios";
 const AddUserComponent = () => {
     checkAuthentication();
     const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
@@ -13,21 +14,21 @@ const AddUserComponent = () => {
         e.preventDefault();
         let user = {username: username,password:password,user_role:'USER'};
         
-        axios.post('http://localhost:8080/users/add',user,getHeaders())
+        axios.post(`${process.env.REACT_APP_SPRING_HOST}/users/add`,user,getHeaders())
         .then((response) => {
             console.log(response.status);
             if (response.status === 200) {
-                setMessage(<p style={{color: 'green'}}>User Added Successfully. Redirecting...</p>);
+                setMessage('User Added Successfully. Redirecting...');
                 setTimeout(() => {
                     window.location.replace('/users');
                   }, 1500);
               } else if (response.status === 400) {
-                setMessage(`Failed to add user. ${response.data.message}`);
+                setError(`Failed to add user. ${response.data.message}`);
               } else {
-                setMessage(`Failed to add user. HTTP status code: ${response.status}`);
+                setError(`Failed to add user. HTTP status code: ${response.status}`);
               }
             }).catch((error) => {
-                setMessage(`Failed to add user. Error: ${error.response.data.message}`);
+                setError(`Failed to add user. Error: ${error.response.data.message}`);
             });
           
         console.log('user => ' + JSON.stringify(user));
@@ -66,7 +67,8 @@ const AddUserComponent = () => {
                                 </input>
                                 </div>
                                 <div>
-                                 {message}
+                                    {error && <div style={{color: 'red'}}>{error}</div>}
+                                    {message && <div style={{color: 'green'}}>{message}</div>}
                                 </div>
                                 <button className = "btn btn-success" onClick={(e) => saveUser(e)}>Save</button>
                         </form>
