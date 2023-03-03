@@ -32,7 +32,7 @@ import java.util.Properties;
 @AllArgsConstructor
 @Log4j2
 @EnableWebSecurity(debug = false)
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin
 public class SecurityConfig {
 
     private UserDetailsService userDetailsService;

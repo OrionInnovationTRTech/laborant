@@ -2,12 +2,13 @@ package tr.com.orioninc.laborant.app.service;
 
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mail.javamail.JavaMailSender;
 import tr.com.orioninc.laborant.app.model.Lab;
-import tr.com.orioninc.laborant.app.model.Team;
 import tr.com.orioninc.laborant.app.model.User;
 import tr.com.orioninc.laborant.app.repository.LabRepository;
 import tr.com.orioninc.laborant.app.repository.TeamRepository;
@@ -15,15 +16,15 @@ import tr.com.orioninc.laborant.app.repository.UserRepository;
 import tr.com.orioninc.laborant.exception.custom.AlreadyExistsException;
 import tr.com.orioninc.laborant.exception.custom.NotFoundException;
 
+import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.fail;
 
 @Log4j2
 @DataJpaTest
- class LabServiceTest {
+class LabServiceTest {
     @Autowired
     private LabRepository labRepository;
     @Autowired
@@ -35,7 +36,89 @@ import static org.junit.jupiter.api.Assertions.fail;
 
     @BeforeEach
     void setUp() {
-        underTest = new LabService(labRepository, teamRepository, userRepository);
+        underTest = new LabService(labRepository, teamRepository, userRepository, null);
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when the lab name is empty")
+    void reserveLabWhenLabNameIsEmptyThenThrowException() {
+        assertThrows(
+                IllegalArgumentException.class, () -> underTest.reserveLab("", "", new Date()));
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when the lab name is null")
+    void reserveLabWhenLabNameIsNullThenThrowException() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> underTest.reserveLab(null, "username", new Date()));
+    }
+
+    @Test
+    @DisplayName(
+            "Should throw an exception when there isn't a lab named labname found in the database to be reserved")
+    void reserveLabWhenThereIsntALabNamedlabNameFoundInTheDatabaseToBeReservedThenThrowException() {
+        String labName = "labname";
+        String username = "username";
+        Date date = new Date();
+        assertThrows(NotFoundException.class, () -> underTest.reserveLab(labName, username, date));
+    }
+
+    @Test
+    @DisplayName(
+            "Should throw an exception when there isn't a user named username found in the database to reserve the lab")
+    void
+    reserveLabWhenThereIsntAUserNamedusernameFoundInTheDatabaseToReserveTheLabThenThrowException() {
+        String labName = "labName";
+        String username = "username";
+        Date date = new Date();
+        assertThrows(NotFoundException.class, () -> underTest.reserveLab(labName, username, date));
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when the lab name is empty")
+    void unreserveLabWhenLabNameIsEmptyThenThrowException() {
+        assertThrows(IllegalArgumentException.class, () -> underTest.unreserveLab(""));
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when the lab name is null")
+    void unreserveLabWhenLabNameIsNullThenThrowException() {
+        assertThrows(IllegalArgumentException.class, () -> underTest.unreserveLab(null));
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when the lab name is not found in the database")
+    void unreserveLabWhenLabNameIsNotFoundInTheDatabaseThenThrowException() {
+        String labName = "lab1";
+        assertThrows(NotFoundException.class, () -> underTest.unreserveLab(labName));
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when the lab is already unreserved")
+    void unreserveLabWhenTheLabIsAlreadyUnreservedThenThrowException() {
+        Lab lab = new Lab("lab1", "user1", "pass1", "host1", 22);
+        lab.setReserved(false);
+        labRepository.save(lab);
+        assertThrows(AlreadyExistsException.class, () -> underTest.unreserveLab("lab1"));
+    }
+
+    @Test
+    @DisplayName(
+            "Should return a lab object when the lab is reserved and it's successfully unreserved")
+    void unreserveLabWhenTheReservedAndSuccessfullyUnreservedThenReturnALabObject() {
+        Lab lab = new Lab("lab1", "user1", "pass1", "host1", 22);
+        User user = new User("user1", "pass1", "role1");
+        userRepository.save(user);
+        lab.setReserved(true);
+        lab.setReservedBy(user);
+        lab.setReservedUntil(new Date());
+        labRepository.save(lab);
+        Lab result = underTest.unreserveLab("lab1");
+        assertThat(result).isNotNull();
+        assertThat(result.getReserved()).isFalse();
+        assertThat(result.getReservedBy()).isNull();
+        assertThat(result.getReservedUntil()).isNull();
     }
 
     @Test
@@ -83,6 +166,7 @@ import static org.junit.jupiter.api.Assertions.fail;
                 .returns("update", Lab::getHost)
                 .returns(222, Lab::getPort);
     }
+
     @Test
     void willGiveErrorWhenUpdateLabByName() {
         // given
@@ -104,7 +188,6 @@ import static org.junit.jupiter.api.Assertions.fail;
         // the test will pass if the NotFound exception is thrown
     }
 
-
     @Test
     void canAddNewLab() {
         // given
@@ -125,10 +208,10 @@ import static org.junit.jupiter.api.Assertions.fail;
     @Test
     void willGiveErrorWhenAddingLabNameExists() {
         //given
-        Lab lab = new Lab( "test",
+        Lab lab = new Lab("test",
                 "userName", "password", "host", 22);
         labRepository.save(lab);
-        Lab actuallySame = new Lab( "test",
+        Lab actuallySame = new Lab("test",
                 "userName", "password", "host", 22);
         //when
         try {
@@ -138,13 +221,14 @@ import static org.junit.jupiter.api.Assertions.fail;
             // expected
         }
     }
+
     @Test
     void willGiveErrorWhenPairOfLabNameAndHostExists() {
         //given
-        Lab lab = new Lab( "test",
+        Lab lab = new Lab("test",
                 "userName", "password", "host", 22);
         labRepository.save(lab);
-        Lab actuallySamePair = new Lab( "test2",
+        Lab actuallySamePair = new Lab("test2",
                 "userName", "password2", "host", 222);
         //when
         try {
@@ -158,7 +242,7 @@ import static org.junit.jupiter.api.Assertions.fail;
     @Test
     void canGetLab() {
         //given
-        Lab lab = new Lab( "canGetLab test lab",
+        Lab lab = new Lab("canGetLab test lab",
                 "userName", "password", "host", 22);
         labRepository.save(lab);
         //when
@@ -166,10 +250,11 @@ import static org.junit.jupiter.api.Assertions.fail;
         //then
         assertEquals(obtLab, lab);
     }
+
     @Test
     void willGiveErrorWhenCantGetLab() {
         //given
-        Lab lab = new Lab( "canGetLab test lab",
+        Lab lab = new Lab("canGetLab test lab",
                 "userName", "password", "host", 22);
         labRepository.save(lab);
         //when
@@ -184,7 +269,7 @@ import static org.junit.jupiter.api.Assertions.fail;
     @Test
     void canDeleteLabByName() {
         //given
-        Lab lab = new Lab( "canDeleteLabByName test lab",
+        Lab lab = new Lab("canDeleteLabByName test lab",
                 "userName", "password", "host", 22);
         labRepository.save(lab);
         //when
@@ -196,7 +281,7 @@ import static org.junit.jupiter.api.Assertions.fail;
     @Test
     void willGiveErrorWhenCantDeleteLabByName() {
         //given
-        Lab lab = new Lab( "canDeleteLabByName test lab",
+        Lab lab = new Lab("canDeleteLabByName test lab",
                 "userName", "password", "host", 22);
         labRepository.save(lab);
         //when
@@ -207,5 +292,4 @@ import static org.junit.jupiter.api.Assertions.fail;
             // expected
         }
     }
-
 }

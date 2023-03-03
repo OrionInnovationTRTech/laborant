@@ -3,7 +3,6 @@ import Table from 'react-bootstrap/Table';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
-import {Link} from "react-router-dom";
 import { checkAuthentication, getHeaders } from "../services/AuthHeader";
 import axios from "axios";
 

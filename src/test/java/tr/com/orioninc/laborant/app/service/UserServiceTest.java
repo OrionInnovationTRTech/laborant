@@ -2,21 +2,17 @@ package tr.com.orioninc.laborant.app.service;
 
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import tr.com.orioninc.laborant.app.repository.LabRepository;
-import tr.com.orioninc.laborant.app.service.LabService;
-import tr.com.orioninc.laborant.security.config.PasswordConfig;
 import tr.com.orioninc.laborant.app.model.User;
+import tr.com.orioninc.laborant.app.repository.LabRepository;
 import tr.com.orioninc.laborant.app.repository.UserRepository;
-import tr.com.orioninc.laborant.app.service.UserService;
+import tr.com.orioninc.laborant.security.config.PasswordConfig;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @Log4j2
@@ -34,6 +30,22 @@ class UserServiceTest {
         underTest = new UserService(userRepository, labRepository);
     }
 
+    @Test
+    @DisplayName("Should return false when the user does not exist")
+    void deleteUserByUsernameWhenUserDoesNotExistThenReturnFalse() {
+        String username = "test";
+        boolean result = underTest.deleteUserByUsername(username);
+        assertFalse(result);
+    }
+
+    @Test
+    @DisplayName("Should delete the user when the user exists")
+    void deleteUserByUsernameWhenUserExists() {
+        User user = new User("test", "test", "test");
+        userRepository.save(user);
+        boolean result = underTest.deleteUserByUsername("test");
+        assertTrue(result);
+    }
 
     @Test
     void addNewUser() {

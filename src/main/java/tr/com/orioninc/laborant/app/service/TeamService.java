@@ -18,7 +18,10 @@ public class TeamService {
     private TeamRepository teamRepo;
 
     public Team addNewTeam(Team team) {
-        if (teamRepo.findByName(team.getName())==null) {
+        if (team.getName() == null || team.getName().isEmpty()) {
+            throw new IllegalArgumentException("Team name cannot be null or empty");
+        }
+        if (teamRepo.findByName(team.getName()) == null) {
             teamRepo.save(team);
             log.info("[addNewTeam] Team added: {}", team.toString());
             return team;

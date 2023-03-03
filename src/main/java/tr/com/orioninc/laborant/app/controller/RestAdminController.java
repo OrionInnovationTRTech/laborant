@@ -36,7 +36,7 @@ public class RestAdminController {
         if (authentication != null && authentication.isAuthenticated()) {
             String sessionId = request.getSession().getId();
             Map<String, String> response = new HashMap<>();
-            response.put("sessionId", sessionId);
+            response.put("username", authentication.getName());
             log.info("[getSession] Session ID: {}", response);
             return ResponseEntity.ok(response);
         } else {
@@ -45,7 +45,7 @@ public class RestAdminController {
     }
 
     @PutMapping("/assign-user")
-    public ResponseEntity<String> assignUserToLab(@RequestParam String username, @RequestParam String labName,Authentication auth) {
+    public ResponseEntity<String> assignUserToLab(@RequestParam String username, @RequestParam String labName, Authentication auth) {
         if (auth.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
             log.info("[assignUserToLab] Assigning user {} to lab {}", username, labName);
             adminService.assignLabToUser(username, labName);

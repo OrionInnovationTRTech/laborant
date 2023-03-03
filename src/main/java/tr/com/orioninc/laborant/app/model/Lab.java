@@ -8,6 +8,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -48,6 +49,15 @@ public class Lab {
     @Column(name = "reserved_until")
     @Temporal(TemporalType.TIMESTAMP)
     private Date reservedUntil;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "mail_awaiting_users_table",
+            joinColumns = @JoinColumn(name = "lab_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id")
+    private List<User> mailAwaitingUsers = new ArrayList<>();
 
 
     public Lab() {

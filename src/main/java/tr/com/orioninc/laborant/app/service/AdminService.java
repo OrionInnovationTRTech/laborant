@@ -96,7 +96,7 @@ public class AdminService {
     }
 
     public String assignLabToUser(String userName, String labName) {
-        log.debug("[assignUserToLab] called");
+        log.debug("[assignLabToUser] called");
         User user = userRepo.findByUsername(userName);
         Lab lab = labRepo.findByLabName(labName);
         if (Objects.equals(userName, "") || userName == null) {
@@ -106,32 +106,32 @@ public class AdminService {
             throw new IllegalArgumentException("Lab name cannot be empty");
         }
         if (Objects.isNull(user)) {
-            log.warn("[assignUserToLab] User with username {} not found in database", userName);
+            log.warn("[assignLabToUser] User with username {} not found in database", userName);
             throw new NotFoundException("User with username " + userName + " not found in database");
         } else if (Objects.isNull(lab)) {
-            log.warn("[assignUserToLab] Lab with name {} not found in database", labName);
+            log.warn("[assignLabToUser] Lab with name {} not found in database", labName);
             throw new NotFoundException("Lab with name " + labName + " not found in database");
         } else {
             if (user.getLabs().contains(lab)) {
-                log.warn("[assignUserToLab] User with username {} already assigned to lab with name {}", userName, labName);
+                log.warn("[assignLabToUser] User with username {} already assigned to lab with name {}", userName, labName);
                 throw new AlreadyExistsException(userName + " already assigned to lab " + labName);
             } else {
                 for (User u : userRepo.findAll()) {
                     if (u.getLabs().contains(lab)) {
-                        log.warn("[assignUserToLab] Lab with name {} already assigned to user with username {}", labName, u.getUsername());
+                        log.warn("[assignLabToUser] Lab with name {} already assigned to user with username {}", labName, u.getUsername());
                         throw new AlreadyExistsException("Lab with name " + labName + " already assigned to user with username " + u.getUsername());
                     }
                 }
                 user.getLabs().add(lab);
                 userRepo.save(user);
-                log.info("[assignUserToLab] User with username {} assigned to lab with name {}", userName, labName);
+                log.info("[assignLabToUser] User with username {} assigned to lab with name {}", userName, labName);
                 return "User with username " + userName + " assigned to " + labName;
             }
         }
     }
 
     public String unassignLabFromUser(String userName, String labName) {
-        log.debug("[unassignUserFromLab] called");
+        log.debug("[unassignLabFromUser] called");
         User user = userRepo.findByUsername(userName);
         Lab lab = labRepo.findByLabName(labName);
         if (Objects.equals(userName, "") || userName == null) {
@@ -141,19 +141,19 @@ public class AdminService {
             throw new IllegalArgumentException("Lab name cannot be empty");
         }
         if (Objects.isNull(user)) {
-            log.warn("[unassignUserFromLab] User with username {} not found in database", userName);
+            log.warn("[unassignLabFromUser] User with username {} not found in database", userName);
             throw new NotFoundException("User with username " + userName + " not found in database");
         } else if (Objects.isNull(lab)) {
-            log.warn("[unassignUserFromLab] Lab with name {} not found in database", labName);
+            log.warn("[unassignLabFromUser] Lab with name {} not found in database", labName);
             throw new NotFoundException("Lab with name " + labName + " not found in database");
         } else {
             if (user.getLabs().contains(lab)) {
                 user.getLabs().remove(lab);
                 userRepo.save(user);
-                log.info("[unassignUserFromLab] User with username {} unassigned from lab with name {}", userName, labName);
+                log.info("[unassignLabFromUser] User with username {} unassigned from lab with name {}", userName, labName);
                 return "User with username " + userName + " unassigned from lab with name " + labName;
             } else {
-                log.warn("[unassignUserFromLab] User with username {} not assigned to lab with name {}", userName, labName);
+                log.warn("[unassignLabFromUser] User with username {} not assigned to lab with name {}", userName, labName);
                 throw new NotFoundException("User with username " + userName + " not assigned to lab with name " + labName);
             }
         }
@@ -175,7 +175,7 @@ public class AdminService {
                     assignedTeams.add(team.getName());
                 }
             }
-            log.info("[getAssignedLabTeams] returning assigned teams");
+            log.info("[getAssignedLabTeams] returning assigned teams for lab: {}", labName);
             return assignedTeams;
         }
     }

@@ -29,6 +29,8 @@ public class User {
     private String password;
     @Column(name = "user_role")
     private String user_role;
+    @Column(name = "email")
+    private String email;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @Fetch(FetchMode.SELECT)
@@ -49,6 +51,10 @@ public class User {
     )
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id")
     private List<Team> teams = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "users")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id")
+    private List<Lab> emailLabs = new ArrayList<>();
 
 
 

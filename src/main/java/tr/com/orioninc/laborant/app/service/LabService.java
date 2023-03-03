@@ -1,15 +1,17 @@
 package tr.com.orioninc.laborant.app.service;
 
-import lombok.AllArgsConstructor;
-import tr.com.orioninc.laborant.app.model.Lab;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import tr.com.orioninc.laborant.app.model.Lab;
 import tr.com.orioninc.laborant.app.model.Team;
 import tr.com.orioninc.laborant.app.model.User;
 import tr.com.orioninc.laborant.app.repository.LabRepository;
@@ -22,7 +24,6 @@ import tr.com.orioninc.laborant.exception.custom.NotFoundException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -30,15 +31,26 @@ import java.util.Objects;
 @Service
 @AllArgsConstructor
 @Log4j2
+@EnableScheduling
 public class LabService {
 
     LabRepository labRepo;
     TeamRepository teamRepo;
     UserRepository userRepo;
+    JavaMailSender javaMailSender;
 
-    public Lab unreserveLab (String labName){
+    public void sendEmail(String to, String subject, String body) {
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setTo(to);
+        msg.setSubject(subject);
+        msg.setText(body);
+        javaMailSender.send(msg);
+    }
+
+
+    public Lab unreserveLab(String labName) {
         log.debug("[unreserveLab] called");
-        if (Objects.equals(labName, "") || labName == null){
+        if (Objects.equals(labName, "") || labName == null) {
             throw new IllegalArgumentException("Lab name cannot be empty");
         }
         Lab labToBeUnreserved = labRepo.findByLabName(labName);
@@ -46,18 +58,31 @@ public class LabService {
             log.warn("[unreserveLab] no lab in the database named: {}", labName);
             throw new NotFoundException("There isn't a lab named " + labName + " found in the database to be unreserved");
         } else {
-            if (labToBeUnreserved.getReserved() == null){
+            if (labToBeUnreserved.getReserved() == null) {
                 labToBeUnreserved.setReserved(false);
                 labToBeUnreserved.setReservedBy(null);
                 labToBeUnreserved.setReservedUntil(null);
                 labRepo.save(labToBeUnreserved);
-                throw new AlreadyExistsException("Lab with name " + labName + " is not reserved already");
-            }
-            else {
+                throw new AlreadyExistsException("Lab with name " + labName + " already not reserved");
+            } else {
                 if (labToBeUnreserved.getReserved()) {
                     labToBeUnreserved.setReservedBy(null);
                     labToBeUnreserved.setReservedUntil(null);
                     labToBeUnreserved.setReserved(false);
+                    labRepo.save(labToBeUnreserved);
+                    if (labToBeUnreserved.getMailAwaitingUsers() != null) {
+                        List<User> awaitingUsers = labToBeUnreserved.getMailAwaitingUsers();
+                        log.info("[emaillabs awaiting user for lab {} is {}", labToBeUnreserved.getLabName(), awaitingUsers);
+                        if (!awaitingUsers.isEmpty()) {
+                            for (User user : awaitingUsers) {
+                                sendEmail(user.getEmail(), labToBeUnreserved.getHost() + " lab is now free",
+                                        "Hi " + user.getUsername() + ",\n" + "\nThe lab " + labToBeUnreserved.getHost() + " is now free. \n" +
+                                                "You can reserve it from the laborant web application. \n\n" +
+                                                "Thank you for using laborant.");
+                            }
+                        }
+                    }
+                    labToBeUnreserved.setMailAwaitingUsers(null);
                     labRepo.save(labToBeUnreserved);
                     log.info("[unreserveLab] lab with name {} is unreserved", labName);
                     return labToBeUnreserved;
@@ -70,7 +95,7 @@ public class LabService {
     }
 
     public Lab findLabByName(String labName) {
-        if (Objects.equals(labName, "") || labName == null){
+        if (Objects.equals(labName, "") || labName == null) {
             throw new IllegalArgumentException("Lab name cannot be empty");
         }
         log.info("[findLabByName] called");
@@ -123,7 +148,7 @@ public class LabService {
     }
 
     public Lab getLab(String labName) {
-        if (Objects.equals(labName, "") || labName == null){
+        if (Objects.equals(labName, "") || labName == null) {
             throw new IllegalArgumentException("Lab name cannot be empty");
         }
         if (findLabByName(labName) == null) {
@@ -137,7 +162,7 @@ public class LabService {
 
     public Lab deleteLabByName(String labName) {
         log.debug("[deleteLabByName] called");
-        if (Objects.equals(labName, "") || labName == null){
+        if (Objects.equals(labName, "") || labName == null) {
             throw new IllegalArgumentException("Lab name cannot be empty");
         }
         Lab labToBeDeleted = labRepo.findByLabName(labName);
@@ -169,14 +194,14 @@ public class LabService {
         return labToBeDeleted;
 
     }
-    public boolean isLabReachable (String host,int timeout) {
+
+    public boolean isLabReachable(String host, int timeout) {
         log.info("[isLabReachable] checking if lab with host {} is reachable", host);
         try {
             if (InetAddress.getByName(host).isReachable(timeout)) {
                 log.info("[isLabReachable] lab is reachable");
                 return true;
-            }
-            else {
+            } else {
                 log.info("[isLabReachable] lab is not reachable");
                 return false;
             }
@@ -189,7 +214,7 @@ public class LabService {
 
     public Lab reserveLab(String labName, String username, Date date) {
         log.debug("[reserveLab] called");
-        if (Objects.equals(labName, "") || labName == null){
+        if (Objects.equals(labName, "") || labName == null) {
             throw new IllegalArgumentException("Lab name cannot be empty");
         }
         User reservedToUser = userRepo.findByUsername(username);
@@ -198,20 +223,18 @@ public class LabService {
             log.warn("[reserveLab] no lab in the database named: {}", labName);
             throw new NotFoundException("There isn't a lab named " + labName + " found in the database to be reserved");
         } else {
-            if (Objects.isNull(reservedToUser)){
+            if (Objects.isNull(reservedToUser)) {
                 log.warn("[reserveLab] no user in the database named: {}", username);
                 throw new NotFoundException("There isn't a user named " + username + " found in the database to reserve the lab");
-            }
-            else {
-                if (labToBeReserved.getReserved() == null){
+            } else {
+                if (labToBeReserved.getReserved() == null) {
                     labToBeReserved.setReserved(true);
                     labToBeReserved.setReservedBy(reservedToUser);
                     labToBeReserved.setReservedUntil(date);
                     labRepo.save(labToBeReserved);
                     log.info("[reserveLab] lab with name {} is reserved", labName);
                     return labToBeReserved;
-                }
-                else {
+                } else {
                     if (labToBeReserved.getReserved()) {
                         log.warn("[reserveLab] lab with name {} is already reserved", labName);
                         throw new AlreadyExistsException("Lab with name " + labName + " is already reserved");
@@ -227,6 +250,7 @@ public class LabService {
             }
         }
     }
+
     public List<Lab> getAllLabs() {
         if (labRepo.findAll().isEmpty()) {
             log.warn("[getAllLabs] No lab found in database");
@@ -246,7 +270,7 @@ public class LabService {
         Session session = null;
         ChannelExec channel = null;
         String responseString = null;
-        if(isLabReachable(host,400)){
+        if (isLabReachable(host, 400)) {
             try {
                 session = new JSch().getSession(username, host, port);
                 session.setPassword(password);
@@ -257,8 +281,7 @@ public class LabService {
                 if (session.isConnected()) {
                     log.info("[connectAndExecuteCommand] session connected for lab {}", host);
 
-                }
-                else {
+                } else {
                     log.info("[connectAndExecuteCommand] session not connected for lab {}", host);
                 }
                 channel = (ChannelExec) session.openChannel("exec");
@@ -283,10 +306,9 @@ public class LabService {
                     channel.disconnect();
                 }
             }
-        }
-        else {
+        } else {
             log.error("[connectAndExecuteCommand] Lab is not reachable");
-            responseString = "Error, lab is not reachable";
+            throw new NotConnectedException("Lab is not reachable");
         }
         log.info("For lab {} response is: {}", host, responseString);
         return responseString;
@@ -303,11 +325,69 @@ public class LabService {
         try {
             outputString = connectAndExecuteCommand(labToExecute.getUserName(), labToExecute.getPassword(),
                     labToExecute.getHost(), labToExecute.getPort(), command);
-            log.debug("[runStatusOnSelectedLab] out string: {}", outputString);
+            log.info("[runStatusOnSelectedLab] out string: {}", outputString);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new NotConnectedException("Couldn't connect to the lab");
         }
         return outputString;
     }
+
+    public String registerUserToWaitingList(String labName, String username) {
+        log.debug("[registerUserToWaitingList] called");
+        Lab labToRegister = findLabByName(labName);
+        if (Objects.isNull(labToRegister)) {
+            log.info("[registerUserToWaitingList] lab couldn't found in database");
+            throw new NotFoundException("Lab couldn't found in database");
+        }
+        User userToRegister = userRepo.findByUsername(username);
+        if (Objects.isNull(userToRegister)) {
+            log.info("[registerUserToWaitingList] user couldn't found in database");
+            throw new NotFoundException("User couldn't found in database");
+        }
+        List<User> awaitingUsers = labToRegister.getMailAwaitingUsers();
+        if (awaitingUsers.contains(userToRegister)) {
+            log.info("[registerUserToWaitingList] user is already in the waiting list");
+            throw new AlreadyExistsException("User is already in the waiting list");
+        } else {
+            awaitingUsers.add(userToRegister);
+            labToRegister.setMailAwaitingUsers(awaitingUsers);
+            labRepo.save(labToRegister);
+            log.info("[registerUserToWaitingList] user is added to the waiting list");
+            return "User is added to the waiting list";
+        }
+    }
+
+    @Scheduled(fixedRate = 60000) // 1 minute
+    public void checkLabs() {
+        log.info("[checkLabs] called");
+        List<Lab> labs = labRepo.findAll();
+        Date now = new Date();
+
+        for (Lab lab : labs) {
+            if (lab.getReserved()) {
+                if (lab.getReservedUntil().before(now)) {
+                    lab.setReserved(false);
+                    lab.setReservedUntil(null);
+                    lab.setReservedBy(null);
+                    labRepo.save(lab);
+                    if (lab.getMailAwaitingUsers() != null) {
+                        List<User> awaitingUsers = lab.getMailAwaitingUsers();
+                        if (!awaitingUsers.isEmpty()) {
+                            for (User user : awaitingUsers) {
+
+                                sendEmail(user.getEmail(), lab.getHost() + " lab is now free",
+                                        "Hi " + user.getUsername() + ",\n" + "\nThe lab " + lab.getHost() + " is now free. \n" +
+                                                "You can reserve it from the laborant web application. \n\n" +
+                                                "Thank you for using laborant.");
+                            }
+                        }
+                        lab.setMailAwaitingUsers(null);
+                        labRepo.save(lab);
+                    }
+                }
+            }
+        }
+    }
 }
+

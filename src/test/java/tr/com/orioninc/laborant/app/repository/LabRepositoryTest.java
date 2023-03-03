@@ -44,6 +44,7 @@ public class LabRepositoryTest {
         assertThat(foundLab).isNull();
         log.info("Lab not found");
     }
+
     @Test
     void itShouldCheckIfHostAndUserNameExists() {
         // given
@@ -58,6 +59,7 @@ public class LabRepositoryTest {
         assertThat(foundLab).isNotNull().returns("testLab", Lab::getLabName);
         log.info("Lab found: {}", foundLab);
     }
+
     @Test
     void itShouldCheckIfHostAndUserNameNotExists() {
         // given
@@ -74,7 +76,7 @@ public class LabRepositoryTest {
     }
 
     @Test
-    void canReserveLab(){
+    void canReserveLab() {
         // given
         String labName = "testLab";
         Lab lab = new Lab(

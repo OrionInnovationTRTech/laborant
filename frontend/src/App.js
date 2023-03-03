@@ -1,13 +1,13 @@
 import './App.css';
 import ReservationListComponent from './components/ReservationListComponent';
 import Header from './components/Header';
-import Footer from './components/Footer';
+import Footer from './services/Footer';
 import {BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AddLabComponent from './components/AddLabComponent';
 import LoginForm from './components/Login';
 import {checkAuthentication} from './services/AuthHeader'
 import EditLabComponent from './components/EditLabComponent';
-import RunCommandComponent from './components/RunCommandComponent';
+import RunStatusComponent from './helpers/RunStatusModal';
 import BulkAddLabComponent from './components/BulkAddLabComponent';
 import UserListComponents from './components/UserListComponents';
 import AddUserComponent from './components/AddUserComponent';
@@ -19,7 +19,7 @@ import AssignTeamPanel from "./components/AssignTeamPanel";
 import AddTeamComponent from "./components/AddTeamComponent";
 import TeamListComponents from "./components/TeamListComponents";
 import ChangePasswordComponent from "./components/ChangePasswordComponent";
-import LabReservationForm from "./components/LabReservationComponent";
+import LabReservationForm from "./helpers/LabReservationComponent";
 import LabListComponent from "./components/LabListComponent";
 function App() {
   checkAuthentication();
@@ -41,7 +41,7 @@ function App() {
           <Route path = "/add-lab" element = { isAdmin() ? <AddLabComponent/> : <NotAuthorized/>}></Route>
           <Route path="/login" element={<LoginForm/>}></Route>
           <Route path="/edit-lab/:labName" element={<EditLabComponent/>}></Route> 
-          <Route path="/run-command/:labName" element={<RunCommandComponent/>}></Route>
+          <Route path="/run-command/:labName" element={<RunStatusComponent/>}></Route>
           <Route path="/reserve-lab/:labName" element={<LabReservationForm/>}></Route>
           <Route path="/bulk-add" element={
               isAdmin() ? <BulkAddLabComponent/> : <NotAuthorized/>
