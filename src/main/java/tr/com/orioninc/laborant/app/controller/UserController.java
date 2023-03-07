@@ -1,12 +1,13 @@
 package tr.com.orioninc.laborant.app.controller;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import net.bytebuddy.asm.Advice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import tr.com.orioninc.laborant.exception.custom.NotAuthorizedException;
 import tr.com.orioninc.laborant.exception.custom.NotFoundException;
@@ -73,16 +74,28 @@ public class UserController {
 
     @GetMapping("/{username}")
     @ApiOperation(value = "Getting user by giving username as a path variable")
-    public ResponseEntity<UserDetails> getUser(@PathVariable("username") String username, Authentication auth) {
+    public ResponseEntity<User> getUser(@PathVariable("username") String username, Authentication auth) {
         if (auth.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN")) || auth.getName().equals(username)) {
-            if (userService.isUserExists(username)) {
+            if (userService.isUserExistsByUsername(username)) {
                 log.info("[getUser] User {} found", username);
-                return ResponseEntity.ok(userService.loadUserByUsername(username));
+                return ResponseEntity.ok(userService.getUserByUsername(username));
             } else {
                 log.info("[getUser] User {} not found", username);
                 throw new NotFoundException("User named " + username + " not found");
             }
         } else {
+            log.error("[addNewUser] User {} is not authorized to get user credentials except itself ", auth.getName());
+            throw new NotAuthorizedException("You are not authorized to get any user's info rather than yourself");
+        }
+    }
+
+    @GetMapping("/{username}/roles")
+    @ApiOperation(value = "Getting user roles by giving username as a path variable")
+    public ResponseEntity<String> getUserRole(@PathVariable("username") String username, Authentication auth) {
+        if (auth.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN")) || auth.getName().equals(username)) {
+            return ResponseEntity.ok(userService.getUserRole(username));
+        }
+        else {
             log.error("[addNewUser] User {} is not authorized to get user credentials except itself ", auth.getName());
             throw new NotAuthorizedException("You are not authorized to get any user's info rather than yourself");
         }
@@ -105,6 +118,4 @@ public class UserController {
             }
         }
     }
-
-
 }

@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/v1")
 @AllArgsConstructor
 @Log4j2
-public class RestLabController {
+public class LabController {
 
     private LabService labService;
     private UserService userService;
@@ -229,6 +229,18 @@ public class RestLabController {
         }
         return ResponseEntity.ok(labService.registerUserToWaitingList(labName, username));
     }
+
+    @PutMapping("/unregisterFromWaitingList")
+    @ApiOperation(value = "Unregistering a user from waiting list of a lab by giving 'labName' and 'username' in parameters")
+public ResponseEntity<String> unregisterFromWaitingList(@RequestParam String labName, @RequestParam String username, Authentication authentication) {
+        log.info("[unregisterFromWaitingList] Called with labName: {}", labName);
+        log.info("[unregisterFromWaitingList] Called with username: {}", username);
+        if (!labService.getLab(labName).getMailAwaitingUsers().contains(userService.getUserByUsername(username))) {
+            throw new RuntimeException("You are not in waiting list of this lab");
+        }
+        return ResponseEntity.ok(labService.unregisterUserFromWaitingList(labName, username));
+    }
+
 
 }
 

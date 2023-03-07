@@ -31,12 +31,14 @@ class LabServiceTest {
     private UserRepository userRepository;
     @Autowired
     private TeamRepository teamRepository;
+    @Autowired
+    private AsyncService asyncService;
     @MockBean
     private LabService underTest;
 
     @BeforeEach
     void setUp() {
-        underTest = new LabService(labRepository, teamRepository, userRepository, null);
+        underTest = new LabService(labRepository, teamRepository, userRepository, asyncService);
     }
 
     @Test

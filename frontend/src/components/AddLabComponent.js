@@ -1,8 +1,10 @@
 import React ,{useState} from "react";
 import LabService from "../services/LabService";
 import {Link} from "react-router-dom";
+import {checkAuthentication} from "../services/AuthHeader";
 
 const AddLabComponent = () => {
+    checkAuthentication();
 
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');

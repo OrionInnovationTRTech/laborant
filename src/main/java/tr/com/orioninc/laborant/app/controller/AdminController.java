@@ -9,23 +9,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import tr.com.orioninc.laborant.app.model.Lab;
-import tr.com.orioninc.laborant.app.model.Team;
 import tr.com.orioninc.laborant.app.service.AdminService;
 import tr.com.orioninc.laborant.exception.custom.NotAuthorizedException;
 
 import javax.servlet.http.HttpServletRequest;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequestMapping("/v1")
 @AllArgsConstructor
 @RestController
 @Log4j2
 @CrossOrigin
-public class RestAdminController {
+public class AdminController {
     private AdminService adminService;
 
 

@@ -51,12 +51,12 @@ public class Lab {
     private Date reservedUntil;
 
     @ManyToMany(fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
     @JoinTable(
             name = "mail_awaiting_users_table",
             joinColumns = @JoinColumn(name = "lab_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id")
     private List<User> mailAwaitingUsers = new ArrayList<>();
 
 

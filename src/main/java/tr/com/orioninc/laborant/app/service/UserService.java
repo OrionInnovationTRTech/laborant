@@ -7,15 +7,23 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import tr.com.orioninc.laborant.app.model.Lab;
+import tr.com.orioninc.laborant.app.model.PasswordResetToken;
+import tr.com.orioninc.laborant.app.model.User;
 import tr.com.orioninc.laborant.app.repository.LabRepository;
+import tr.com.orioninc.laborant.app.repository.UserRepository;
 import tr.com.orioninc.laborant.exception.custom.AlreadyExistsException;
 import tr.com.orioninc.laborant.exception.custom.NotFoundException;
-import tr.com.orioninc.laborant.app.model.User;
-import tr.com.orioninc.laborant.app.repository.UserRepository;
 import tr.com.orioninc.laborant.security.config.PasswordConfig;
 import tr.com.orioninc.laborant.security.service.CustomUserDetails;
 
-import java.util.List;import java.util.Objects;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.util.Base64;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 
 @Service
 @AllArgsConstructor
@@ -26,7 +34,7 @@ public class UserService implements UserDetailsService {
     private LabRepository labRepository;
 
     public void addNewUser(User user) {
-        if (!isUserExists(user.getUsername())) {
+        if (!isUserExistsByUsername(user.getUsername())) {
             user.setPassword(PasswordConfig.passwordEncoder().encode(user.getPassword()));
             userRepository.save(user);
             log.info("[addNewUser] User added: {}", user.toString());
@@ -45,6 +53,14 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
+    public User getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UsernameNotFoundException("[getUserByEmail] User not found");
+        }
+        return user;
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
@@ -54,11 +70,16 @@ public class UserService implements UserDetailsService {
         return new CustomUserDetails(user);
     }
 
-    public boolean isUserExists(String username) {
+    public boolean isUserExistsByUsername(String username) {
         log.info("[isUserExists] Checking if user named '{}' exists", username);
         log.info(Objects.isNull(userRepository.findByUsername(username)) ? "[isUserExists] User not found" : "User found");
         return !Objects.isNull(userRepository.findByUsername(username));
+    }
 
+    public boolean isUserExistsByEmail(String email) {
+        log.info("[isUserExists] Checking if user with email '{}' exists", email);
+        log.info(Objects.isNull(userRepository.findByEmail(email)) ? "[isUserExists] User not found" : "User found");
+        return !Objects.isNull(userRepository.findByEmail(email));
     }
 
     public boolean deleteUserByUsername(String username) {
@@ -68,7 +89,7 @@ public class UserService implements UserDetailsService {
                 user.setLabs(null);
                 userRepository.save(user);
             }
-            for (Lab lab: labRepository.findAll()) {
+            for (Lab lab : labRepository.findAll()) {
                 if (lab.getReserved() != null && lab.getReservedBy() != null) {
                     if (lab.getReservedBy().equals(user)) {
                         lab.setReservedBy(null);
@@ -108,5 +129,15 @@ public class UserService implements UserDetailsService {
             throw new NotFoundException("User not found");
         }
 
+    }
+
+    public String getUserRole(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            return user.getUser_role();
+        } else {
+            log.info("[getUserRole] User {} not found", username);
+            throw new NotFoundException("User not found");
+        }
     }
 }

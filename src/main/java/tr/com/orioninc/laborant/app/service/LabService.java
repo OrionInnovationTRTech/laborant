@@ -6,8 +6,8 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -27,25 +27,20 @@ import java.net.InetAddress;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @AllArgsConstructor
 @Log4j2
 @EnableScheduling
+@EnableAsync
 public class LabService {
 
     LabRepository labRepo;
     TeamRepository teamRepo;
     UserRepository userRepo;
-    JavaMailSender javaMailSender;
+    AsyncService asyncService;
 
-    public void sendEmail(String to, String subject, String body) {
-        SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setTo(to);
-        msg.setSubject(subject);
-        msg.setText(body);
-        javaMailSender.send(msg);
-    }
 
 
     public Lab unreserveLab(String labName) {
@@ -70,21 +65,8 @@ public class LabService {
                     labToBeUnreserved.setReservedUntil(null);
                     labToBeUnreserved.setReserved(false);
                     labRepo.save(labToBeUnreserved);
-                    if (labToBeUnreserved.getMailAwaitingUsers() != null) {
-                        List<User> awaitingUsers = labToBeUnreserved.getMailAwaitingUsers();
-                        log.info("[emaillabs awaiting user for lab {} is {}", labToBeUnreserved.getLabName(), awaitingUsers);
-                        if (!awaitingUsers.isEmpty()) {
-                            for (User user : awaitingUsers) {
-                                sendEmail(user.getEmail(), labToBeUnreserved.getHost() + " lab is now free",
-                                        "Hi " + user.getUsername() + ",\n" + "\nThe lab " + labToBeUnreserved.getHost() + " is now free. \n" +
-                                                "You can reserve it from the laborant web application. \n\n" +
-                                                "Thank you for using laborant.");
-                            }
-                        }
-                    }
-                    labToBeUnreserved.setMailAwaitingUsers(null);
-                    labRepo.save(labToBeUnreserved);
                     log.info("[unreserveLab] lab with name {} is unreserved", labName);
+                    asyncService.sendMailToWaiters(labToBeUnreserved);
                     return labToBeUnreserved;
                 } else {
                     log.warn("[unreserveLab] lab with name {} is already unreserved", labName);
@@ -358,6 +340,31 @@ public class LabService {
         }
     }
 
+    public String unregisterUserFromWaitingList(String labName, String username) {
+        log.debug("[unregisterUserFromWaitingList] called");
+        Lab labToUnregister = findLabByName(labName);
+        if (Objects.isNull(labToUnregister)) {
+            log.info("[unregisterUserFromWaitingList] lab couldn't found in database");
+            throw new NotFoundException("Lab couldn't found in database");
+        }
+        User userToUnregister = userRepo.findByUsername(username);
+        if (Objects.isNull(userToUnregister)) {
+            log.info("[unregisterUserFromWaitingList] user couldn't found in database");
+            throw new NotFoundException("User couldn't found in database");
+        }
+        List<User> awaitingUsers = labToUnregister.getMailAwaitingUsers();
+        if (awaitingUsers.contains(userToUnregister)) {
+            awaitingUsers.remove(userToUnregister);
+            labToUnregister.setMailAwaitingUsers(awaitingUsers);
+            labRepo.save(labToUnregister);
+            log.info("[unregisterUserFromWaitingList] user is removed from the waiting list");
+            return "User is removed from the waiting list";
+        } else {
+            log.info("[unregisterUserFromWaitingList] user is not in the waiting list");
+            throw new NotFoundException("User is not in the waiting list");
+        }
+    }
+
     @Scheduled(fixedRate = 60000) // 1 minute
     public void checkLabs() {
         log.info("[checkLabs] called");
@@ -371,23 +378,11 @@ public class LabService {
                     lab.setReservedUntil(null);
                     lab.setReservedBy(null);
                     labRepo.save(lab);
-                    if (lab.getMailAwaitingUsers() != null) {
-                        List<User> awaitingUsers = lab.getMailAwaitingUsers();
-                        if (!awaitingUsers.isEmpty()) {
-                            for (User user : awaitingUsers) {
-
-                                sendEmail(user.getEmail(), lab.getHost() + " lab is now free",
-                                        "Hi " + user.getUsername() + ",\n" + "\nThe lab " + lab.getHost() + " is now free. \n" +
-                                                "You can reserve it from the laborant web application. \n\n" +
-                                                "Thank you for using laborant.");
-                            }
-                        }
-                        lab.setMailAwaitingUsers(null);
-                        labRepo.save(lab);
-                    }
+                    asyncService.sendMailToWaiters(lab);
                 }
             }
         }
     }
+
 }
 

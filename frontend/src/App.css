@@ -42,11 +42,24 @@
   text-align: center;
 }
 
-.Footer p {
-  margin: 0;
-  font-size: 14px;
+.Footer {
+  position: static;
+  bottom: 0;
+  left: 0;
+  width: 100%;
   color: #fff;
+  text-align: center;
+  padding: 20px 0;
+  z-index: 9999;
 }
+
+@media screen and (min-height: 1000px) {
+  .Footer {
+    position: absolute;
+    margin-top: 50px;
+  }
+}
+
 .Header {
   padding: 20px;
   background-color: rgba(255, 145, 0, 0.67);
