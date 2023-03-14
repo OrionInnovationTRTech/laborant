@@ -23,7 +23,7 @@ const Header = () => {
                 )}
                 {localStorage.getItem('isAuthenticated') && (
                     <button className="header__button">
-                        <Link to="/change-password">Change Pass</Link>
+                        <Link to="/dashboard">Dashboard</Link>
                     </button>
                 )}
                 {localStorage.getItem('isAuthenticated') && <Logout />}

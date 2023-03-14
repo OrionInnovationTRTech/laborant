@@ -39,6 +39,7 @@ const AddTeamComponent = () => {
         <div className="container">
             <div className="row">
                 <div className="card col-md-6 offset-md-3 offset-md-3">
+                    <br/>
                     <h3 className="text-center">Add Team</h3>
                     <div className="card-body">
                         <form>

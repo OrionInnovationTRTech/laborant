@@ -10,7 +10,6 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +59,7 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JsonIgnore
-    private PasswordResetToken passwordResetToken;
+    private Token passwordResetToken;
 
     public User(String username, String password, String user_role) {
         this.username = username;

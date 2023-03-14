@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from "axios";
 import {Link} from "react-router-dom";
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import {createTheme, ThemeProvider} from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -26,7 +26,7 @@ class Logout extends React.Component {
     }
 
     render() {
-        return(
+        return (
             <button onClick={this.logout}>Logout</button>
         );
     }
@@ -50,22 +50,25 @@ class LoginForm extends React.Component {
 
         const {username, password} = this.state;
 
-        axios.get(`${process.env.REACT_APP_SPRING_HOST}/users/${username}/roles`, {
+        axios.get(`${process.env.REACT_APP_SPRING_HOST}/users/${username}/login`, {
             headers: {
                 'Authorization': 'Basic ' + btoa(username + ':' + password),
             },
         })
             .then((response) => {
                 if (response.status === 200) {
-                    if (response.data === "admin" || response.data === "ADMIN") {
-                        console.log("admin");
+                    if (response.data.user_role === "ADMIN") {
                         localStorage.setItem('isAdmin', true);
                     } else {
-                        console.log(response.data);
-                        console.log("not admin");
                         localStorage.setItem('isAdmin', false);
                     }
-
+                    if (response.data.email !== null) {
+                        if (response.data.email !== "") {
+                            localStorage.setItem('hasEmail', true);
+                        } else {
+                            localStorage.setItem('hasEmail', false);
+                        }
+                    }
                     // If the authentication is successful, save the username and password in local storage
                     localStorage.setItem('username', username);
                     localStorage.setItem('password', password);
@@ -73,7 +76,13 @@ class LoginForm extends React.Component {
                         isAuthenticated: true,
                     });
                     localStorage.setItem('isAuthenticated', true);
-                    window.location.replace('/labs');
+                    if (localStorage.getItem('isAuthenticated')) {
+                        if (localStorage.getItem('hasEmail') === "true") {
+                            window.location.replace('/');
+                        } else {
+                            window.location.replace('/dashboard');
+                        }
+                    }
                 } else {
                     throw new Error('Error logging in: ' + response.statusText);
                 }
@@ -158,5 +167,5 @@ class LoginForm extends React.Component {
 
 
 export default LoginForm;
-export { Logout };
+export {Logout};
 

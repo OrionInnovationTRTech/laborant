@@ -4,9 +4,9 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,21 +27,23 @@ import java.net.InetAddress;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 
 @Service
-@AllArgsConstructor
 @Log4j2
 @EnableScheduling
 @EnableAsync
 public class LabService {
 
+    @Autowired
     LabRepository labRepo;
+    @Autowired
     TeamRepository teamRepo;
+    @Autowired
     UserRepository userRepo;
+    @Autowired
     AsyncService asyncService;
-
-
+    @Autowired
+    UserService userService;
 
     public Lab unreserveLab(String labName) {
         log.debug("[unreserveLab] called");
@@ -80,7 +82,7 @@ public class LabService {
         if (Objects.equals(labName, "") || labName == null) {
             throw new IllegalArgumentException("Lab name cannot be empty");
         }
-        log.info("[findLabByName] called");
+        log.debug("[findLabByName] called");
         return labRepo.findByLabName(labName);
     }
 
@@ -115,6 +117,27 @@ public class LabService {
             if (Objects.isNull(searchLab)) {
                 Lab searchHostUserPair = labRepo.findByUserNameAndHost(lab.getUserName(), lab.getHost());
                 if (Objects.isNull(searchHostUserPair)) {
+                    if (lab.getTeamName() != null && !lab.getTeamName().isEmpty()) {
+                        lab = labRepo.save(lab);
+                        if (teamRepo.findByName(lab.getTeamName()) == null) {
+                            Team team = new Team();
+                            team.setName(lab.getTeamName());
+                            teamRepo.save(team);
+                        }
+                        teamRepo.findByName(lab.getTeamName()).getLabs().add(lab);
+                        teamRepo.save(teamRepo.findByName(lab.getTeamName()));
+                    }
+                    log.info("[addNewLab] User: {}", lab.getUserEmail());
+                    if (lab.getUserEmail() != null && !lab.getUserEmail().isEmpty()) {
+                        lab = labRepo.save(lab);
+                        if (userRepo.findByEmail(lab.getUserEmail()) == null) {
+                            User user = new User();
+                            userService.addNewUserWithJustEmail(user);
+                        }
+                        userRepo.findByEmail(lab.getUserEmail()).getLabs().add(lab);
+                        userRepo.save(userRepo.findByEmail(lab.getUserEmail()));
+                    }
+
                     lab = labRepo.save(lab);
                     log.info("[addNewLab] adding new lab named: {}", lab.getLabName());
                     return lab;
@@ -177,23 +200,6 @@ public class LabService {
 
     }
 
-    public boolean isLabReachable(String host, int timeout) {
-        log.info("[isLabReachable] checking if lab with host {} is reachable", host);
-        try {
-            if (InetAddress.getByName(host).isReachable(timeout)) {
-                log.info("[isLabReachable] lab is reachable");
-                return true;
-            } else {
-                log.info("[isLabReachable] lab is not reachable");
-                return false;
-            }
-        } catch (IOException e) {
-            log.error("[isLabReachable] lab is not reachable");
-            return false;
-        }
-    }
-
-
     public Lab reserveLab(String labName, String username, Date date) {
         log.debug("[reserveLab] called");
         if (Objects.equals(labName, "") || labName == null) {
@@ -252,7 +258,6 @@ public class LabService {
         Session session = null;
         ChannelExec channel = null;
         String responseString = null;
-        if (isLabReachable(host, 400)) {
             try {
                 session = new JSch().getSession(username, host, port);
                 session.setPassword(password);
@@ -279,7 +284,7 @@ public class LabService {
 
                 responseString = responseStream.toString();
             } catch (JSchException e) {
-                responseString = "Error, could not connect to lab";
+                throw new NotConnectedException(host + " is not reachable.");
             } finally {
                 if (session != null) {
                     session.disconnect();
@@ -288,10 +293,6 @@ public class LabService {
                     channel.disconnect();
                 }
             }
-        } else {
-            log.error("[connectAndExecuteCommand] Lab is not reachable");
-            throw new NotConnectedException("Lab is not reachable");
-        }
         log.info("For lab {} response is: {}", host, responseString);
         return responseString;
     }

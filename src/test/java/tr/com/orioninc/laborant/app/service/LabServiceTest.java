@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -36,10 +37,6 @@ class LabServiceTest {
     @MockBean
     private LabService underTest;
 
-    @BeforeEach
-    void setUp() {
-        underTest = new LabService(labRepository, teamRepository, userRepository, asyncService);
-    }
 
     @Test
     @DisplayName("Should throw an exception when the lab name is empty")

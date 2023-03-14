@@ -105,7 +105,7 @@ public class LabController {
                 }
                 return ResponseEntity.ok("Requested to add with " + c + " labs. " + a + " of them were added successfully, " + b + " of them couldn't added due to duplicate lab credentials. Labs couldn't add: \n " + failedLabNames);
             } else {
-                return ResponseEntity.ok("Requested to add with " + c + " labs. " + a + " of them were added successfully, " + b + " of them couldn't added due to duplicate lab credentials.");
+                return ResponseEntity.ok("Requested to add with " + c + " labs. " + a + " of them were added successfully.");
             }
         } else {
             throw new NotAuthorizedException("You are not authorized to add labs");
@@ -155,14 +155,14 @@ public class LabController {
     @GetMapping("/labs/status/{labName}")
     @ApiOperation(value = "Running status command on a lab by giving 'labName' as a path variable")
     public ResponseEntity<String> runCommand(@PathVariable("labName") String labName) {
-        log.info("[runCommand] Running status command on lab {}", labName);
+        log.debug("[runCommand] Running status command on lab {}", labName);
         return ResponseEntity.ok(labService.runCommandOnSelectedLab(labName, "sudo wae-status"));
     }
 
     @PostMapping("/labs/command")
     @ApiOperation(value = "Running a command on a lab by giving 'labName' as a path variable and command as parameter")
     public ResponseEntity<String> runCommand(@RequestParam("labName") String labName, @RequestParam("command") String command) {
-        log.info("[runCommand] Running command {} on lab {}", command, labName);
+        log.debug("[runCommand] Running command {} on lab {}", command, labName);
         return ResponseEntity.ok(labService.runCommandOnSelectedLab(labName, command));
     }
 

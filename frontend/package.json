@@ -15,6 +15,7 @@
     "bootstrap": "^5.2.3",
     "cookies-js": "^1.2.3",
     "csv-parse": "^5.3.3",
+    "hts-react-form": "^0.0.8",
     "js-cookie": "^3.0.1",
     "js-cookies": "^1.0.4",
     "moment": "^2.29.4",

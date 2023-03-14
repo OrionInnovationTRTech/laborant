@@ -30,7 +30,7 @@ public class AsyncService {
         emailService.sendEmail(
                 email,
                 "Laborant - Password Reset",
-                "Your password reset link is: " + reactAppApiUrl + "/forgot-password?code=" + code + ". You have 15 minutes to reset your password. You can click the link or enter it manually. Your password reset code is: " + code
+                "Your password reset link is: " + reactAppApiUrl + "/forgot-password?code=" + code + ". You have 15 minutes to reset your password. You can click the link or enter it manually. Your password reset code is: " + code +" .\n\n If you did not request a password reset, you can safely ignore this email."
         );
         return CompletableFuture.completedFuture(null);
     }
@@ -55,4 +55,27 @@ public class AsyncService {
     }
 
 
+    @Async
+    public CompletableFuture<Void> sendApprovalEmail(String email, String code) {
+        emailService.sendEmail(
+                email,
+                "Laborant - Email Approval",
+                "Your email approval link is: " + reactAppApiUrl + "/approve-email?code=" + code + ". You have 15 minutes to approve your account. \nYou can click the link or enter it manually. Your account approval code is: " + code +"." +
+                        "\n\nIf you did not request this email, you can safely ignore that email."
+        );
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Async
+    public CompletableFuture<Void> sendCredentialsWithEmail(String email, String username, String password) {
+        emailService.sendEmail(
+                email,
+                "Laborant - Your Credentials",
+                "Your login credentials are: \n" +
+                        "Username: " + username + "\n" +
+                        "Password: " + password + "\n\n" +
+                        "You can change your password from the laborant web application.\n\nThank you for using laborant."
+        );
+        return CompletableFuture.completedFuture(null);
+    }
 }

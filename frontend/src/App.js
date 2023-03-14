@@ -5,7 +5,6 @@ import Footer from './services/Footer';
 import {BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AddLabComponent from './components/AddLabComponent';
 import LoginForm from './components/Login';
-import {checkAuthentication} from './services/AuthHeader'
 import EditLabComponent from './components/EditLabComponent';
 import BulkAddLabComponent from './components/BulkAddLabComponent';
 import UserListComponents from './components/UserListComponents';
@@ -17,9 +16,10 @@ import AssignUsersPanel from './components/AssignUserPanel';
 import AssignTeamPanel from "./components/AssignTeamPanel";
 import AddTeamComponent from "./components/AddTeamComponent";
 import TeamListComponents from "./components/TeamListComponents";
-import ChangePasswordComponent from "./components/ChangePasswordComponent";
+import AccountDashboard from "./components/AccountDashboard";
 import LabListComponent from "./components/LabListComponent";
 import ForgotPasswordComponent from "./components/ForgotPasswordComponent";
+import BulkAddUserComponent from "./components/BulkAddUserComponent";
 function App() {
   function isAdmin() {
     if (localStorage.getItem('isAdmin') === 'true') {
@@ -39,10 +39,14 @@ function App() {
           <Route path = "/add-lab" element = { isAdmin() ? <AddLabComponent/> : <NotAuthorized/>}></Route>
           <Route path="/login" element={<LoginForm/>}></Route>
             <Route path="/forgot-password" element={<ForgotPasswordComponent/>}></Route>
+            <Route path="/approve-email" element={<AccountDashboard/>}></Route>
           <Route path="/edit-lab/:labName" element={<EditLabComponent/>}></Route> 
-          <Route path="/bulk-add" element={
+          <Route path="/bulk-add-lab" element={
               isAdmin() ? <BulkAddLabComponent/> : <NotAuthorized/>
           }></Route>
+            <Route path="/bulk-add-user" element={
+                isAdmin() ? <BulkAddUserComponent/> : <NotAuthorized/>
+            }></Route>
           <Route path="/lab-list" element={<LabListComponent/>}></Route>}
           <Route path="panel/" element={
               isAdmin() ? (
@@ -100,7 +104,7 @@ function App() {
                 )
             }
             />
-            <Route path='/change-password' element={<ChangePasswordComponent/>}></Route>
+            <Route path='/dashboard' element={<AccountDashboard/>}></Route>
           <Route path="*" element={<NotFound/>}></Route>          
         </Routes>
       </div>   

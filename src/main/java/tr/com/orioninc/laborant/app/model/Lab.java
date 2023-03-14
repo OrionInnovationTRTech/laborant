@@ -2,6 +2,7 @@ package tr.com.orioninc.laborant.app.model;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
@@ -59,6 +60,11 @@ public class Lab {
     )
     private List<User> mailAwaitingUsers = new ArrayList<>();
 
+    @Transient
+    private String teamName;
+
+    @Transient
+    private String userEmail;
 
     public Lab() {
         this.id = null;

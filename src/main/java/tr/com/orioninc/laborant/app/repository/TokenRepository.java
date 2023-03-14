@@ -2,17 +2,17 @@ package tr.com.orioninc.laborant.app.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import tr.com.orioninc.laborant.app.model.PasswordResetToken;
+import tr.com.orioninc.laborant.app.model.Token;
 import tr.com.orioninc.laborant.app.model.User;
 
 import javax.transaction.Transactional;
 
 @Repository
-public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {
+public interface TokenRepository extends JpaRepository<Token, Long> {
 
-    PasswordResetToken findByToken(String token);
+    Token findByToken(String token);
 
-    PasswordResetToken findByUser(User user);
+    Token findByUser(User user);
 
     @Override
     @Transactional
@@ -23,4 +23,6 @@ public interface PasswordResetTokenRepository extends JpaRepository<PasswordRese
 
     @Transactional
     void deleteByUserId(Integer id);
+
+    Token findByEmail(String email);
 }

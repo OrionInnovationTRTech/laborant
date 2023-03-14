@@ -6,18 +6,14 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import tr.com.orioninc.laborant.app.model.Lab;
 import tr.com.orioninc.laborant.app.model.Team;
+import tr.com.orioninc.laborant.app.model.User;
 import tr.com.orioninc.laborant.app.repository.LabRepository;
 import tr.com.orioninc.laborant.app.repository.TeamRepository;
+import tr.com.orioninc.laborant.app.repository.UserRepository;
 import tr.com.orioninc.laborant.exception.custom.AlreadyExistsException;
 import tr.com.orioninc.laborant.exception.custom.NotFoundException;
-import tr.com.orioninc.laborant.app.model.User;
-import tr.com.orioninc.laborant.app.repository.UserRepository;
 
-import java.io.IOException;
-import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -29,7 +25,7 @@ public class AdminService {
     private UserRepository userRepo;
     private TeamRepository teamRepo;
 
-    public Lab findLab(String labName){
+    public Lab findLab(String labName) {
         Lab lab = labRepo.findByLabName(labName);
         if (lab == null) {
             throw new NotFoundException("Lab not found");
@@ -161,7 +157,7 @@ public class AdminService {
 
     public ArrayList<String> getAssignedLabTeams(String labName) {
         log.debug("[getAssignedLabTeams] called");
-        if (Objects.equals(labName, "") || labName == null){
+        if (Objects.equals(labName, "") || labName == null) {
             throw new IllegalArgumentException("Lab name cannot be empty");
         }
         Lab lab = labRepo.findByLabName(labName);
@@ -175,7 +171,7 @@ public class AdminService {
                     assignedTeams.add(team.getName());
                 }
             }
-            log.info("[getAssignedLabTeams] returning assigned teams for lab: {}", labName);
+            log.debug("[getAssignedLabTeams] returning assigned teams for lab: {}", labName);
             return assignedTeams;
         }
     }
@@ -187,7 +183,7 @@ public class AdminService {
             log.warn("[getAssignedLabUsers] Lab with name {} not found in database", labName);
             throw new NotFoundException("Lab with name " + labName + " not found in database");
         } else {
-            log.info("[getAssignedLabUsers] All users assigned to lab with name {} are listed", labName);
+            log.debug("[getAssignedLabUsers] All users assigned to lab with name {} are listed", labName);
             ArrayList<String> assignedUsers = new ArrayList<>();
             for (User user : userRepo.findAll()) {
                 if (user.getLabs().contains(lab)) {

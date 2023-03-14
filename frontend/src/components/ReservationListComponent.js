@@ -18,6 +18,7 @@ const ReservationListComponent = () => {
     checkAuthentication();
 
 
+
     const [labs, setLabs] = useState([]);
     const [labVersion, setLabVersion] = useState({});
     const [search, setSearch] = useState('');
@@ -40,6 +41,7 @@ const ReservationListComponent = () => {
 
 
     useEffect(() => {
+
 
 
         getAllLabs();
@@ -275,7 +277,7 @@ const ReservationListComponent = () => {
         })
             .then(response => {
                 setModalResponse(prevModalResponse => [...prevModalResponse,
-                    <React.Fragment>COMMAND: {modalCommand}<br/>SERVER: {response.data}<br/><br/></React.Fragment>]);
+                    <React.Fragment>COMMAND: {modalCommand}<br/>SERVER: <br/>{response.data}<br/><br/></React.Fragment>]);
             })
             .catch(error => {
                 setModalResponse(prevModalResponse => [...prevModalResponse,
@@ -292,6 +294,8 @@ const ReservationListComponent = () => {
 
 
             <Container>
+                <br/>
+                <h6 className="text-center">Total Labs: {labs.length}, The labs that have '**' on version indicates that is a multi lab.</h6>
                 <Form>
                     <InputGroup className='my-3'>
                         <Form.Control
@@ -426,7 +430,7 @@ const ReservationListComponent = () => {
 
                         <Modal.Body>
 
-                            {modalResponse}
+                            <div style={{ whiteSpace: 'pre-wrap' }}>{modalResponse}</div>
                             <br/>
                             <br/>
 

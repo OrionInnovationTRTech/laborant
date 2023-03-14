@@ -28,7 +28,7 @@ function PasswordResetComponent() {
     const handleEmailSubmit = (event) => {
         event.preventDefault();
         axios
-            .put(`${process.env.REACT_APP_SPRING_HOST}/pw/forgot-password`, {}, {
+            .put(`${process.env.REACT_APP_SPRING_HOST}/users/forgot-password`, {}, {
                 params: {
                     email: email,
                 },
@@ -51,7 +51,7 @@ function PasswordResetComponent() {
         event.preventDefault();
         axios
             .put(
-                `${process.env.REACT_APP_SPRING_HOST}/pw/reset-password`,
+                `${process.env.REACT_APP_SPRING_HOST}/users/reset-password`,
                 {},
                 {
                     params: {
