@@ -9,7 +9,6 @@ const AddUserComponent = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const [role, setRole] = useState('USER');
 
     const saveUser = (e) => {

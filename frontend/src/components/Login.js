@@ -19,7 +19,7 @@ class Logout extends React.Component {
 
     logout = () => {
         localStorage.clear();
-        window.location.replace('http://localhost:3000/login')
+        window.location.replace('/login')
         this.setState({
             isAuthenticated: false,
         });
@@ -69,6 +69,9 @@ class LoginForm extends React.Component {
                             localStorage.setItem('hasEmail', false);
                         }
                     }
+                    else {
+                        localStorage.setItem('hasEmail', false);
+                    }
                     // If the authentication is successful, save the username and password in local storage
                     localStorage.setItem('username', username);
                     localStorage.setItem('password', password);
@@ -77,7 +80,7 @@ class LoginForm extends React.Component {
                     });
                     localStorage.setItem('isAuthenticated', true);
                     if (localStorage.getItem('isAuthenticated')) {
-                        if (localStorage.getItem('hasEmail') === "true") {
+                        if (localStorage.getItem('hasEmail')) {
                             window.location.replace('/');
                         } else {
                             window.location.replace('/dashboard');
@@ -95,8 +98,6 @@ class LoginForm extends React.Component {
     }
 
     render() {
-        const {username, password, isAuthenticated} = this.state;
-
         if (localStorage.getItem('isAuthenticated')) {
             // If the user is authenticated, show a message
             return <p>You are logged in as {localStorage.getItem('username')}.</p>;

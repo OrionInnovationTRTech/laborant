@@ -4,8 +4,7 @@ export const checkAuthentication = () => {
         window.location.replace("/login");
     }
     else {
-        console.log("User is authenticated.");
-        if (localStorage.getItem("hasEmail") === "false" && window.location.pathname !== "/dashboard") {
+        if (!localStorage.getItem("hasEmail")  && window.location.pathname !== "/dashboard") {
             window.location.replace("/dashboard");
         }
     }
