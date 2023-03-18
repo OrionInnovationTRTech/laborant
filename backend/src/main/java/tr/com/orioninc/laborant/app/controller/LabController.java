@@ -11,6 +11,7 @@ import tr.com.orioninc.laborant.app.model.Lab;
 import tr.com.orioninc.laborant.app.service.LabService;
 import tr.com.orioninc.laborant.app.service.UserService;
 import tr.com.orioninc.laborant.exception.custom.NotAuthorizedException;
+import tr.com.orioninc.laborant.exception.custom.NotFoundException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -178,10 +179,10 @@ public class LabController {
         try {
             reservedUntil = dateFormat.parse(date);
         } catch (ParseException e) {
-            throw new RuntimeException("Date format is not correct");
+            throw new NotFoundException("Date format is not correct");
         }
         if (reservedUntil.before(new Date())) {
-            throw new RuntimeException("Date can't be in the past");
+            throw new NotFoundException("Date can't be in the past");
         }
         log.info("[reserveLab] Called with reservedUntil: {}", reservedUntil);
         Lab lab = labService.getLab(labName);
@@ -222,10 +223,10 @@ public class LabController {
         log.info("[registerToWaitingList] Called with labName: {}", labName);
         log.info("[registerToWaitingList] Called with username: {}", username);
         if (labService.getLab(labName).getReservedBy().getUsername().equals(username)) {
-            throw new RuntimeException("You already reserved this lab");
+            throw new NotAuthorizedException("You already reserved this lab");
         }
         if (labService.getLab(labName).getMailAwaitingUsers().contains(userService.getUserByUsername(username))) {
-            throw new RuntimeException("You are already in waiting list of this lab");
+            throw new NotAuthorizedException("You are already in waiting list of this lab");
         }
         return ResponseEntity.ok(labService.registerUserToWaitingList(labName, username));
     }

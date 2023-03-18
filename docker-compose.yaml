@@ -1,3 +1,5 @@
+version: '3.7'
+
 services:
   backend:
     build:
@@ -8,19 +10,26 @@ services:
     depends_on:
       - mysql
     environment:
-        - MYSQL_DATABASE=${MYSQL_DATABASE}
-        - MYSQL_USER=${MYSQL_USER}
-        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-        - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-        - MAIL_HOST=${MAIL_HOST}
-        - MAIL_PORT=${MAIL_PORT}
-        - MAIL_USERNAME=${MAIL_USERNAME}
-        - MAIL_PASSWORD=${MAIL_PASSWORD}
-        - REACT_APP_API_URL=${REACT_APP_API_URL}
-        - DEFAULT_USER_PASSWORD=${DEFAULT_USER_PASSWORD}
-        - SERVER_IP=${SERVER_IP}
-        - SERVER_DOMAIN=${SERVER_DOMAIN}
-        - SERVER_ENABLED=${SERVER_ENABLED}
+      - TZ=Europe/Istanbul
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MAIL_HOST=${MAIL_HOST}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - SERVER_IP=${SERVER_IP}
+      - SERVER_DOMAIN=${SERVER_DOMAIN}
+      - SERVER_ENABLED=${SERVER_ENABLED}
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
+      - DEFAULT_USER_PASSWORD=${DEFAULT_USER_PASSWORD}
+    hostname: backend # set the hostname property
+    networks:
+      laborant-network:
+        aliases:
+          - backend
+
   frontend:
     build:
       context: ./frontend
@@ -29,6 +38,12 @@ services:
       - 80:3000
     depends_on:
       - backend
+    environment:
+      - TZ=Europe/Istanbul
+    networks:
+      laborant-network:
+        aliases:
+          - frontend
   mysql:
     build:
       context: ./database
@@ -40,3 +55,24 @@ services:
         - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     ports:
       - "${MYSQL_PORT}:3306"
+    networks:
+      laborant-network:
+        aliases:
+          - mysql
+    environment:
+      - TZ=Europe/Istanbul
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+    db:
+
+
+
+networks:
+  laborant-network:
+    driver: bridge
