@@ -134,6 +134,7 @@ public class LabService {
                         lab = labRepo.save(lab);
                         if (userRepo.findByEmail(lab.getUserEmail()) == null) {
                             User user = new User();
+                            user.setEmail(lab.getUserEmail());
                             userService.addNewUserWithJustEmail(user);
                         }
                         userRepo.findByEmail(lab.getUserEmail()).getLabs().add(lab);
