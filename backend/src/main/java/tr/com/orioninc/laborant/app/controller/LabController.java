@@ -237,7 +237,7 @@ public ResponseEntity<String> unregisterFromWaitingList(@RequestParam String lab
         log.info("[unregisterFromWaitingList] Called with labName: {}", labName);
         log.info("[unregisterFromWaitingList] Called with username: {}", username);
         if (!labService.getLab(labName).getMailAwaitingUsers().contains(userService.getUserByUsername(username))) {
-            throw new RuntimeException("You are not in waiting list of this lab");
+            throw new NotFoundException("You are not in waiting list of this lab");
         }
         return ResponseEntity.ok(labService.unregisterUserFromWaitingList(labName, username));
     }
