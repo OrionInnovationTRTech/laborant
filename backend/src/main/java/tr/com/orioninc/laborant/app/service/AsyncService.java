@@ -71,10 +71,14 @@ public class AsyncService {
         emailService.sendEmail(
                 email,
                 "Laborant - Your Credentials",
-                "Your login credentials are: \n" +
+                "Welcome to Laborant!\n\nThat application is for have total control over labs.\nApplication works on 47.168.150.38 machine and can be accessed from the link below:\n\n" +
+                        reactAppApiUrl + "\n\n" +
+                        "Your login credentials are: \n" +
                         "Username: " + username + "\n" +
                         "Password: " + password + "\n\n" +
-                        "You can change your password from the laborant web application.\n\nThank you for using laborant."
+                        "You can change your password from the web application - dashboard section.\n\nThank you for using laborant. \n\n\n" +
+                        "Developed by Ergüncan Keçelioğlu under the design team as internship project.\n" +
+                        "If you have any questions, requests or bug reports, please contact me via email or MS teams directly.\nerguncan.kecelioglu@orioninc.com"
         );
         return CompletableFuture.completedFuture(null);
     }
