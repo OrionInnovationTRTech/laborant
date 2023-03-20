@@ -70,7 +70,9 @@ public class UserService implements UserDetailsService {
             String pass = tokenService.generateCode(6, "alphanumeric");
             user.setPassword(PasswordConfig.passwordEncoder().encode(pass));
             user.setUsername(user.getEmail().split("@")[0]);
-            user.setUser_role("USER");
+            if (user.getUser_role() == null || user.getUser_role().isEmpty()) {
+                user.setUser_role("USER");
+            }
             userRepository.save(user);
             asyncService.sendCredentialsWithEmail(user.getEmail(), user.getUsername(), pass);
             log.info("[addNewUser] User added: {}", user.getUsername());

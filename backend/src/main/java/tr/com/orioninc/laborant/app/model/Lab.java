@@ -22,7 +22,7 @@ public class Lab {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     private String labName;
     @Column(name = "username")
     private String userName;
