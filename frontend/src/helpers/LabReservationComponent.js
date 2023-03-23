@@ -38,7 +38,7 @@ const LabReservationForm = ({ labName, showModal, handleCloseModal }) => {
                 setMessage(
                     `Lab reserved successfully until date: ${date} hour: ${hour}`
                 );
-                window.location.replace(`/`);
+                window.location.reload();
             })
             .catch((error) => {
                 setMessage(error.response.data.message);
