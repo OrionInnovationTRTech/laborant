@@ -2,6 +2,7 @@ import React ,{useState} from "react";
 import { getHeaders } from "../services/AuthHeader";
 import axios from "axios";
 import {checkAuthentication} from "../services/AuthHeader";
+const base = process.env.REACT_APP_BASE_PATH || '';
 
 
 const AddTeamComponent = () => {
@@ -21,7 +22,7 @@ const AddTeamComponent = () => {
                 if (response.status === 200) {
                     setMessage('Team Added Successfully. Redirecting...');
                     setTimeout(() => {
-                        window.location.replace('/teams');
+                        window.location.replace(base+'/teams');
                     }, 1500);
                 } else if (response.status === 400) {
                     setError(`Failed to add team. ${response.data.message}`);

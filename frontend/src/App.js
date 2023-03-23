@@ -30,7 +30,7 @@ function App() {
   }  
   return (
     <div className="App">
-      <Router>
+      <Router basename={"laborant"}>
       <Header />
       <div className= "container">
         <Routes>

@@ -9,6 +9,7 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+const base = process.env.REACT_APP_BASE_PATH || '';
 
 const theme = createTheme();
 
@@ -19,7 +20,7 @@ class Logout extends React.Component {
 
     logout = () => {
         localStorage.clear();
-        window.location.replace('/login')
+        window.location.replace(base+'/login')
         this.setState({
             isAuthenticated: false,
         });
@@ -81,9 +82,9 @@ class LoginForm extends React.Component {
                     localStorage.setItem('isAuthenticated', true);
                     if (localStorage.getItem('isAuthenticated')) {
                         if (localStorage.getItem('hasEmail')) {
-                            window.location.replace('/');
+                            window.location.replace(base+'/');
                         } else {
-                            window.location.replace('/dashboard');
+                            window.location.replace(base+'/dashboard');
                         }
                     }
                 } else {

@@ -11,6 +11,7 @@ const EditLabComponent = () => {
     const [password, setPassword] = useState('');
     const [host, setHost] = useState('');
     const [port, setPort] = useState('');
+    const base = process.env.REACT_APP_BASE_PATH || '';
 
     const saveLab = (e) => {
         e.preventDefault();
@@ -21,7 +22,7 @@ const EditLabComponent = () => {
             if (response.status === 200) {
                setMessage('Lab Updated Successfully. Redirecting...');
                       setTimeout(() => {
-                  window.location.replace('/labs');
+                  window.location.replace(base+'/labs');
                 }, 1500);
               } else if (response.status === 400) {
                 setError(`Failed to update lab. ${response.data.message}`);

@@ -164,7 +164,7 @@ const ReservationListComponent = () => {
             })
                 .then((response) => {
                     window.alert("Lab unreserved successfully");
-                    window.location.replace('/labs');
+                    window.location.reload()
                 }).catch((error) => {
                 window.alert(error.response.data.message);
             })
@@ -184,7 +184,7 @@ const ReservationListComponent = () => {
             })
                 .then((response) => {
                     window.alert("You will get an email when lab is free");
-                    window.location.replace('/labs');
+                    window.location.reload();
                 }).catch((error) => {
                 window.alert(error.response.data.message);
             })
@@ -204,7 +204,7 @@ const ReservationListComponent = () => {
             })
                 .then((response) => {
                     window.alert("You will NOT get an email when lab is free");
-                    window.location.replace('/labs');
+                    window.location.reload();
                 }).catch((error) => {
                 window.alert(error.response.data.message);
             })

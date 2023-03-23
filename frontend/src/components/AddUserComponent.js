@@ -2,6 +2,7 @@ import React ,{useState} from "react";
 import {checkAuthentication, getHeaders} from "../services/AuthHeader";
 import axios from "axios";
 import {Link} from "react-router-dom";
+const base = process.env.REACT_APP_BASE_PATH || '';
 
 
 const AddUserComponent = () => {
@@ -21,7 +22,7 @@ const AddUserComponent = () => {
                 if (response.status === 200) {
                     setMessage('User Added Successfully. Redirecting...');
                     setTimeout(() => {
-                        window.location.replace('/users');
+                        window.location.replace(base+'/users');
                     }, 1500);
                 } else if (response.status === 400) {
                     setError(`Failed to add user. ${response.data.message}`);
