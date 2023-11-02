@@ -1,10 +1,8 @@
 import React, {useState} from "react";
 import LabService from "../services/LabService";
-import {Link} from "react-router-dom";
-import {checkAuthentication} from "../services/AuthHeader";
+import {Link, useNavigate} from "react-router-dom";
 
 const AddLabComponent = () => {
-    checkAuthentication();
 
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
@@ -15,7 +13,7 @@ const AddLabComponent = () => {
     const [password, setPassword] = useState('');
     const [host, setHost] = useState('');
     const [port, setPort] = useState('');
-    const base = process.env.REACT_APP_BASE_PATH || '';
+    const navigate = useNavigate();
 
     const saveLab = (e) => {
         e.preventDefault();
@@ -34,7 +32,7 @@ const AddLabComponent = () => {
             if (response.status === 200) {
                 setMessage('Lab Added Successfully. Redirecting...');
                 setTimeout(() => {
-                    window.location.replace(base+'/labs');
+                    navigate('/labs');
                 }, 1500);
             } else if (response.status === 400) {
                 setError(`Failed to add lab. ${response.data.message}`);

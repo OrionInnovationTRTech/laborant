@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 import {Link} from "react-router-dom";
-import {checkAuthentication} from "../services/AuthHeader";
 
 const ChangePassword = ({setRenderChangePassword, renderChangePassword}) => {
     const [oldPassword, setOldPassword] = useState("");
@@ -285,7 +284,6 @@ const EmailComponent = ({setUrlApproval, setRenderChangePassword, urlApproval, r
 };
 
 const Dashboard = () => {
-    checkAuthentication();
     const [renderChangePassword, setRenderChangePassword] = useState(true);
     const [urlApproval, setUrlApproval] = useState(false);
     const [codeSent, setCodeSent] = useState(false);

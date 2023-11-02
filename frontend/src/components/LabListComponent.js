@@ -3,12 +3,11 @@ import Table from 'react-bootstrap/Table';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
-import { checkAuthentication, getHeaders } from "../services/AuthHeader";
+import {getHeaders } from "../services/AuthHeader";
 import axios from "axios";
 
 
 const LabListComponent = () => {
-    checkAuthentication();
     const [labs, setLabs] = useState([]);
     const [search, setSearch] = useState('');
     const [assignedUsers, setAssignedUsers] = useState({});

@@ -1,28 +1,26 @@
 import React ,{useState} from "react";
-import {checkAuthentication, getHeaders} from "../services/AuthHeader";
+import {getHeaders} from "../services/AuthHeader";
 import axios from "axios";
-import {Link} from "react-router-dom";
-const base = process.env.REACT_APP_BASE_PATH || '';
+import {Link, useNavigate} from "react-router-dom";
 
 
 const AddUserComponent = () => {
-    checkAuthentication();
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const [email, setEmail] = useState('');
     const [role, setRole] = useState('USER');
-
+    const navigate = useNavigate();
     const saveUser = (e) => {
         e.preventDefault();
         let user = {email:email,user_role:role};
 
-        axios.post(`${process.env.REACT_APP_SPRING_HOST}/users/add-user-with-email`,user,getHeaders())
+        axios.post(`${process.env.REACT_APP_SPRING_HOST}/users/add-user-with-email?`,user,getHeaders())
             .then((response) => {
                 console.log(response.status);
                 if (response.status === 200) {
                     setMessage('User Added Successfully. Redirecting...');
                     setTimeout(() => {
-                        window.location.replace(base+'/users');
+                        navigate("/users");
                     }, 1500);
                 } else if (response.status === 400) {
                     setError(`Failed to add user. ${response.data.message}`);

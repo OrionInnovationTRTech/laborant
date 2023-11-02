@@ -10,14 +10,22 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import {useState} from "react";
+import {useAuth} from "../services/AuthContext";
 
 const theme = createTheme();
 
 function Logout() {
     const navigate = useNavigate();
+    const { authState, setAuthState } = useAuth();
 
     const handleLogout = () => {
         localStorage.clear();
+        setAuthState({
+            username: null,
+            isAdmin: false,
+            isAuthenticated: false,
+        });
+
         navigate("/login");
     };
 
@@ -32,6 +40,7 @@ function LoginForm() {
     const [password, setPassword] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const navigate = useNavigate();
+    const { authState, setAuthState } = useAuth();
 
     const handleChange = (event) => {
         if (event.target.name === "username") {
@@ -50,32 +59,25 @@ function LoginForm() {
         })
             .then((response) => {
                 if (response.status === 200) {
-                    if (response.data.user_role === "ADMIN") {
-                        localStorage.setItem('isAdmin', true);
-                    } else {
-                        localStorage.setItem('isAdmin', false);
-                    }
-                    if (response.data.email !== null) {
-                        if (response.data.email !== "") {
-                            localStorage.setItem('hasEmail', true);
-                        } else {
-                            localStorage.setItem('hasEmail', false);
-                        }
-                    }
-                    else {
-                        localStorage.setItem('hasEmail', false);
-                    }
-                    // If the authentication is successful, save the username and password in local storage
+                    const isAdmin = response.data.user_role === "ADMIN";
+                    const hasEmail = response.data.email && response.data.email !== "";
+
+                    localStorage.setItem('isAdmin', isAdmin);
+                    localStorage.setItem('hasEmail', hasEmail);
                     localStorage.setItem('username', username);
                     localStorage.setItem('password', password);
-                    setIsAuthenticated(true);
                     localStorage.setItem('isAuthenticated', true);
-                    if (localStorage.getItem('isAuthenticated')) {
-                        if (localStorage.getItem('hasEmail')) {
-                            navigate("/");
-                        } else {
-                            navigate("/dashboard");
-                        }
+
+                    setAuthState({
+                        username: username,
+                        isAdmin: isAdmin,
+                        isAuthenticated: true,
+                    });
+
+                    if (hasEmail) {
+                        navigate("/");
+                    } else {
+                        navigate("/dashboard");
                     }
                 } else {
                     throw new Error('Error logging in: ' + response.statusText);

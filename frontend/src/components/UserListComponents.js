@@ -5,12 +5,11 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
-import {checkAuthentication, getHeaders} from "../services/AuthHeader";
+import {getHeaders} from "../services/AuthHeader";
 const base = process.env.REACT_APP_BASE_PATH || '';
 
 
 const UserListComponents = () => {
-    checkAuthentication();
     const [users, setUsers] = useState([]);
     const [search, setSearch] = useState('');
     const [assignedLabs, setAssignedLabs] = useState({});
@@ -48,7 +47,7 @@ const UserListComponents = () => {
             axios.delete(`${process.env.REACT_APP_SPRING_HOST}/users/delete/` + username, getHeaders())
                 .then((response) => {
                     console.log(response);
-                    window.location.replace(base+'/users');
+                    window.location.reload();
                 }).catch((error) => {
                     console.log(error);
                 })

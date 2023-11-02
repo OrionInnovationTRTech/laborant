@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { checkAuthentication, getHeaders } from "../services/AuthHeader";
+import {getHeaders } from "../services/AuthHeader";
 import axios from "axios";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
@@ -7,7 +7,6 @@ import { InputGroup } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const AssignUsersPanel = () => {
-    checkAuthentication();
 
     const navigate = useNavigate();
     const [labs, setLabs] = useState([]);

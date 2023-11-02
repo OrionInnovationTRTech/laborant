@@ -4,7 +4,7 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import {Link} from "react-router-dom";
-import {checkAuthentication, getHeaders} from "../services/AuthHeader";
+import {getHeaders} from "../services/AuthHeader";
 import axios from "axios";
 import moment from 'moment';
 import {Fragment} from "react";
@@ -15,7 +15,6 @@ import RunStatusModal from "../helpers/RunStatusModal";
 import LabReservationForm from "../helpers/LabReservationComponent";
 
 const ReservationListComponent = () => {
-    checkAuthentication();
 
 
 

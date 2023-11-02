@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import Papa from 'papaparse';
-import { checkAuthentication, getHeaders } from '../services/AuthHeader';
+import {getHeaders } from '../services/AuthHeader';
 
 const BulkAddUsers = () => {
-    checkAuthentication();
     const [csvData, setCsvData] = useState('');
     const [response, setResponse] = useState('');
     const [error, setError] = useState('');

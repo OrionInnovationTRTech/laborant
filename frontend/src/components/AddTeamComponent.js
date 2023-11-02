@@ -1,15 +1,14 @@
 import React ,{useState} from "react";
 import { getHeaders } from "../services/AuthHeader";
 import axios from "axios";
-import {checkAuthentication} from "../services/AuthHeader";
-const base = process.env.REACT_APP_BASE_PATH || '';
+import {useNavigate} from "react-router-dom";
 
 
 const AddTeamComponent = () => {
-    checkAuthentication();
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const [name, setName] = useState('');
+    const navigate = useNavigate();
 
     const saveUser = (e) => {
         e.preventDefault();
@@ -22,7 +21,7 @@ const AddTeamComponent = () => {
                 if (response.status === 200) {
                     setMessage('Team Added Successfully. Redirecting...');
                     setTimeout(() => {
-                        window.location.replace(base+'/teams');
+                        navigate("/teams");
                     }, 1500);
                 } else if (response.status === 400) {
                     setError(`Failed to add team. ${response.data.message}`);

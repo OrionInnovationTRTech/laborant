@@ -5,12 +5,11 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
-import {checkAuthentication, getHeaders} from "../services/AuthHeader";
+import {getHeaders} from "../services/AuthHeader";
 const base = process.env.REACT_APP_BASE_PATH || '';
 
 
 const TeamListComponents = () => {
-    checkAuthentication();
     const [teams, setTeams] = useState([]);
     const [search, setSearch] = useState('');
     const [assignedLabs, setAssignedLabs] = useState({});

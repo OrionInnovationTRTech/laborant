@@ -2,7 +2,7 @@ import './App.css';
 import ReservationListComponent from './components/ReservationListComponent';
 import Header from './components/Header';
 import Footer from './services/Footer';
-import {BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import {BrowserRouter as Router, Routes, Route, useNavigate} from 'react-router-dom';
 import AddLabComponent from './components/AddLabComponent';
 import LoginForm from './components/Login';
 import EditLabComponent from './components/EditLabComponent';
@@ -20,6 +20,7 @@ import AccountDashboard from "./components/AccountDashboard";
 import LabListComponent from "./components/LabListComponent";
 import ForgotPasswordComponent from "./components/ForgotPasswordComponent";
 import BulkAddUserComponent from "./components/BulkAddUserComponent";
+import {useEffect} from "react";
 function App() {
   function isAdmin() {
     if (localStorage.getItem('isAdmin') === 'true') {
@@ -27,14 +28,32 @@ function App() {
     } else {
       return false;
     }
-  }  
+  }
+
+    function CheckAuthentication() {
+        const navigate = useNavigate();
+
+        useEffect(() => {
+            if (!localStorage.getItem("isAuthenticated") && window.location.pathname !== "/login") {
+                navigate("/login");
+            }
+            else {
+                if (!localStorage.getItem("hasEmail")  && window.location.pathname !== "/dashboard") {
+                    navigate("/dashboard");
+                }
+            }
+        }, [navigate]);
+
+        return null;
+    }
   return (
     <div className="App">
       <Router basename={"laborant"}>
+          <CheckAuthentication />
       <Header />
       <div className= "container">
         <Routes>
-          <Route exact path = "/" element = {<ReservationListComponent/>}></Route>
+          <Route path = "/" element = {<ReservationListComponent/>}></Route>
           <Route path = "/labs" element = {<ReservationListComponent/>}></Route>
           <Route path = "/add-lab" element = { isAdmin() ? <AddLabComponent/> : <NotAuthorized/>}></Route>
           <Route path="/login" element={<LoginForm/>}></Route>
