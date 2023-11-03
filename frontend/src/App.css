@@ -42,11 +42,24 @@
   text-align: center;
 }
 
-.Footer p {
-  margin: 0;
-  font-size: 14px;
+.Footer {
+  position: static;
+  bottom: 0;
+  left: 0;
+  width: 100%;
   color: #fff;
+  text-align: center;
+  padding: 20px 0;
+  z-index: 9999;
 }
+
+@media screen and (min-height: 1000px) {
+  .Footer {
+    position: absolute;
+    margin-top: 50px;
+  }
+}
+
 .Header {
   padding: 20px;
   background-color: rgba(255, 145, 0, 0.67);
@@ -56,4 +69,32 @@
 .Header h1 {
   margin: 0;
   font-size: 24px;
+}
+
+.modal-content {
+  /* this is because we can resize this background so we'll hide it. The coloring will
+  now be maintained by the modal-resizable class */
+  background-color: transparent;
+}
+
+.modal-content > .modal-resizable {
+  background-color: white;
+  background-clip: padding-box;
+  border: 1px solid #ebedee;
+  border: 0;
+  border-radius: .6em;
+  box-shadow: 0 0 0 1px rgba(101, 108, 126, 0.5) inset, 0 1px 3px 1px rgba(64, 64, 64, 0.5);
+}
+
+.modal-resizable > .modal-body {
+  /* This is to account for the height of the footer */
+  padding: 1em 1em 5em 1em;
+}
+
+.modal-footer {
+  /* this is to keep the footer pinned to the bottom when we resize */
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  z-index: 10;
 }

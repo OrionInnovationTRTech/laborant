@@ -5,21 +5,25 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
-import { getHeaders } from "../services/AuthHeader";
+import {getHeaders} from "../services/AuthHeader";
+const base = process.env.REACT_APP_BASE_PATH || '';
 
 
 const UserListComponents = () => {
-    
     const [users, setUsers] = useState([]);
     const [search, setSearch] = useState('');
+    const [assignedLabs, setAssignedLabs] = useState({});
 
     useEffect(() => {
-
         getAllUsers();
     }, []);
 
+    useEffect(() => {
+        getLabs();
+    }, [users]);
+
     const getAllUsers = () => {
-         axios.get('http://localhost:8080/users/', getHeaders())
+         axios.get(`${process.env.REACT_APP_SPRING_HOST}/users/`, getHeaders())
           .then((response) => {
             setUsers(response.data);
             console.log(response.data);
@@ -28,12 +32,22 @@ const UserListComponents = () => {
         })
     }
 
+    const getLabs = () => {
+        users.forEach(user => {axios.get(`${process.env.REACT_APP_SPRING_HOST}/v1/user-labs/${user.username}`, getHeaders())
+            .then((response) => {
+                setAssignedLabs((prevAssignedLabs) => ({...prevAssignedLabs, [user.username]: response.data.join('\n')}));
+            }).catch((error) => {
+                setAssignedLabs("Error");
+            });
+        })};
+
+
     const deleteUser = (username) => {
         if (window.confirm("Are you sure you want to delete this user?")) {
-            axios.delete("http://localhost:8080/users/delete/" + username, getHeaders())
+            axios.delete(`${process.env.REACT_APP_SPRING_HOST}/users/delete/` + username, getHeaders())
                 .then((response) => {
                     console.log(response);
-                    window.location.replace('/users');
+                    window.location.reload();
                 }).catch((error) => {
                     console.log(error);
                 })
@@ -50,7 +64,7 @@ const UserListComponents = () => {
                         <InputGroup className='my-3'>
                             <Form.Control
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder='Filter labs...'
+                            placeholder='Filter users...'
                             />
                         </InputGroup>
                         </Form>
@@ -60,6 +74,7 @@ const UserListComponents = () => {
                             <td>Username</td>
                             <td>Password</td>
                             <td>Role</td>
+                            <td>Assigned Labs</td>
                             <td>Actions</td>
                         </tr>
                     </thead>
@@ -75,6 +90,7 @@ const UserListComponents = () => {
                                     <td>{users.username}</td>
                                     <td style={{ color: "gray"}}>hidden</td>
                                     <td>{users.user_role}</td>
+                                    <td>{assignedLabs[users.username]}</td>
                                     <td>
                                         <button onClick={() => deleteUser(users.username)} className="btn btn-danger">Delete</button>
                                     </td>

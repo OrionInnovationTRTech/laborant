@@ -1,98 +1,160 @@
 import React from 'react';
+import axios from "axios";
+import {Link, useNavigate} from "react-router-dom";
+import {createTheme, ThemeProvider} from '@mui/material/styles';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import {useState} from "react";
+import {useAuth} from "../services/AuthContext";
 
-class Logout extends React.Component {
-  state = {
-    isAuthenticated: false,
-  };
+const theme = createTheme();
 
-  logout = () => {
-    localStorage.clear();
-    window.location.replace('http://localhost:3000/login')
-    this.setState({
-      isAuthenticated: false,
-    });
-  }
+function Logout() {
+    const navigate = useNavigate();
+    const { authState, setAuthState } = useAuth();
 
-  render() {
-    return(
-        <button onClick={this.logout}>Logout</button>
+    const handleLogout = () => {
+        localStorage.clear();
+        setAuthState({
+            username: null,
+            isAdmin: false,
+            isAuthenticated: false,
+        });
+
+        navigate("/login");
+    };
+
+    return (
+        <button onClick={handleLogout}>Logout</button>
     );
-  }
 }
 
-class LoginForm extends React.Component {
-  state = {
-    username: '',
-    password: '',
-    isAuthenticated: false,
-  };
 
-  handleChange = (event) => {
-    this.setState({
-      [event.target.name]: event.target.value,
-    });
-  }
+function LoginForm() {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const navigate = useNavigate();
+    const { authState, setAuthState } = useAuth();
 
-  handleSubmit = (event) => {
-    event.preventDefault();
-
-    const { username, password } = this.state;
-
-    fetch('http://localhost:8080/v1/login', {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Basic ' + btoa(username + ':' + password),
-      },
-    })
-      .then((response) => {
-       if (response.ok) {
-        console.log(localStorage.getItem('isAuthenticated'));
-
-          // If the authentication is successful, save the username and password in local storage
-          localStorage.setItem('username', username);
-          localStorage.setItem('password', password);
-          this.setState({
-            isAuthenticated: true,
-          });
-          localStorage.setItem('isAuthenticated', true);
-          window.location.replace('/labs/')
-          
-        
+    const handleChange = (event) => {
+        if (event.target.name === "username") {
+            setUsername(event.target.value);
+        } else if (event.target.name === "password") {
+            setPassword(event.target.value);
         }
-        else{
-          throw new Error('Error logging in: ' + response.statusText);
-        }
-      })
-  
-      .catch(error => {
-        console.log('Error:', error.message);
-        alert('Couldn not authenticated');
-      });
     }
 
-  render() {
-    const { username, password, isAuthenticated } = this.state;
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        axios.get(`${process.env.REACT_APP_SPRING_HOST}/users/${username}/login`, {
+            headers: {
+                'Authorization': 'Basic ' + btoa(username + ':' + password),
+            },
+        })
+            .then((response) => {
+                if (response.status === 200) {
+                    const isAdmin = response.data.user_role === "ADMIN";
+                    const hasEmail = response.data.email && response.data.email !== "";
 
-    if (localStorage.getItem('isAuthenticated')) {
-      // If the user is authenticated, show a message
-      return <p>You are logged in as {localStorage.getItem('username')}.</p>;
+                    localStorage.setItem('isAdmin', isAdmin);
+                    localStorage.setItem('hasEmail', hasEmail);
+                    localStorage.setItem('username', username);
+                    localStorage.setItem('password', password);
+                    localStorage.setItem('isAuthenticated', true);
+
+                    setAuthState({
+                        username: username,
+                        isAdmin: isAdmin,
+                        isAuthenticated: true,
+                    });
+
+                    if (hasEmail) {
+                        navigate("/");
+                    } else {
+                        navigate("/dashboard");
+                    }
+                } else {
+                    throw new Error('Error logging in: ' + response.statusText);
+                }
+            })
+            .catch(error => {
+                console.log('Error:', error.message);
+                alert('Could not authenticated');
+            });
+    }
+
+    if (isAuthenticated) {
+        // If the user is authenticated, show a message
+        return <p>You are logged in as {localStorage.getItem('username')}.</p>;
     }
 
     return (
-      <form onSubmit={this.handleSubmit}>
-        <label>
-          username:
-          <input type="text" name="username" value={username} onChange={this.handleChange} />
-        </label>
-        <label>
-          password:
-          <input type="password" name="password" value={password} onChange={this.handleChange} />
-        </label>
-        <button type="submit">Login</button>
-      </form>
-    );
-  }
+        <ThemeProvider theme={theme}>
+            <Container component="main" maxWidth="xs">
+                <CssBaseline />
+                <Box
+                    sx={{
+                        marginTop: 8,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                    }}
+                >
+                    <Typography component="h1" variant="h5">
+                        Sign in
+                    </Typography>
+                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="username"
+                            label="Username"
+                            name="username"
+                            autoComplete="username"
+                            autoFocus
+                            value={username}
+                            onChange={handleChange}
+                        />
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            name="password"
+                            label="Password"
+                            type="password"
+                            id="password"
+                            autoComplete="current-password"
+                            value={password}
+                            onChange={handleChange}
+                        />
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            sx={{ mt: 3, mb: 2 }}
+                        >
+                            Sign In
+                        </Button>
+                        <Grid container>
+                            <Grid item xs>
+                                <Link to="/forgot-password" variant="body2">
+                                    Forgot password?
+                                </Link>
+                            </Grid>
+                        </Grid>
+                    </Box>
+                </Box>
+            </Container>
+        </ThemeProvider>
+);
 }
-
 export default LoginForm;
-export { Logout };
+export {Logout};
+

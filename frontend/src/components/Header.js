@@ -1,31 +1,38 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import logo from '../laborant.png'
-import { Logout } from './Login';
-
+import React, { useEffect, useState } from 'react';
+import {Link} from 'react-router-dom';
+import logo from '../laborant.png';
+import {Logout} from './Login';
+import { useAuth } from '../services/AuthContext';
 
 const Header = () => {
-  return (
-    <header className="Header">
-      <div style={{display: 'flex', alignItems: 'center'}}>
-  <Link to="/"><img src={logo} alt="logo" width="150" height="75" /></Link>
-  {localStorage.getItem('username') !== undefined && localStorage.getItem('username')!== null && (
-  <text style={{color: 'whitesmoke', fontSize: '20px', marginLeft: '250px'}}>
-    You are logged in as: <b>{localStorage.getItem('username')}</b>
-  </text>
-  )}
-  <div style={{flex: 1}}></div>
-  {localStorage.getItem('username') === 'admin' && (
-          <button style={{marginRight: '20px'}}>
-            <Link to="/panel">Admin Panel</Link>
-          </button>
-        )}
-  <Logout />  
-</div>
+    const { authState } = useAuth();
 
-      
-    </header>
-  );
-}
+    return (
+        <header className="Header">
+            <div className="header__content">
+                <Link to="/">
+                    <img src={logo} alt="logo" width="150" height="75" />
+                </Link>
+                {authState.username && (
+                    <p className="header__username">
+                        You are logged in as: <b>{authState.username}</b>
+                    </p>
+                )}
+                <div className="header__spacer" />
+                {authState.isAdmin && (
+                    <button className="header__button">
+                        <Link to="/panel">Admin Panel</Link>
+                    </button>
+                )}
+                {authState.isAuthenticated && (
+                    <button className="header__button">
+                        <Link to="/dashboard">Dashboard</Link>
+                    </button>
+                )}
+                {authState.isAuthenticated && <Logout />}
+            </div>
+        </header>
+    );
+};
 
 export default Header;

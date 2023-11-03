@@ -1,79 +1,110 @@
 import React ,{useState} from "react";
-import { getHeaders } from "../services/AuthHeader";
+import {getHeaders} from "../services/AuthHeader";
 import axios from "axios";
+import {Link, useNavigate} from "react-router-dom";
 
 
 const AddUserComponent = () => {
-
     const [message, setMessage] = useState('');
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-
+    const [error, setError] = useState('');
+    const [email, setEmail] = useState('');
+    const [role, setRole] = useState('USER');
+    const navigate = useNavigate();
     const saveUser = (e) => {
         e.preventDefault();
-        let user = {username: username,password:password,user_role:'USER'};
-        
-        axios.post('http://localhost:8080/users/add',user,getHeaders())
-        .then((response) => {
-            console.log(response.status);
-            if (response.status === 200) {
-                setMessage(<p style={{color: 'green'}}>User Added Successfully. Redirecting...</p>);
-                setTimeout(() => {
-                    window.location.replace('/users');
-                  }, 1500);
-              } else if (response.status === 400) {
-                setMessage(`Failed to add user. ${response.data.message}`);
-              } else {
-                setMessage(`Failed to add user. HTTP status code: ${response.status}`);
-              }
+        let user = {email:email,user_role:role};
+
+        axios.post(`${process.env.REACT_APP_SPRING_HOST}/users/add-user-with-email?`,user,getHeaders())
+            .then((response) => {
+                console.log(response.status);
+                if (response.status === 200) {
+                    setMessage('User Added Successfully. Redirecting...');
+                    setTimeout(() => {
+                        navigate("/users");
+                    }, 1500);
+                } else if (response.status === 400) {
+                    setError(`Failed to add user. ${response.data.message}`);
+                } else {
+                    setError(`Failed to add user. HTTP status code: ${response.status}`);
+                }
             }).catch((error) => {
-                setMessage(`Failed to add user. Error: ${error.response.data.message}`);
-            });
-          
+            setError(`Failed to add user. Error: ${error.response.data.message}`);
+        });
+
         console.log('user => ' + JSON.stringify(user));
+    }
+
+    const handleRoleChange = (e) => {
+        setRole(e.target.value);
     }
 
     return(
         <div className="container">
             <div className="row">
                 <div className="card col-md-6 offset-md-3 offset-md-3">
-                    <h3 className="text-center">Add User</h3>
+                    <br />
+                    <h3 className="text-center">
+                        Add User<Link to="/bulk-add-user" className={"btn btn-primary float-right"} style={{ marginLeft: '20px' }}>Bulk Add</Link>
+                    </h3>
                     <div className="card-body">
                         <form>
                             <div className="form-group">
-                                <label className = "form-label">Username:</label>
+                                <label className="form-label">Email:</label>
                                 <input
-                                    type = "text"
-                                    placeholder = "Enter Username"
-                                    name = "username" 
-                                    className = "form-control"
-                                    value = {username} 
-                                    onChange = {e => setUsername(e.target.value)}
-                                >
-                                </input>
+                                    type="text"
+                                    placeholder="Enter Email"
+                                    name="username"
+                                    className="form-control"
+                                    value={email}
+                                    onChange={e => setEmail(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="form-group" style={{ marginTop: '20px' }}>
+                                <label className="form-label" style={{ marginBottom: '10px', display: 'block' }}>Role:</label>
+                                <div className="form-check form-check-inline" style={{ marginBottom: '10px' }}>
+                                    <input
+                                        type="radio"
+                                        name="role"
+                                        value="USER"
+                                        checked={role === "USER"}
+                                        onChange={handleRoleChange}
+                                        className="form-check-input"
+                                    />
+                                    <label className="form-check-label" style={{ marginLeft: '5px' }}>
+                                        User
+                                    </label>
                                 </div>
 
-                                <div className="form-group">
-                                <label className = "form-label">Password:</label>
-                                <input
-                                    type = "text"
-                                    placeholder = "Enter Password"
-                                    name = "password"
-                                    className = "form-control"
-                                    value = {password}
-                                    onChange = {e => setPassword(e.target.value)}
-                                >
-                                </input>
+                                <div className="form-check form-check-inline" style={{ marginBottom: '20px' }}>
+                                    <input
+                                        type="radio"
+                                        name="role"
+                                        value="ADMIN"
+                                        checked={role === "ADMIN"}
+                                        onChange={handleRoleChange}
+                                        className="form-check-input"
+                                    />
+                                    <label className="form-check-label" style={{ marginLeft: '5px' }}>
+                                        Admin
+                                    </label>
                                 </div>
+
                                 <div>
-                                 {message}
+                                    {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
+                                    {message && <div style={{ color: 'green', marginBottom: '10px' }}>{message}</div>}
                                 </div>
-                                <button className = "btn btn-success" onClick={(e) => saveUser(e)}>Save</button>
+
+                                <button className="btn btn-success" onClick={(e) => saveUser(e)}>Save</button>
+                            </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
+
     )
 }
+
 export default AddUserComponent;
+

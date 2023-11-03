@@ -1,7 +1,8 @@
 target/
-.mvn/wrapper/maven-wrapper.jar
+/backend/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+.env
 
 ### STS ###
 .apt_generated
@@ -30,8 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
-.env
-/src/main/resources/ldap.properties
+backend/.env
+/backend/src/main/resources/ldap.properties
 
 /node_modules
 /.pnp
@@ -54,3 +55,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+/frontend/node_modules/
+/frontend/node_modules/

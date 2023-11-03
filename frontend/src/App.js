@@ -1,47 +1,75 @@
 import './App.css';
-import LabListComponents from './components/LabListComponents';
+import ReservationListComponent from './components/ReservationListComponent';
 import Header from './components/Header';
-import Footer from './components/Footer';
-import {BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Footer from './services/Footer';
+import {BrowserRouter as Router, Routes, Route, useNavigate} from 'react-router-dom';
 import AddLabComponent from './components/AddLabComponent';
 import LoginForm from './components/Login';
-import {checkAuthentication} from './services/AuthHeader'
 import EditLabComponent from './components/EditLabComponent';
-import RunCommandComponent from './components/RunCommandComponent';
 import BulkAddLabComponent from './components/BulkAddLabComponent';
 import UserListComponents from './components/UserListComponents';
 import AddUserComponent from './components/AddUserComponent';
 import NotFound from './components/NotFound';
 import NotAuthorized from './components/NotAuthorized'
-import AssignUsers from './components/AssignUserComponent';
-import LabUserComponent from './components/LabUserComponent';
-
+import AdminPanelComponent from './components/AdminPanelComponent';
+import AssignUsersPanel from './components/AssignUserPanel';
+import AssignTeamPanel from "./components/AssignTeamPanel";
+import AddTeamComponent from "./components/AddTeamComponent";
+import TeamListComponents from "./components/TeamListComponents";
+import AccountDashboard from "./components/AccountDashboard";
+import LabListComponent from "./components/LabListComponent";
+import ForgotPasswordComponent from "./components/ForgotPasswordComponent";
+import BulkAddUserComponent from "./components/BulkAddUserComponent";
+import {useEffect} from "react";
 function App() {
-  checkAuthentication();
   function isAdmin() {
-    const username = localStorage.getItem('username');
-    if (username === 'admin') {
+    if (localStorage.getItem('isAdmin') === 'true') {
       return true;
     } else {
       return false;
     }
-  }  
+  }
+
+    function CheckAuthentication() {
+        const navigate = useNavigate();
+
+        useEffect(() => {
+            if (!localStorage.getItem("isAuthenticated") && window.location.pathname !== "/login") {
+                navigate("/login");
+            }
+            else {
+                if (!localStorage.getItem("hasEmail")  && window.location.pathname !== "/dashboard") {
+                    navigate("/dashboard");
+                }
+            }
+        }, [navigate]);
+
+        return null;
+    }
   return (
     <div className="App">
-      <Router>
+      <Router basename={"laborant"}>
+          <CheckAuthentication />
       <Header />
       <div className= "container">
         <Routes>
-          <Route exact path = "/" element = {<LabListComponents/>}></Route>
-          <Route path = "/labs" element = {<LabListComponents/>}></Route>
-          <Route path = "/add-lab" element = {<AddLabComponent/>}></Route>
+          <Route path = "/" element = {<ReservationListComponent/>}></Route>
+          <Route path = "/labs" element = {<ReservationListComponent/>}></Route>
+          <Route path = "/add-lab" element = { isAdmin() ? <AddLabComponent/> : <NotAuthorized/>}></Route>
           <Route path="/login" element={<LoginForm/>}></Route>
+            <Route path="/forgot-password" element={<ForgotPasswordComponent/>}></Route>
+            <Route path="/approve-email" element={<AccountDashboard/>}></Route>
           <Route path="/edit-lab/:labName" element={<EditLabComponent/>}></Route> 
-          <Route path="/run-command/:labName" element={<RunCommandComponent/>}></Route>
-          <Route path="/bulk-add" element={<BulkAddLabComponent/>}></Route>
+          <Route path="/bulk-add-lab" element={
+              isAdmin() ? <BulkAddLabComponent/> : <NotAuthorized/>
+          }></Route>
+            <Route path="/bulk-add-user" element={
+                isAdmin() ? <BulkAddUserComponent/> : <NotAuthorized/>
+            }></Route>
+          <Route path="/lab-list" element={<LabListComponent/>}></Route>}
           <Route path="panel/" element={
               isAdmin() ? (
-                <LabUserComponent/>
+                <AdminPanelComponent/>
               ) : (
                 <NotAuthorized/>
               )
@@ -49,7 +77,15 @@ function App() {
           />
           <Route path="panel/assign-users/" element={
               isAdmin() ? (
-                <AssignUsers/>
+                <AssignUsersPanel/>
+              ) : (
+                <NotAuthorized/>
+              )
+          }
+          />
+          <Route path="panel/assign-teams/" element={
+              isAdmin() ? ( 
+                <AssignTeamPanel/>
               ) : (
                 <NotAuthorized/>
               )
@@ -63,14 +99,31 @@ function App() {
               )
             }
           />
-          <Route path="/add-user"  element={
+          <Route path='/add-team' element={
+                isAdmin() ? (
+                    <AddTeamComponent />
+                ) : (
+                    <NotAuthorized/>
+                )
+            }
+            />
+          <Route path='/add-user'  element={
               isAdmin() ? (
                 <AddUserComponent />
               ) : (
                 <NotAuthorized/>
               )
             }
-          />
+            />
+            <Route path='/teams' element={
+                isAdmin() ? (
+                    <TeamListComponents />
+                ) : (
+                    <NotAuthorized/>
+                )
+            }
+            />
+            <Route path='/dashboard' element={<AccountDashboard/>}></Route>
           <Route path="*" element={<NotFound/>}></Route>          
         </Routes>
       </div>   
